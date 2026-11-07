@@ -1120,17 +1120,25 @@ document.title="Zarakoustra";
 document.querySelector("header h1").textContent="Zarakoustra";
 
 /* Nouvelles villes */
-const cities=[
-"Bonoua","Yaou","Grand-Bassam",
-"Adiaké","Assinie","Aboisso"
-];
+["Bonoua","Yaou","Grand-Bassam","Adiaké","Assinie","Aboisso"].forEach(v=>{
 ["vi","fv"].forEach(id=>{
 const s=$(id);
-if(s)cities.forEach(v=>{
-if(![...s.options].some(o=>o.value===v))
-s.add(new Option(v,v));
+if(s&&![...s.options].some(o=>o.value===v))s.add(new Option(v,v));
 });
 });
+
+/* Style des paramètres */
+const css=document.createElement("style");
+css.textContent=`
+#settingsPanel{padding:16px;gap:0}
+#settingsPanel>h2{margin:0 0 4px;font-size:20px}
+#settingsPanel .sg{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+#settingsPanel .sg-title{margin:0 0 2px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--mu)}
+#settingsPanel button,#settingsPanel a.lnk{display:block;width:100%;min-height:48px;text-align:left;font-size:15px;font-weight:600;padding:0 14px}
+#settingsPanel .sfield{display:flex;flex-direction:column;gap:6px}
+#settingsPanel .sfield label{font-size:14px;font-weight:600;color:var(--mu)}
+`;
+document.head.append(css);
 
 /* Paramètres */
 const panel=document.createElement("section");
@@ -1138,110 +1146,87 @@ panel.id="settingsPanel";
 panel.innerHTML=`
 <h2>Paramètres</h2>
 
-<h3>Mon espace</h3>
-<button class="btn2" data-open="xmine">📋 Mes annonces</button>
-<button class="btn2" data-open="xrev">⭐ Mes avis</button>
-<button class="btn2" data-open="xfaq">❓ Questions fréquentes</button>
-<button class="btn2" data-open="xnotif">🔔 Notifications</button>
-<button class="btn2" data-open="xfol">👥 Mes abonnés</button>
-<button class="btn2" data-open="xmoney">💰 Faire l’argent</button>
-<button class="btn2" data-open="xprofile">📤 Partager mon profil</button>
-<button class="btn2" data-open="xname">✏️ Mon nom</button>
-<button class="btn2" data-open="xagency">🚩 Contacter l’agence</button>
+<div class="sg">
+<p class="sg-title">Compte</p>
+<button class="btn2" data-open="xname">Mon nom</button>
+<div id="secSlot" style="display:contents"></div>
+</div>
 
-<h3>Préférences</h3>
+<div class="sg">
+<p class="sg-title">Activité</p>
+<button class="btn2" data-open="xmine">Mes annonces</button>
+<button class="btn2" data-open="xrev">Avis reçus</button>
+<button class="btn2" data-open="xfol">Abonnés</button>
+<button class="btn2" data-open="xnotif">Notifications</button>
+</div>
 
-<label for="appLanguage">Langue</label>
-<select id="appLanguage">
-<option value="fr">🇫🇷 Français</option>
-<option value="en">🇬🇧 English</option>
-<option value="es">🇪🇸 Español</option>
-<option value="de">🇩🇪 Deutsch</option>
-</select>
+<div class="sg">
+<p class="sg-title">Partager</p>
+<button class="btn2" data-open="xmoney">Faire l’argent</button>
+<button class="btn2" data-open="xprofile">Partager mon profil</button>
+</div>
 
-<label>Apparence</label>
+<div class="sg">
+<p class="sg-title">Aide</p>
+<button class="btn2" data-open="xfaq">Questions fréquentes</button>
+<button class="btn2" data-open="xagency">Contacter l’agence</button>
+<a class="lnk btn2" href="https://wa.me/2250170075417" target="_blank" rel="noopener noreferrer">WhatsApp de l’agence</a>
+<a class="lnk btn2" href="mailto:businessci1213@gmail.com">E-mail de l’agence</a>
+</div>
+
+<div class="sg">
+<p class="sg-title">Préférences</p>
+<div class="sfield">
+<label for="appTheme">Apparence</label>
 <select id="appTheme">
-<option value="light">☀️ Mode clair</option>
-<option value="dark">🌙 Mode sombre</option>
+<option value="light">Clair</option>
+<option value="dark">Sombre</option>
 </select>
-
-<h3>Agence ZARAKOUSTRA</h3>
-<a class="lnk btn" href="https://wa.me/2250170075417">
-Contacter sur WhatsApp
-</a>
-<a class="lnk btn2" href="mailto:businessci1213@gmail.com">
-Envoyer un e-mail
-</a>
+</div>
+</div>
 `;
-
-
 $("xacc").append(panel);
 
+/* Ouverture des rubriques */
 panel.querySelectorAll('[data-open]').forEach(b=>{
 b.addEventListener('click',()=>{
 const target=b.dataset.open;
-
 document.body.classList.remove('settings-open');
 
-if(target==='xagency'){
-$('xag').scrollIntoView();
-return;
-}
-
-if(target==='xname'){
-$('xname').scrollIntoView();
-return;
-}
-
+if(target==='xagency'){$('xag').scrollIntoView();return;}
+if(target==='xname'){$('xname').scrollIntoView();return;}
 if(target==='xprofile'){
-const c=[...$('xgrid').querySelectorAll('.card')]
-.find(e=>e.textContent.includes('Partager mon profil'));
+const c=[...$('xgrid').querySelectorAll('.card')].find(e=>e.textContent.includes('Partager mon profil'));
 if(c)c.click();
 return;
 }
 
-const card=[...$('xgrid').querySelectorAll('.card')]
-.find(e=>e.textContent.includes(
-({
-xmine:'Mes annonces',
-xrev:'Avis',
-xfaq:'FAQ',
-xnotif:'Notifications',
-xfol:'Abonnés',
-xmoney:'Faire l’argent'
-})[target]||'---'
-));
-
+const names={xmine:'Mes annonces',xrev:'Avis',xfaq:'FAQ',xnotif:'Notifications',xfol:'Abonnés',xmoney:'Faire l’argent'};
+const card=[...$('xgrid').querySelectorAll('.card')].find(e=>e.textContent.includes(names[target]||'---'));
 if(card)card.click();
 });
 });
 
-/* Mémorisation du thème */
+/* Apparence */
 const theme=$("appTheme");
-const lang=$("appLanguage");
-
 theme.value=localStorage.getItem("zarathoustra_theme")||"light";
-lang.value=localStorage.getItem("zarathoustra_language")||"fr";
-
 function applyTheme(){
 document.documentElement.dataset.theme=theme.value;
 localStorage.setItem("zarathoustra_theme",theme.value);
 }
 theme.onchange=applyTheme;
-lang.onchange=()=>{
-localStorage.setItem("zarathoustra_language",lang.value);
-};
 applyTheme();
 
 /* Correction du nom dans les textes générés */
 const observer=new MutationObserver(()=>{
 document.querySelectorAll("header h1").forEach(e=>{
-if(e.textContent==="ZARATHOUSTRA")e.textContent="Zarathoustra";
+if(e.textContent==="ZARATHOUSTRA")e.textContent="Zarakoustra";
 });
 });
 observer.observe(document.body,{childList:true,subtree:true});
 })();
-</script><script type="module">
+</script>
+<script type="module">
 import {getApp} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
 import {getAuth,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
 import {getFirestore,collection,query,where,onSnapshot,deleteDoc,doc} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
