@@ -2780,6 +2780,10 @@ b.type='button';b.className='btn';b.textContent='➕ Publier une annonce';
 b.onclick=()=>$('top').click();
 p.append(t,s,b);
 }).observe($('list'),{childList:true});
+</script><script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
+}
 </script>
 </body>
 </html>
