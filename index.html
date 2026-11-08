@@ -4,17 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#A8DDF7">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap">
-<link rel="manifest" href="manifest2.json">
-<link rel="apple-touch-icon" href="icon-192.png">
 <title>ZARATHOUSTRA</title>
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-MZ78EHSL6R"></script>
-<script>
-window.dataLayer=window.dataLayer||[];
-function gtag(){dataLayer.push(arguments);}
-gtag('js',new Date());
-gtag('config','G-MZ78EHSL6R');
-</script>
 <style>
 :root{
 --bg:#F4FAFF;--tx:#0B2545;--mu:#3E5C76;
@@ -60,75 +50,11 @@ border-radius:10px;padding:8px;font-size:14px}
 .chk input{width:auto;min-height:0}
 #terms p{margin:0;font-size:14px}
 [hidden]{display:none!important}
-
-header{padding:10px 14px}
-  
-.pf{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
-.pft{font-size:11px;font-weight:700}
-.pfa{position:relative;width:44px;height:44px}
-.pfa img{width:100%;height:100%;border-radius:50%;object-fit:cover;border:2px solid #fff}
-.pfc{position:absolute;right:-6px;bottom:-4px;font-size:12px;font-style:normal;
-background:#fff;border-radius:50%;padding:2px}
-header #top{background:transparent;color:#000;border:2px solid #000}
 </style>
-<style>
-/* Photo de profil : bord noir, "Profil" sous la photo */
-.pfa img{border:3px solid #000}
-.pft{order:2;margin-top:2px}
-.pfc{border:1.5px solid #000}
-  
-header h1{
-width:max-content;
-flex:0 0 auto;
-margin:0 auto;
-padding:6px 0.5cm;
-text-indent:0;
-text-align:center;
-border:3px solid #000;border-radius:14px;
-background:#fff;
-box-shadow:4px 4px 0 #000;
-animation:none;
-font-family:'Montserrat','Arial Black',Arial,sans-serif;
-font-weight:900;font-size:16px;letter-spacing:.02em;
-line-height:1.2;
-text-transform:uppercase;white-space:nowrap;
-color:#0B2545;
-text-shadow:
--1px -1px 0 #000,1px -1px 0 #000,
--1px 1px 0 #000,1px 1px 0 #000;
-}
-header #top{flex:0 0 auto;padding:0 10px;font-size:14px;min-height:40px}
-border:3px solid #000;border-radius:14px;
-background:#fff;
-box-shadow:4px 4px 0 #000;
-animation:none;
-font-family:'Montserrat','Arial Black',Arial,sans-serif;
-font-weight:900;font-size:clamp(18px,5vw,26px);letter-spacing:.03em;
-text-transform:uppercase;white-space:nowrap;min-width:0;
-color:#0B2545;
-text-shadow:
--2px -2px 0 #000,2px -2px 0 #000,
--2px 2px 0 #000,2px 2px 0 #000,
-0 3px 0 #000;
-}
-@keyframes zkneon{
-0%,100%{box-shadow:0 0 8px #00E5FF,inset 0 0 8px rgba(0,229,255,.45)}
-50%{box-shadow:0 0 16px #00E5FF,inset 0 0 12px rgba(0,229,255,.7)}
-}
-@media (prefers-reduced-motion:reduce){header h1{animation:none}}
-</style>  
 </head>
 <body>
 <header>
-<label class="pf">
-<span class="pft">Profil</span>
-<span class="pfa">
-<img id="pfimg" alt="Profil" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%23fff'/%3E%3Ccircle cx='20' cy='15' r='7' fill='%233E5C76'/%3E%3Cellipse cx='20' cy='36' rx='13' ry='10' fill='%233E5C76'/%3E%3C/svg%3E">
-<i class="pfc">📷</i>
-</span>
-<input id="pfin" type="file" accept="image/*" hidden>
-</label>
-<h1>ZARAKOUSTRA</h1>
+<h1>ZARATHOUSTRA</h1>
 <button id="top" type="button">Connexion</button>
 </header>
 <main>
@@ -488,4 +414,60 @@ a.append(el('b','Vendeurs ('+sel.size+')'));
 sel.forEach(s=>{
 const c=el('div',null,'mod');
 c.append(el('span',(s.name||'?')+' · '+s.n+' annonce(s)'+(verified.has(s.uid)?' · ✓ vérifié':'')+(blocked.has(s.uid)?' · BLOQUÉ':'')));
-const v=el('button',verified.has(s.uid)
+const v=el('button',verified.has(s.uid)?'Retirer le badge':'Vérifier ce vendeur','btn');v.type='button';
+v.onclick=()=>verified.has(s.uid)?deleteDoc(doc(db,'verified',s.uid)):setDoc(doc(db,'verified',s.uid),{t:Date.now()});
+const b=el('button',blocked.has(s.uid)?'Débloquer':'Bloquer cet utilisateur','btn2');b.type='button';
+b.onclick=()=>{if(blocked.has(s.uid))deleteDoc(doc(db,'blocked',s.uid));else if(confirm('Bloquer cet utilisateur ?'))setDoc(doc(db,'blocked',s.uid),{t:Date.now()});};
+c.append(v,b);a.append(c);
+});
+}
+
+function err(e){
+const c=e?.code||'';
+$('amsg').textContent=c.includes('email-already')?'Cet e-mail a déjà un compte.':
+c.includes('weak')?'Mot de passe trop court (6 minimum).':
+c.includes('invalid')?'E-mail ou mot de passe incorrect.':'Une erreur est survenue.';
+}
+
+['q','fc','fv'].forEach(k=>$(k).oninput=render);
+$('top').onclick=()=>user?($('sellp').hidden=!$('sellp').hidden):($('authp').hidden=!$('authp').hidden);
+$('tl').onclick=()=>{$('terms').hidden=false;$('terms').scrollIntoView();};
+$('tclose').onclick=()=>$('terms').hidden=true;
+$('login').onclick=()=>signInWithEmailAndPassword(auth,$('em').value.trim(),$('pw').value).catch(err);
+$('signup').onclick=()=>{
+if(!$('cg').checked){$('amsg').textContent='Accepte les conditions pour créer un compte.';return;}
+createUserWithEmailAndPassword(auth,$('em').value.trim(),$('pw').value).catch(err);
+};
+$('logout').onclick=()=>signOut(auth);
+
+onAuthStateChanged(auth,u=>{
+user=u;$('amsg').textContent='';
+unsubs.forEach(f=>f());unsubs=[];
+adm=!!(u&&ADMIN_UIDS.includes(u.uid));
+all=[];reps=[];blocked=new Set();sales=[];buyerSales=[];sellerSales=[];
+renderAdm();
+$('top').textContent=u?'Vendre':'Connexion';
+$('authp').hidden=true;$('sellp').hidden=!u;$('salesPanel').hidden=!u;
+if(u){
+$('who').textContent='Connecté : '+u.email;$('uidp').textContent=u.uid;
+unsubs.push(onSnapshot(query(collection(db,'sales'),where('buyerUid','==',u.uid)),s=>{
+buyerSales=s.docs.map(d=>({id:d.id,...d.data()}));mergeSales();
+},()=>{}));
+unsubs.push(onSnapshot(query(collection(db,'sales'),where('sellerUid','==',u.uid)),s=>{
+sellerSales=s.docs.map(d=>({id:d.id,...d.data()}));mergeSales();
+},()=>{}));
+if(adm){
+unsubs.push(onSnapshot(collection(db,'reports'),s=>{reps=s.docs.map(d=>({id:d.id,...d.data()}));renderAdm();},()=>{}));
+unsubs.push(onSnapshot(collection(db,'products'),s=>{all=s.docs.map(d=>({id:d.id,...d.data()}));renderAdm();},()=>{}));
+unsubs.push(onSnapshot(collection(db,'blocked'),s=>{blocked=new Set(s.docs.map(d=>d.id));renderAdm();},()=>{}));
+}
+}
+render();renderSales();
+});
+
+$('ph').onchange=async e=>{
+photos=[];$('pv').replaceChildren();
+const fl=Array.from(e.target.files);
+if(fl.length>4)msg('4 photos maximum.');
+for(const f of fl.slice(0,4)){
+try{const d=await shrink
