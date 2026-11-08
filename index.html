@@ -8,103 +8,103 @@
 <title>ZARATHOUSTRA</title>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-MZ78EHSL6R"></script>
 <script>
-fenêtre.dataLayer=fenêtre.dataLayer||[];
-fonction gtag(){dataLayer.push(arguments);}
+window.dataLayer=window.dataLayer||[];
+function gtag(){dataLayer.push(arguments);}
 gtag('js',new Date());
 gtag('config','G-MZ78EHSL6R');
 </script>
 <style>
-:racine{
+:root{
 --bg:#F4FAFF;--tx:#0B2545;--mu:#3E5C76;
 --bd:#CFE8F7;--cd:#FFFFFF;--nv:#A8DDF7;
 --hd:#0B2545;--ac:#0B6FA8;
 color-scheme:light;box-sizing:border-box
 }
 *{box-sizing:border-box}
-corps{marge:0;padding-top:env(safe-area-inset-top,0px);
+body{margin:0;padding-top:env(safe-area-inset-top,0px);
 padding-bottom:env(safe-area-inset-bottom,0px);
-arrière-plan:var(--bg);couleur:var(--tx);police:system-ui,sans-serif}
+background:var(--bg);color:var(--tx);font-family:system-ui,sans-serif}
 header{background:var(--nv);color:var(--hd);padding:14px 16px;
 display:flex;align-items:center;justify-content:space-between;gap:8px}
-h1{marge:0;taille-police:19px}
+h1{margin:0;font-size:19px}
 main{max-width:560px;margin:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
-h2{marge:4px 0}
+h2{margin:4px 0}
 input,textarea,select{width:100%;min-height:44px;padding:8px 12px;
-taille de police : 16 px ; bordure : 1 px solide var(--bd) ; rayon de bordure : 10 px ;
-arrière-plan:var(--cd);couleur:var(--tx)}
-bouton{hauteur minimale:48px;taille de police:16px;poids de police:700;bordure arrondie:12px;
+font-size:16px;border:1px solid var(--bd);border-radius:10px;
+background:var(--cd);color:var(--tx)}
+button{min-height:48px;font-size:16px;font-weight:700;border-radius:12px;
 padding:0 16px;border:0;cursor:pointer}
-bouton d'en-tête{hauteur minimale:40px;arrière-plan:#fff;couleur:#0B2545}
+header button{min-height:40px;background:#fff;color:#0B2545}
 .btn{background:#5BB8EA;color:#0B2545}
 .btn2{background:var(--cd);color:var(--ac);border:1px solid var(--ac)}
 .lnk{display:flex;align-items:center;justify-content:center;text-decoration:none;
-hauteur minimale : 48 px ; rayon de bordure : 12 px ; poids de police : 700}
+min-height:48px;border-radius:12px;font-weight:700}
 section{background:var(--cd);border:1px solid var(--bd);border-radius:12px;
 padding:12px;display:flex;flex-direction:column;gap:8px}
 .row{display:flex;gap:8px}
 #list{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-bouton.card{min-height:0;padding:8px;font-weight:400;text-align:left;
-arrière-plan : var(--cd); bordure : 1px solide var(--bd); affichage : flex;
+button.card{min-height:0;padding:8px;font-weight:400;text-align:left;
+background:var(--cd);border:1px solid var(--bd);display:flex;
 flex-direction:column;gap:4px;color:var(--tx);font-size:15px}
-bouton.carte b{taille de police:16px}
+button.card b{font-size:16px}
 .mu{color:var(--mu);margin:0;font-size:14px}
 .ok{color:var(--ac);font-weight:700;font-size:13px;margin:0}
 .strip{display:flex;gap:8px;overflow-x:auto}
-.strip img{hauteur:200px;largeur:auto;bordure-radius:8px;flex:none}
+.strip img{height:200px;width:auto;border-radius:8px;flex:none}
 .safe{border:1px solid var(--ac);border-radius:10px;padding:10px;font-size:14px;margin:0}
 .mod{display:flex;flex-direction:column;gap:6px;border:1px solid var(--bd);
 border-radius:10px;padding:8px;font-size:14px}
 .chk{display:flex;gap:8px;align-items:center;font-size:14px}
 .chk input{width:auto;min-height:0}
 #terms p{margin:0;font-size:14px}
-[masqué]{afficher:aucun!important}
+[hidden]{display:none!important}
 
 header{padding:10px 14px}
-  
+
 .pf{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
 .pft{font-size:11px;font-weight:700}
 .pfa{position:relative;width:44px;height:44px}
 .pfa img{width:100%;height:100%;border-radius:50%;object-fit:cover;border:2px solid #fff}
 .pfc{position:absolute;right:-6px;bottom:-4px;font-size:12px;font-style:normal;
-arrière-plan : #fff;bordure arrondie : 50 %;padding : 2px}
-en-tête #top{background:transparent;color:#000;border:2px solid #000}
+background:#fff;border-radius:50%;padding:2px}
+header #top{background:transparent;color:#000;border:2px solid #000}
 </style>
 <style>
 /* Photo de profil : bord noir, "Profil" sous la photo */
 .pfa img{border:3px solid #000}
-.pft{ordre:2;marge-haut:2px}
+.pft{order:2;margin-top:2px}
 .pfc{border:1.5px solid #000}
-  
-titre h1{
-largeur:max-content;
+
+header h1{
+width:max-content;
 flex:0 0 auto;
-marge:0 auto;
-marge intérieure : 6px 0,5cm ;
-indentation du texte : 0 ;
-alignement du texte : centré ;
-bordure:3px solide #000;bordure-radius:14px;
-arrière-plan : #fff;
-ombre portée : 4px 4px 0 #000;
-animation : aucune ;
+margin:0 auto;
+padding:6px 0.5cm;
+text-indent:0;
+text-align:center;
+border:3px solid #000;border-radius:14px;
+background:#fff;
+box-shadow:4px 4px 0 #000;
+animation:none;
 font-family:'Montserrat','Arial Black',Arial,sans-serif;
-police-weight:900;police-size:16px;letter-spacing:.02em;
-hauteur de ligne : 1,2 ;
+font-weight:900;font-size:16px;letter-spacing:.02em;
+line-height:1.2;
 text-transform:uppercase;white-space:nowrap;
-couleur : #0B2545 ;
-ombre portée du texte :
+color:#0B2545;
+text-shadow:
 -1px -1px 0 #000,1px -1px 0 #000,
 -1px 1px 0 #000,1px 1px 0 #000;
 }
-en-tête #top{flex:0 0 auto;padding:0 10px;font-size:14px;min-height:40px}
-bordure:3px solide #000;bordure-radius:14px;
-arrière-plan : #fff;
-ombre portée : 4px 4px 0 #000;
-animation : aucune ;
+header #top{flex:0 0 auto;padding:0 10px;font-size:14px;min-height:40px}
+border:3px solid #000;border-radius:14px;
+background:#fff;
+box-shadow:4px 4px 0 #000;
+animation:none;
 font-family:'Montserrat','Arial Black',Arial,sans-serif;
 font-weight:900;font-size:clamp(18px,5vw,26px);letter-spacing:.03em;
 text-transform:uppercase;white-space:nowrap;min-width:0;
-couleur : #0B2545 ;
-ombre portée du texte :
+color:#0B2545;
+text-shadow:
 -2px -2px 0 #000,2px -2px 0 #000,
 -2px 2px 0 #000,2px 2px 0 #000,
 0 3px 0 #000;
@@ -114,9 +114,9 @@ ombre portée du texte :
 50%{box-shadow:0 0 16px #00E5FF,inset 0 0 12px rgba(0,229,255,.7)}
 }
 @media (prefers-reduced-motion:reduce){header h1{animation:none}}
-</style>  
+</style>
 </head>
-<corps>
+<body>
 <header>
 <label class="pf">
 <span class="pft">Profil</span>
@@ -130,16 +130,16 @@ ombre portée du texte :
 <button id="top" type="button">Connexion</button>
 </header>
 <main>
-<section id="authp" caché>
+<section id="authp" hidden>
 <h2>Connexion</h2>
 <input id="em" type="email" placeholder="E-mail" autocomplete="email">
 <input id="pw" type="password" placeholder="Mot de passe (6 caractères minimum)">
-<label class="chk"><input type="checkbox" id="cg"> J'accepte les conditions d'utilisation</label>
+<label class="chk"><input type="checkbox" id="cg"> J’accepte les conditions d’utilisation</label>
 <button class="btn" id="login" type="button">Se connecter</button>
 <button class="btn2" id="signup" type="button">Créer un compte</button>
 <p class="mu" id="amsg"></p>
 </section>
-<section id="sellp" caché>
+<section id="sellp" hidden>
 <h2>Publier une annonce</h2>
 <p class="mu" id="who"></p>
 <details><summary class="mu">Mon identifiant</summary>
@@ -174,31 +174,31 @@ ombre portée du texte :
 <section id="detail" hidden></section>
 <div id="list"></div>
 <section id="terms" hidden>
-<h2>Conditions d'utilisation</h2>
-<p>1. Ce site met en relation vendeurs et acheteurs. Il n'est pas partie aux ventes.</p>
+<h2>Conditions d’utilisation</h2>
+<p>1. Ce site met en relation vendeurs et acheteurs. Il n’est pas partie aux ventes.</p>
 <p>2. Les produits illégaux, fausses annonces et arnaques sont interdits.</p>
 <p>3. Les vendeurs doivent fournir des informations exactes.</p>
-<p>4. Acheteurs : voyez le produit avant de payer et n'envoie jamais d'argent à l'avance.</p>
+<p>4. Acheteurs : vois le produit avant de payer et n’envoie jamais d’argent à l’avance.</p>
 <p>5. Le numéro de téléphone est réservé aux utilisateurs connectés.</p>
-<p>6. L'administrateur peut refuser ou supprimer une annonce abusive, ou bloquer un compte.</p>
+<p>6. L’administrateur peut refuser ou supprimer une annonce abusive, ou bloquer un compte.</p>
 <p>7. Tu peux signaler toute annonce suspecte.</p>
 <button class="btn2" id="tclose" type="button">Fermer</button>
 </section>
-<button class="btn2" id="tl" type="button">Conditions d'utilisation</button>
+<button class="btn2" id="tl" type="button">Conditions d’utilisation</button>
 </main>
 <script type="module">
 import {initializeApp} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
-importer {
-obtenirAuthentification,onAuthStateChanged,signInWithEmailAndPassword,
-créer un utilisateur avec adresse e-mail et mot de passe, se déconnecter
-} depuis "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
-importer {
+import {
+getAuth,onAuthStateChanged,signInWithEmailAndPassword,
+createUserWithEmailAndPassword,signOut
+} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+import {
 getFirestore,collection,collectionGroup,addDoc,setDoc,onSnapshot,query,where,
-supprimerDoc, mettreàjourDoc, document, obtenirDoc, horodatageserveur
-} de "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
+deleteDoc,updateDoc,doc,getDoc,serverTimestamp
+} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
 
 const app=initializeApp({
-Clé API : "AIzaSyC4DsEYJOfILmytTRfgaPr1QymJGgp-87o",
+apiKey:"AIzaSyC4DsEYJOfILmytTRfgaPr1QymJGgp-87o",
 authDomain:"business-express-ci.firebaseapp.com",
 projectId:"business-express-ci",
 storageBucket:"business-express-ci.firebasestorage.app",
@@ -211,7 +211,7 @@ const auth=getAuth(app),db=getFirestore(app);
 const ADMIN_UIDS=["rBxaE8OltfeNwvpUivDdqZqhxjl1"];
 
 const CATS=['Téléphones','Électronique','Mode','Maison','Véhicules',
-'Immobilier', 'Services', 'Livres & formations', 'Autres'];
+'Immobilier','Services','Livres & formations','Autres'];
 const CITIES=['Abidjan','Bouaké','Yamoussoukro','Daloa','San-Pédro','Korhogo','Autre'];
 const UNITS=[['','Prix fixe'],['par mois','Par mois'],['par nuit','Par nuit'],['par jour','Par jour']];
 
@@ -220,109 +220,109 @@ let verified=new Set(),blocked=new Set(),sales=[],buyerSales=[],sellerSales=[],r
 const $=id=>document.getElementById(id);
 const msg=t=>$('msg').textContent=t;
 
-fonction el(tag,text,cls){
+function el(tag,text,cls){
 const e=document.createElement(tag);
-si (texte != null) e.textContent = texte ;
-si(cls)e.className=cls;
-renvoyer e;
+if(text!=null)e.textContent=text;
+if(cls)e.className=cls;
+return e;
 }
-fonction opts(id,liste,allText){
+function opts(id,list,allText){
 const s=$(id);
 if(allText)s.append(new Option(allText,''));
-liste.forEach(v=>s.append(new Option(v,v)));
+list.forEach(v=>s.append(new Option(v,v)));
 }
 opts('fc',CATS,'Toutes les catégories');
 opts('fv',CITIES,'Toutes les villes');
-opts('ca',CHATS);opts('vi',VILLES);
-UNITÉS.forEach(u=>$('un').append(new Option(u[1],u[0])));
+opts('ca',CATS);opts('vi',CITIES);
+UNITS.forEach(u=>$('un').append(new Option(u[1],u[0])));
 
 const money=i=>Number(i.price).toLocaleString('fr-FR')+' FCFA'+(i.unit?' '+i.unit:'');
-fonction téléphone(p){
-soit d=p.replace(/\D/g,'');
-si(d.startsWith('00'))d=d.slice(2);
-si (d.length===10)d='225'+d;
-retourner /^\d{11,13}$/.test(d)?d:null;
+function phone(p){
+let d=p.replace(/\D/g,'');
+if(d.startsWith('00'))d=d.slice(2);
+if(d.length===10)d='225'+d;
+return /^\d{11,13}$/.test(d)?d:null;
 }
-const étoiles=n=>'★'.repeat(n)+'☆'.repeat(5-n);
-fonction rv(uid){
+const stars=n=>'★'.repeat(n)+'☆'.repeat(5-n);
+function rv(uid){
 const a=revs.filter(r=>r.sellerUid===uid);
 const n=a.length;
-retourner {n,a,avg:n?a.reduce((s,r)=>s+r.rating,0)/n:0};
+return {n,a,avg:n?a.reduce((s,r)=>s+r.rating,0)/n:0};
 }
 
-fonction rétrécir(fichier){
-retourner une nouvelle promesse((ok,ko)=>{
+function shrink(file){
+return new Promise((ok,ko)=>{
 const r=new FileReader();
 r.onload=()=>{
 const im=new Image();
 im.onload=()=>{
 const s=Math.min(1,640/Math.max(im.width,im.height));
 const c=document.createElement('canvas');
-c.largeur = Math.round(im.largeur * s); c.hauteur = Math.round(im.hauteur * s);
+c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);
 c.getContext('2d').drawImage(im,0,0,c.width,c.height);
 ok(c.toDataURL('image/jpeg',0.6));
 };
 im.onerror=ko;im.src=r.result;
 };
-r.onerror=ko;r.readAsDataURL(fichier);
+r.onerror=ko;r.readAsDataURL(file);
 });
 }
-fonction pics(i){
-retourner (Array.isArray(i.photos)&&i.photos.length?i.photos:(i.photo?[i.photo]:[]))
+function pics(i){
+return (Array.isArray(i.photos)&&i.photos.length?i.photos:(i.photo?[i.photo]:[]))
 .filter(s=>String(s).startsWith('data:image/'));
 }
-fonction pic(i,h){
+function pic(i,h){
 const a=pics(i);
-si(a.longueur){
+if(a.length){
 const m=document.createElement('img');m.src=a[0];m.alt=i.title||'';
 m.style.cssText=`width:100%;height:${h}px;object-fit:cover;border-radius:8px`;
-renvoyer m;
+return m;
 }
 const d=el('div','Pas de photo','mu');
 d.style.cssText=`height:${h}px;display:flex;align-items:center;justify-content:center;background:var(--bd);border-radius:8px`;
-retourner d;
+return d;
 }
 
-fonction render(){
+function render(){
 const q=$('q').value.toLowerCase(),c=$('fc').value,v=$('fv').value,l=$('list');
-l.remplacerEnfants();
+l.replaceChildren();
 const f=items.filter(i=>(!c||i.cat===c)&&(!v||i.city===v)&&
 ((i.title||'')+' '+(i.desc||'')).toLowerCase().includes(q));
-if(!f.length){l.append(el('p','Aucune annonce pour l'instant.','mu'));return;}
+if(!f.length){l.append(el('p','Aucune annonce pour l’instant.','mu'));return;}
 f.forEach(i=>{
 const k=el('button',null,'card');k.type='button';
 k.append(pic(i,120),el('b',money(i)),el('span',i.title),
 el('span',(i.city||'')+' · '+(i.cat||''),'mu'));
 if(verified.has(i.uid))k.append(el('span','✓ Vendeur vérifié','ok'));
 const R=rv(i.uid);
-si(Rn)k.append(el('span','★ '+R.avg.toFixed(1)+' ('+R.n+' avis)','mu'));
+if(R.n)k.append(el('span','★ '+R.avg.toFixed(1)+' ('+R.n+' avis)','mu'));
 k.onclick=()=>show(i);l.append(k);
 });
 }
 
-fonction show(i){
+function show(i){
 const p=$('detail');p.hidden=false;p.replaceChildren();
 const close=el('button','Fermer','btn2');close.type='button';close.onclick=()=>p.hidden=true;p.append(close);
 const a=pics(i);
-si (a.length>1){
+if(a.length>1){
 const s=el('div',null,'strip');
 a.forEach(u=>{const m=document.createElement('img');m.src=u;m.alt=i.title||'';s.append(m);});
 p.append(s);
-}sinon p.append(pic(i,240));
+}else p.append(pic(i,240));
 
 p.append(el('h2',money(i)),el('b',i.title),el('p',i.desc,'mu'),
 el('p',(i.city||'')+' · '+(i.cat||'')+' · '+(i.seller||''),'mu'));
 if(verified.has(i.uid))p.append(el('p','✓ Vendeur vérifié','ok'));
 
 const R=rv(i.uid);
-si(Rn){
+if(R.n){
 p.append(el('p','Avis sur ce vendeur : ★ '+R.avg.toFixed(1)+' ('+R.n+' avis)','ok'));
-Raslice().sort((x,y)=>(yt?.seconds||0)-(xt?.seconds||0)).slice(0,3).forEach(r=>{
+R.a.slice().sort((x,y)=>(y.t?.seconds||0)-(x.t?.seconds||0)).slice(0,3).forEach(r=>{
 const b=el('div',null,'mod');
 b.append(el('span',stars(r.rating)));
-si(r.comment)b.append(el('span',r.comment,'mu'));
-si(adm){
-const d=el('button','Supprimer l'avis','btn2');d.type='button';
+if(r.comment)b.append(el('span',r.comment,'mu'));
+if(adm){
+const d=el('button','Supprimer l’avis','btn2');d.type='button';
 d.onclick=async()=>{if(confirm('Supprimer cet avis ?'))await deleteDoc(doc(db,'products',r.pid,'reviews',r.id));};
 b.append(d);
 }
@@ -338,7 +338,7 @@ lk.href=i.link;lk.target='_blank';lk.rel='noopener noreferrer';p.append(lk);
 const contactBtn=el('button','Voir le numéro du vendeur','btn');contactBtn.type='button';
 contactBtn.onclick=async()=>{
 if(!user){alert('Connecte-toi pour voir le numéro.');$('authp').hidden=false;$('authp').scrollIntoView();return;}
-essayer{
+try{
 const c=await getDoc(doc(db,'productContacts',i.id));
 if(!c.exists()){alert('Numéro indisponible.');return;}
 const n=String(c.data().phone||'');
@@ -352,22 +352,22 @@ contactBtn.replaceWith(call,wa);
 };
 p.append(contactBtn);
 
-si (utilisateur&&utilisateur.uid!==i.uid){
+if(user&&user.uid!==i.uid){
 const buy=el('button','Demander la confirmation de vente','btn2');buy.type='button';
-acheter.onclick=async()=>{
+buy.onclick=async()=>{
 if(!confirm('As-tu réellement acheté ce produit ? Cette demande sera envoyée au vendeur.'))return;
-essayer{
+try{
 const saleId=i.id+'_'+user.uid;
 const old=await getDoc(doc(db,'sales',saleId));
 if(old.exists()){alert('Une demande existe déjà pour cette annonce.');return;}
 await setDoc(doc(db,'sales',saleId),{
 productId:i.id,buyerUid:user.uid,sellerUid:i.uid,
-productTitle:i.title,statut:'en attente',createdAt:Date.now()
+productTitle:i.title,status:'pending',createdAt:Date.now()
 });
 alert('Demande envoyée au vendeur.');
-}catch(e){alert('Impossible d'envoyer la demande.');}
+}catch(e){alert('Impossible d’envoyer la demande.');}
 };
-p.append(acheter);
+p.append(buy);
 
 const saleId=i.id+'_'+user.uid;
 getDoc(doc(db,'sales',saleId)).then(s=>{
@@ -382,8 +382,8 @@ const comment=document.createElement('textarea');
 comment.placeholder='Commentaire facultatif (300 caractères maximum)';
 comment.maxLength=300;
 const submit=el('button','Envoyer mon avis','btn');submit.type='button';
-soumettre.onclick=async()=>{
-essayer{
+submit.onclick=async()=>{
+try{
 await setDoc(doc(db,'products',i.id,'reviews',user.uid),{
 uid:user.uid,sellerUid:i.uid,rating:Number(rating.value),
 comment:comment.value.trim(),t:serverTimestamp()
@@ -391,7 +391,7 @@ comment:comment.value.trim(),t:serverTimestamp()
 alert('Avis envoyé.');submit.disabled=true;
 }catch(e){alert('Avis refusé. Vérifie que la vente est confirmée.');}
 };
-boîte.append(évaluation, commentaire, soumettre); p.append(boîte);
+box.append(rating,comment,submit);p.append(box);
 }).catch(()=>{});
 }).catch(()=>{});
 }
@@ -400,12 +400,12 @@ const rp=el('button','Signaler cette annonce','btn2');rp.type='button';
 rp.onclick=async()=>{
 if(!user){alert('Connecte-toi pour signaler.');return;}
 if(!confirm('Signaler cette annonce ?'))return;
-try{await addDoc(collection(db,'reports'),{pid:i.id,title:i.title,uid:user.uid,t:Date.now()});alert('Signature envoyée.');}
-catch(e){alert('Impossible d'envoyer le signal.');}
+try{await addDoc(collection(db,'reports'),{pid:i.id,title:i.title,uid:user.uid,t:Date.now()});alert('Signalement envoyé.');}
+catch(e){alert('Impossible d’envoyer le signalement.');}
 };
 p.append(rp);
 
-si(utilisateur&&utilisateur.uid===i.uid){
+if(user&&user.uid===i.uid){
 const d=el('button','Supprimer mon annonce','btn2');d.type='button';
 d.onclick=async()=>{
 if(!confirm('Supprimer cette annonce ?'))return;
@@ -415,24 +415,24 @@ p.hidden=true;
 };
 p.append(d);
 }
-p.append(el('p','⚠️ Vois le produit avant de payer et n'envoie jamais d'argent à l'avance.','safe'));
+p.append(el('p','⚠️ Vois le produit avant de payer et n’envoie jamais d’argent à l’avance.','safe'));
 p.scrollIntoView();
 }
 
-fonction fusionnerVentes(){
-ventes=[...new Map([...buyerSales,...sellerSales].map(x=>[x.id,x])).values()];
+function mergeSales(){
+sales=[...new Map([...buyerSales,...sellerSales].map(x=>[x.id,x])).values()];
 renderSales();
 }
-fonction renderSales(){
+function renderSales(){
 const panel=$('salesPanel'),list=$('salesList');
-panneau.hidden=!user;list.replaceChildren();
-si(!utilisateur)retourner;
+panel.hidden=!user;list.replaceChildren();
+if(!user)return;
 if(!sales.length){list.append(el('p','Aucune vente ou demande pour le moment.','mu'));return;}
-ventes.forEach(s=>{
+sales.forEach(s=>{
 const c=el('div',null,'mod');
 c.append(el('b',s.productTitle||s.productId),
 el('p','Statut : '+(s.status==='confirmed'?'Vente confirmée':'En attente'),'mu'));
-si(s.sellerUid===user.uid&&s.status==='pending'){
+if(s.sellerUid===user.uid&&s.status==='pending'){
 const b=el('button','Confirmer la vente','btn');b.type='button';
 b.onclick=async()=>{
 if(!confirm('Confirmer que la vente a réellement eu lieu ?'))return;
@@ -441,42 +441,50 @@ catch(e){alert('Impossible de confirmer cette vente.');}
 };
 c.append(b);
 }
-si(s.buyerUid===user.uid&&s.status==='confirmé'){
+if(s.buyerUid===user.uid&&s.status==='confirmed'){
 c.append(el('p','Tu peux maintenant laisser un avis sur cette annonce.','ok'));
-const b=el('button','Ouvrir l'annonce pour noter','btn2');b.type='button';
+const b=el('button','Ouvrir l’annonce pour noter','btn2');b.type='button';
 b.onclick=async()=>{
 const d=await getDoc(doc(db,'products',s.productId));
 if(d.exists())show({id:d.id,...d.data()});
 };
 c.append(b);
 }
-liste.ajouter(c);
+list.append(c);
 });
 }
 
-fonction asynchrone delAd(id){
+async function delAd(id){
 try{await deleteDoc(doc(db,'products',id));}catch(e){}
 try{await deleteDoc(doc(db,'productContacts',id));}catch(e){}
 }
-fonction renderAdm(){
+function renderAdm(){
 const a=$('adm');a.hidden=!adm;if(!adm)return;
 a.replaceChildren(el('h2','Modération'));
 const pend=all.filter(i=>i.ok!==true);
-a.append(el('b','À valider ("+pend.length+')'));
+a.append(el('b','À valider ('+pend.length+')'));
 pend.forEach(i=>{
 const c=el('div',null,'mod');
 c.append(pic(i,100),el('span',money(i)+' · '+i.title+' · '+(i.city||'')+' · '+(i.seller||'')),el('span',i.desc||'','mu'));
-const ok=el('bouton','Approuver','btn');ok.type='bouton';
+const ok=el('button','Approuver','btn');ok.type='button';
 ok.onclick=()=>updateDoc(doc(db,'products',i.id),{ok:true});
-const no=el('button',' Supprimer','btn2');no.type='button';
+const no=el('button','Supprimer','btn2');no.type='button';
 no.onclick=()=>{if(confirm('Supprimer ?'))delAd(i.id);};
-c.append(ok,non);a.append(c);
+c.append(ok,no);a.append(c);
 });
 a.append(el('b','Signalements ('+reps.length+')'));
 reps.forEach(r=>{
 const c=el('div',null,'mod');c.append(el('span','Signalée : '+(r.title||r.pid)));
-const del=el('button','Supprimer l'annonce','btn');del.type='button';
+const del=el('button','Supprimer l’annonce','btn');del.type='button';
 del.onclick=async()=>{if(confirm('Supprimer ?')){await delAd(r.pid);await deleteDoc(doc(db,'reports',r.id));}};
 const ig=el('button','Ignorer','btn2');ig.type='button';ig.onclick=()=>deleteDoc(doc(db,'reports',r.id));
 c.append(del,ig);a.append(c);
 });
+const sel=new Map();
+all.forEach(i=>{if(!i.uid)return;const s=sel.get(i.uid)||{uid:i.uid,name:i.seller,n:0};s.n++;sel.set(i.uid,s);});
+a.append(el('b','Vendeurs ('+sel.size+')'));
+sel.forEach(s=>{
+const c=el('div',null,'mod');
+c.append(el('span',(s.name||'?')+' · '+s.n+' annonce(s)'+(verified.has(s.uid)?' · ✓ vérifié':'')+(blocked.has(s.uid)?' · BLOQUÉ':'')));
+const v=el('button',verified.has(s.uid)?'Retirer le badge':'Vérifier ce vendeur','btn');v.type='button';
+v.onclick=()=>verified.has(s
