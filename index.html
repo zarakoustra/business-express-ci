@@ -2769,6 +2769,59 @@ p.append(t,s,b);
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js');
 }
+</script><script type="module">
+(function(){
+const $=id=>document.getElementById(id);
+
+const st=document.createElement('style');
+st.textContent='#apropos{display:none}#apropos.open{display:flex}body:not([data-tab="home"]) :is(#apropos,#apropos-btn),body:is(.sellmode,.catmode,.xprofmode) :is(#apropos,#apropos-btn){display:none!important}';
+document.head.append(st);
+
+const btn=document.createElement('button');
+btn.id='apropos-btn';btn.type='button';btn.className='btn2';
+btn.textContent='ℹ️ À propos de ZARAKOUSTRA';
+
+const sec=document.createElement('section');
+sec.id='apropos';
+
+const h=document.createElement('h2');
+h.textContent='À propos de ZARAKOUSTRA';
+sec.append(h);
+
+const blocs=[
+['p','ZARAKOUSTRA est une petite plateforme d’annonces, créée à Abidjan pour permettre à chacun d’acheter et de vendre facilement : téléphones, mode, services, livres et formations, et bien d’autres catégories.'],
+['p','Nous sommes l’équipe ZARAKOUSTRA, basée à Abidjan. Nous construisons l’appli pas à pas, en écoutant nos utilisateurs.'],
+['b','Notre engagement'],
+['p','• Chaque annonce est vérifiée avant d’être publiée.'],
+['p','• Tu peux signaler une annonce suspecte à tout moment.'],
+['p','• Nous ne demandons jamais d’argent d’avance.'],
+['p','• Tu peux nous contacter directement si tu rencontres un problème.'],
+['b','Nous contacter'],
+['p','WhatsApp : +225 01 70 07 54 17'],
+['p','E-mail : businessci1213@gmail.com'],
+['p','Adresse : Angré 22e tranche, Abidjan'],
+['p','Merci de nous faire confiance. Chaque avis, chaque annonce et chaque message nous aide à améliorer ZARAKOUSTRA.']
+];
+blocs.forEach(([tag,txt])=>{
+const e=document.createElement(tag==='b'?'b':'p');
+if(tag!=='b')e.className='mu';
+e.textContent=txt;
+sec.append(e);
+});
+
+const fermer=document.createElement('button');
+fermer.type='button';fermer.className='btn2';fermer.textContent='Fermer';
+fermer.onclick=()=>{sec.classList.remove('open');};
+sec.append(fermer);
+
+btn.onclick=()=>{
+sec.classList.toggle('open');
+if(sec.classList.contains('open'))sec.scrollIntoView();
+};
+
+$('tl').after(btn);
+btn.after(sec);
+})();
 </script>
 </body>
 </html>
