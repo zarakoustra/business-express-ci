@@ -98,19 +98,12 @@ text-shadow:
 -1px 1px 0 #000,1px 1px 0 #000;
 }
 header #top{flex:0 0 auto;padding:0 10px;font-size:14px;min-height:40px}
-border:3px solid #000;border-radius:14px;
-background:#fff;
-box-shadow:4px 4px 0 #000;
-animation:none;
-font-family:'Montserrat','Arial Black',Arial,sans-serif;
-font-weight:900;font-size:clamp(18px,5vw,26px);letter-spacing:.03em;
-text-transform:uppercase;white-space:nowrap;min-width:0;
-color:#0B2545;
-text-shadow:
--2px -2px 0 #000,2px -2px 0 #000,
--2px 2px 0 #000,2px 2px 0 #000,
-0 3px 0 #000;
+@keyframes zkneon{
+0%,100%{box-shadow:0 0 8px #00E5FF,inset 0 0 8px rgba(0,229,255,.45)}
+50%{box-shadow:0 0 16px #00E5FF,inset 0 0 12px rgba(0,229,255,.7)}
 }
+@media (prefers-reduced-motion:reduce){header h1{animation:none}}
+</style>
 @keyframes zkneon{
 0%,100%{box-shadow:0 0 8px #00E5FF,inset 0 0 8px rgba(0,229,255,.45)}
 50%{box-shadow:0 0 16px #00E5FF,inset 0 0 12px rgba(0,229,255,.7)}
