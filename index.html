@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#A8DDF7">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap">
-<title>ZARATHOUSTRA</title>
+<title>ZARAKOUSTRA</title>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-MZ78EHSL6R"></script>
 <script>
 window.dataLayer=window.dataLayer||[];
@@ -24,7 +24,7 @@ color-scheme:light;box-sizing:border-box
 body{margin:0;padding-top:env(safe-area-inset-top,0px);
 padding-bottom:env(safe-area-inset-bottom,0px);
 background:var(--bg);color:var(--tx);font-family:system-ui,sans-serif}
-header{background:var(--nv);color:var(--hd);padding:14px 16px;
+header{background:var(--nv);color:var(--hd);padding:10px 14px;
 display:flex;align-items:center;justify-content:space-between;gap:8px}
 h1{margin:0;font-size:19px}
 main{max-width:560px;margin:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
@@ -58,62 +58,22 @@ border-radius:10px;padding:8px;font-size:14px}
 .chk input{width:auto;min-height:0}
 #terms p{margin:0;font-size:14px}
 [hidden]{display:none!important}
-
-header{padding:10px 14px}
-
 .pf{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
-.pft{font-size:11px;font-weight:700}
+.pft{font-size:11px;font-weight:700;order:2;margin-top:2px}
 .pfa{position:relative;width:44px;height:44px}
-.pfa img{width:100%;height:100%;border-radius:50%;object-fit:cover;border:2px solid #fff}
+.pfa img{width:100%;height:100%;border-radius:50%;object-fit:cover;border:3px solid #000}
 .pfc{position:absolute;right:-6px;bottom:-4px;font-size:12px;font-style:normal;
-background:#fff;border-radius:50%;padding:2px}
-header #top{background:transparent;color:#000;border:2px solid #000}
-</style>
-<style>
-/* Photo de profil : bord noir, "Profil" sous la photo */
-.pfa img{border:3px solid #000}
-.pft{order:2;margin-top:2px}
-.pfc{border:1.5px solid #000}
-
+background:#fff;border-radius:50%;padding:2px;border:1.5px solid #000}
+header #top{background:transparent;color:#000;border:2px solid #000;flex:0 0 auto;padding:0 10px;font-size:14px;min-height:40px}
 header h1{
-width:max-content;
-flex:0 0 auto;
-margin:0 auto;
-padding:6px 0.5cm;
-text-indent:0;
-text-align:center;
-border:3px solid #000;border-radius:14px;
-background:#fff;
-box-shadow:4px 4px 0 #000;
-animation:none;
+width:max-content;flex:0 0 auto;margin:0 auto;padding:6px 0.5cm;
+text-align:center;border:3px solid #000;border-radius:14px;
+background:#fff;box-shadow:4px 4px 0 #000;
 font-family:'Montserrat','Arial Black',Arial,sans-serif;
-font-weight:900;font-size:16px;letter-spacing:.02em;
-line-height:1.2;
-text-transform:uppercase;white-space:nowrap;
-color:#0B2545;
-text-shadow:
--1px -1px 0 #000,1px -1px 0 #000,
--1px 1px 0 #000,1px 1px 0 #000;
+font-weight:900;font-size:16px;letter-spacing:.02em;line-height:1.2;
+text-transform:uppercase;white-space:nowrap;color:#0B2545;
+text-shadow:-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000;
 }
-header #top{flex:0 0 auto;padding:0 10px;font-size:14px;min-height:40px}
-border:3px solid #000;border-radius:14px;
-background:#fff;
-box-shadow:4px 4px 0 #000;
-animation:none;
-font-family:'Montserrat','Arial Black',Arial,sans-serif;
-font-weight:900;font-size:clamp(18px,5vw,26px);letter-spacing:.03em;
-text-transform:uppercase;white-space:nowrap;min-width:0;
-color:#0B2545;
-text-shadow:
--2px -2px 0 #000,2px -2px 0 #000,
--2px 2px 0 #000,2px 2px 0 #000,
-0 3px 0 #000;
-}
-@keyframes zkneon{
-0%,100%{box-shadow:0 0 8px #00E5FF,inset 0 0 8px rgba(0,229,255,.45)}
-50%{box-shadow:0 0 16px #00E5FF,inset 0 0 12px rgba(0,229,255,.7)}
-}
-@media (prefers-reduced-motion:reduce){header h1{animation:none}}
 </style>
 </head>
 <body>
@@ -190,7 +150,7 @@ text-shadow:
 import {initializeApp} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
 import {
 getAuth,onAuthStateChanged,signInWithEmailAndPassword,
-createUserWithEmailAndPassword,signOut
+createUserWithEmailAndPassword,signOut,sendPasswordResetEmail
 } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
 import {
 getFirestore,collection,collectionGroup,addDoc,setDoc,onSnapshot,query,where,
@@ -207,7 +167,6 @@ appId:"1:45446517286:web:1aaf5de2d58429b61e4ce7"
 });
 const auth=getAuth(app),db=getFirestore(app);
 
-/* ADMIN : même identifiant que dans les règles Firestore */
 const ADMIN_UIDS=["rBxaE8OltfeNwvpUivDdqZqhxjl1"];
 
 const CATS=['Téléphones','Électronique','Mode','Maison','Véhicules',
@@ -256,11 +215,11 @@ const r=new FileReader();
 r.onload=()=>{
 const im=new Image();
 im.onload=()=>{
-const s=Math.min(1,640/Math.max(im.width,im.height));
+const s=Math.min(1,480/Math.max(im.width,im.height));
 const c=document.createElement('canvas');
 c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);
 c.getContext('2d').drawImage(im,0,0,c.width,c.height);
-ok(c.toDataURL('image/jpeg',0.6));
+ok(c.toDataURL('image/jpeg',0.5));
 };
 im.onerror=ko;im.src=r.result;
 };
@@ -487,524 +446,13 @@ sel.forEach(s=>{
 const c=el('div',null,'mod');
 c.append(el('span',(s.name||'?')+' · '+s.n+' annonce(s)'+(verified.has(s.uid)?' · ✓ vérifié':'')+(blocked.has(s.uid)?' · BLOQUÉ':'')));
 const v=el('button',verified.has(s.uid)?'Retirer le badge':'Vérifier ce vendeur','btn');v.type='button';
-v.onclick=()=>verified.has(s
-const v = el(
-  'button',
-  verified.has(s.uid) ? 'Retirer le badge' : 'Vérifier ce vendeur',
-  'btn'
-);
-
-v.type = 'button';
-
-v.onclick = async () => {
-  try {
-    if (verified.has(s.uid)) {
-      await deleteDoc(doc(db, 'verified', s.uid));
-    } else {
-      await setDoc(doc(db, 'verified', s.uid), {
-        t: Date.now()
-      });
-    }
-  } catch (e) {
-    console.error('Erreur badge vendeur :', e);
-  }
-};
-
-const b = el(
-  'button',
-  blocked.has(s.uid) ? 'Débloquer' : 'Bloquer cet utilisateur',
-  'btn2'
-);
-
-b.type = 'button';
-
-b.onclick = async () => {
-  try {
-    if (blocked.has(s.uid)) {
-      await deleteDoc(doc(db, 'blocked', s.uid));
-    } else if (confirm('Bloquer cet utilisateur ?')) {
-      await setDoc(doc(db, 'blocked', s.uid), {
-        t: Date.now()
-      });
-    }
-  } catch (e) {
-    console.error('Erreur blocage utilisateur :', e);
-  }
-};
-
-c.append(v, b);
-a.append(c);
-  function err(e) {
-  const c = e?.code || '';
-
-  $('amsg').textContent =
-    c.includes('email-already')
-      ? 'Cet e-mail a déjà un compte.'
-      : c.includes('weak')
-      ? 'Mot de passe trop court (6 minimum).'
-      : c.includes('invalid')
-      ? 'E-mail ou mot de passe incorrect.'
-      : 'Une erreur est survenue.';
-}
-
-['q', 'fc', 'fv'].forEach(k => {
-  $(k).oninput = render;
+v.onclick=()=>verified.has(s.uid)?deleteDoc(doc(db,'verified',s.uid)):setDoc(doc(db,'verified',s.uid),{t:Date.now()});
+const b=el('button',blocked.has(s.uid)?'Débloquer':'Bloquer cet utilisateur','btn2');b.type='button';
+b.onclick=()=>{if(blocked.has(s.uid))deleteDoc(doc(db,'blocked',s.uid));else if(confirm('Bloquer cet utilisateur ?'))setDoc(doc(db,'blocked',s.uid),{t:Date.now()});};
+c.append(v,b);a.append(c);
 });
-
-$('top').onclick = () => {
-  if (user) {
-    $('sellp').hidden = !$('sellp').hidden;
-  } else {
-    $('authp').hidden = !$('authp').hidden;
-  }
-};
-
-$('tl').onclick = () => {
-  $('terms').hidden = false;
-  $('terms').scrollIntoView();
-};
-
-$('tclose').onclick = () => {
-  $('terms').hidden = true;
-};
-
-$('login').onclick = () => {
-  signInWithEmailAndPassword(
-    auth,
-    $('em').value.trim(),
-    $('pw').value
-  ).catch(err);
-};
-
-$('signup').onclick = () => {
-  if (!$('cg').checked) {
-    $('amsg').textContent =
-      'Accepte les conditions pour créer un compte.';
-    return;
-  }
-
-  createUserWithEmailAndPassword(
-    auth,
-    $('em').value.trim(),
-    $('pw').value
-  ).catch(err);
-};
-
-$('logout').onclick = () => signOut(auth);onAuthStateChanged(auth, u => {
-  user = u;
-  $('amsg').textContent = '';
-
-  unsubs.forEach(f => f());
-  unsubs = [];
-
-  adm = !!(u && ADMIN_UIDS.includes(u.uid));
-
-  all = [];
-  reps = [];
-  blocked = new Set();
-  sales = [];
-  buyerSales = [];
-  sellerSales = [];
-
-  renderAdm();
-
-  $('top').textContent = u ? 'Vendre' : 'Connexion';
-
-  $('authp').hidden = true;
-  $('sellp').hidden = !u;
-  $('salesPanel').hidden = !u;
-
-  if (u) {
-    $('who').textContent = 'Compte connecté ✓';
-    $('uidp').textContent = u.uid;
-
-    unsubs.push(
-      onSnapshot(
-        query(
-          collection(db, 'sales'),
-          where('buyerUid', '==', u.uid)
-        ),
-        s => {
-          buyerSales = s.docs.map(d => ({
-            id: d.id,
-            ...d.data()
-          }));
-
-          mergeSales();
-        },
-        () => {}
-      )
-    );
-
-    unsubs.push(
-      onSnapshot(
-        query(
-          collection(db, 'sales'),
-          where('sellerUid', '==', u.uid)
-        ),
-        s => {
-          sellerSales = s.docs.map(d => ({
-            id: d.id,
-            ...d.data()
-          }));
-
-          mergeSales();
-        },
-        () => {}
-      )
-    );
-
-    if (adm) {
-      unsubs.push(
-        onSnapshot(collection(db, 'reports'), s => {
-          reps = s.docs.map(d => ({
-            id: d.id,
-            ...d.data()
-          }));
-
-          renderAdm();
-        }, () => {})
-      );
-
-      unsubs.push(
-        onSnapshot(collection(db, 'products'), s => {
-          all = s.docs.map(d => ({
-            id: d.id,
-            ...d.data()
-          }));
-
-          renderAdm();
-        }, () => {})
-      );
-
-      unsubs.push(
-        onSnapshot(collection(db, 'blocked'), s => {
-          blocked = new Set(s.docs.map(d => d.id));
-          renderAdm();
-        }, () => {})
-      );
-    }
-  }
-
-  render();
-  renderSales();
-});$('ph').onchange = async e => {
-  photos = [];
-  $('pv').replaceChildren();
-
-  const fl = Array.from(e.target.files);
-
-  if (fl.length > 4) {
-    msg('4 photos maximum.');
-  }
-
-  for (const f of fl.slice(0, 4)) {
-    try {
-      const d = await shrink(f);
-
-      photos.push(d);
-
-      const m = document.createElement('img');
-      m.src = d;
-
-      $('pv').append(m);
-    } catch (x) {
-      msg('Une photo est illisible.');
-    }
-  }
-};
-
-$('go').onclick = async () => {
-  const v = k => $(k).value.trim();
-
-  const price = parseInt(v('pr'), 10);
-  const n = phone(v('tel'));
-  const lk = v('li');
-
-  if (!user) return;
-
-  if (!v('ti') || !(price > 0)) {
-    msg('Mets un titre et un prix.');
-    return;
-  }
-
-  if (!n) {
-    msg('Numéro invalide (10 chiffres, ex : 0707070707).');
-    return;
-  }
-
-  if (lk && !/^https?:\/\//.test(lk)) {
-    msg('Le lien doit commencer par https://');
-    return;
-  }
-
-  try {
-    const annonce = await addDoc(
-      collection(db, 'products'),
-      {
-        title: v('ti'),
-        desc: v('de'),
-        price,
-        unit: $('un').value,
-        cat: $('ca').value,
-        city: $('vi').value,
-        seller: v('se') || 'Vendeur',
-        link: lk,
-        photos,
-        photo: photos[0] || '',
-        uid: user.uid,
-        ok: false,
-        t: Date.now()
-      }
-    );
-
-    await setDoc(
-      doc(db, 'productContacts', annonce.id),
-      {
-        phone: n,
-        uid: user.uid
-      }
-    );
-
-    msg('Annonce envoyée ✓ Elle sera visible après validation.');
-
-    ['ti', 'de', 'pr', 'se', 'tel', 'li'].forEach(k => {
-      $(k).value = '';
-    });
-
-    $('ph').value = '';
-    $('pv').replaceChildren();
-
-    photos = [];
-
-  } catch (e) {
-    msg(
-      e && e.code === 'permission-denied'
-        ? 'Ton compte ne peut pas publier. Contacte l’administrateur.'
-        : 'Publication impossible. Essaie avec moins de photos.'
-    );
-  }
-};onSnapshot(
-  collection(db, 'verified'),
-  s => {
-    verified = new Set(s.docs.map(d => d.id));
-    render();
-    renderAdm();
-  },
-  () => {}
-);
-
-onSnapshot(
-  collectionGroup(db, 'reviews'),
-  s => {
-    revs = s.docs.map(d => ({
-      id: d.id,
-      pid: d.ref.parent.parent.id,
-      ...d.data()
-    }));
-
-    render();
-  },
-  () => {}
-);
-
-onSnapshot(
-  query(
-    collection(db, 'products'),
-    where('ok', '==', true)
-  ),
-  s => {
-    items = s.docs
-      .map(d => ({
-        id: d.id,
-        ...d.data()
-      }))
-      .sort((a, b) => (b.t || 0) - (a.t || 0));
-
-    render();
-  },
-  () => {
-    $('list').replaceChildren(
-      el('p', 'Impossible de charger les annonces.', 'mu')
-    );
-  }
-);
-
-render();import { getApp } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
-
-import {
-  getAuth,
-  onAuthStateChanged,
-  sendPasswordResetEmail
-} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
-
-import {
-  getFirestore,
-  collection,
-  query,
-  where,
-  orderBy,
-  onSnapshot,
-  addDoc,
-  setDoc,
-  updateDoc,
-  doc
-} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
-
-const app = getApp();
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-const $ = id => document.getElementById(id);
-
-function h(tag, text, cls) {
-  const e = document.createElement(tag);
-
-  if (text != null) e.textContent = text;
-  if (cls) e.className = cls;
-
-  return e;
 }
-
-function btn(text, cls, fn) {
-  const b = h('button', text, cls);
-
-  b.type = 'button';
-  b.onclick = fn;
-
-  return b;
-}
-
-const money = i =>
-  Number(i.price).toLocaleString('fr-FR') +
-  ' FCFA' +
-  (i.unit ? ' ' + i.unit : '');const st = document.createElement('style');
-
-st.textContent = `
-body {
-  padding-bottom: calc(68px + env(safe-area-inset-bottom, 0px));
-}
-
-#xnav {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 50;
-  display: flex;
-  background: #fff;
-  border-top: 1px solid var(--bd);
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-}
-
-#xnav button {
-  flex: 1;
-  min-height: 58px;
-  background: none;
-  border: 0;
-  border-radius: 0;
-  color: var(--mu);
-  font-size: 12px;
-  font-weight: 600;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 2px;
-  padding: 0;
-}
-
-#xnav button span {
-  font-size: 20px;
-  line-height: 1;
-}
-
-#xnav button.on {
-  color: var(--ac);
-}
-
-body:is([data-tab="fav"], [data-tab="msg"])
-:is(#q, main > .row, #list, #terms, #tl, #detail, #authp, #sellp, #salesPanel, #adm) {
-  display: none !important;
-}
-
-body[data-tab="acc"]
-:is(#q, main > .row, #list, #terms, #tl, #detail) {
-  display: none !important;
-}
-
-#xfav .row > button {
-  flex: 1;
-}
-
-#xmsg .row button {
-  flex: none;
-}
-
-.xbox {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  max-height: 55vh;
-  overflow-y: auto;
-  padding: 4px 0;
-}
-
-.xb {
-  max-width: 80%;
-  padding: 8px 12px;
-  border-radius: 12px;
-  font-size: 15px;
-  word-break: break-word;
-}
-
-.xb.me {
-  align-self: flex-end;
-  background: var(--nv);
-}
-
-.xb.ot {
-  align-self: flex-start;
-  background: #fff;
-  border: 1px solid var(--bd);
-}
-
-.xrow button {
-  flex: 1;
-}
-`;
-
-document.head.append(st);let user = null;
-let items = [];
-let chats = [];
-let bch = [];
-let sch = [];
-let unsubs = [];
-
-let tab = 'home';
-let thread = null;
-let unsubThread = null;
-
-let favs = [];
-
-try {
-  favs = JSON.parse(localStorage.getItem('xfav') || '[]');
-
-  if (!Array.isArray(favs)) {
-    favs = [];
-  }
-} catch (e) {
-  favs = [];
-}
-
-function toggleFav(id) {
-  favs = favs.includes(id)
-    ? favs.filter(x => x !== id)
-    : [...favs, id];
-
-  try {
-    localStorage.setItem('xfav', JSON.stringify(favs));
-  } catch (e) {
-    console.error('Erreur favoris :', e);
-  }
-  }
+</script>
+</body>
+</html>
+  </documents>
