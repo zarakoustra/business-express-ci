@@ -1751,3 +1751,1068 @@ patchDetail();
 },()=>{});
 onAuthStateChanged(auth,u=>{user=u;draw();fillSe();});
 </script>
+<script type="module">
+import {getApp} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+import {getAuth,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+import {getFirestore,collection,query,where,onSnapshot,setDoc,doc} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
+
+const auth=getAuth(getApp()),db=getFirestore(getApp());
+const $=id=>document.getElementById(id);
+const ADMIN='rBxaE8OltfeNwvpUivDdqZqhxjl1';
+const BAD=/admin|officiel/i;
+function h(tag,text,cls){
+const e=document.createElement(tag);
+if(text!=null)e.textContent=text;
+if(cls)e.className=cls;
+return e;
+}
+const money=i=>Number(i.price).toLocaleString('fr-FR')+' FCFA'+(i.unit?' '+i.unit:'');
+let user=null,items=[],names=new Map(),nameInput=null;
+
+const st=document.createElement('style');
+st.textContent='body:not([data-tab="acc"]) #xname{display:none!important}';
+document.head.append(st);
+
+const box=h('section');box.id='xname';
+$('xacc').after(box);
+
+function draw(){
+box.replaceChildren(h('h2','Mon nom'));
+nameInput=null;
+if(!user){box.append(h('p','Connecte-toi pour choisir ton nom.','mu'));return;}
+box.append(h('p','Ce nom est visible par tout le monde sur tes annonces.','mu'));
+const inp=document.createElement('input');
+inp.maxLength=30;inp.placeholder='Ton nom public';
+inp.value=names.get(user.uid)||'';
+nameInput=inp;
+const msg=h('p',null,'mu');
+const save=h('button','Enregistrer mon nom','btn');save.type='button';
+save.onclick=async()=>{
+const n=inp.value.trim().replace(/\s+/g,' ');
+if(n.length<2){msg.textContent='Minimum 2 caractères.';return;}
+if(BAD.test(n)&&user.uid!==ADMIN){msg.textContent='Ce nom n’est pas autorisé.';return;}
+save.disabled=true;
+try{
+await setDoc(doc(db,'profiles',user.uid),{name:n,t:Date.now()});
+msg.textContent='Nom enregistré ✓';
+}catch(e){msg.textContent='Enregistrement impossible. Réessaie.';}
+save.disabled=false;
+};
+box.append(inp,save,msg);
+}
+
+function fillSe(){
+const n=user&&names.get(user.uid),s=$('se');
+if(n&&s&&!s.value)s.value=n;
+}
+$('go').addEventListener('click',()=>{
+const n=user&&names.get(user.uid);
+if(n)$('se').value=n;
+},true);
+
+const det=$('detail');
+function patchDetail(){
+if(det.hidden)return;
+const t=[...det.children].find(e=>e.tagName==='B');
+const m=det.querySelector(':scope>h2');
+if(!t||!m)return;
+const i=items.find(x=>x.title===t.textContent&&money(x)===m.textContent);
+if(!i||!names.has(i.uid))return;
+const pre=(i.city||'')+' · '+(i.cat||'')+' · ';
+const p=[...det.querySelectorAll(':scope>p')].find(e=>e.textContent.startsWith(pre));
+if(p&&p.textContent!==pre+names.get(i.uid))p.textContent=pre+names.get(i.uid);
+}
+new MutationObserver(patchDetail).observe(det,{childList:true});
+
+function patchProf(){
+const sec=$('xprof');if(!sec)return;
+const sid=new URLSearchParams(location.search).get('v');
+const hh=[...sec.children].find(e=>e.tagName==='H2'&&e.textContent.startsWith('👤 '));
+if(hh&&names.has(sid)&&hh.textContent!=='👤 '+names.get(sid))hh.textContent='👤 '+names.get(sid);
+}
+if($('xprof'))new MutationObserver(patchProf).observe($('xprof'),{childList:true});
+
+onSnapshot(collection(db,'profiles'),s=>{
+names=new Map(s.docs.map(d=>[d.id,d.data().name]));
+if(nameInput&&user&&document.activeElement!==nameInput)nameInput.value=names.get(user.uid)||'';
+fillSe();patchDetail();patchProf();
+},()=>{});
+onSnapshot(query(collection(db,'products'),where('ok','==',true)),s=>{
+items=s.docs.map(d=>({id:d.id,...d.data()}));
+patchDetail();
+},()=>{});
+onAuthStateChanged(auth,u=>{user=u;draw();fillSe();});
+</script>
+  <h3>Mon espace</h3>
+<button class="btn2" data-open="xmine">📋 Mes annonces</button>
+<button class="btn2" data-open="xrev">⭐ Mes avis</button>
+<button class="btn2" data-open="xfaq">❓ Questions fréquentes</button>
+<button class="btn2" data-open="xnotif">🔔 Notifications</button>
+<button class="btn2" data-open="xfol">👥 Mes abonnés</button>
+<button class="btn2" data-open="xmoney">💰 Faire l’argent</button>
+<button class="btn2" data-open="xprofile">📤 Partager mon profil</button>
+<button class="btn2" data-open="xname">✏️ Mon nom</button>
+<button class="btn2" data-open="xagency">🚩 Contacter l’agence</button>
+
+<h3>Préférences</h3>
+
+<label for="appLanguage">Langue</label>
+<select id="appLanguage">
+<option value="fr">🇫🇷 Français</option>
+<option value="en">🇬🇧 English</option>
+<option value="es">🇪🇸 Español</option>
+<option value="de">🇩🇪 Deutsch</option>
+</select>
+
+<label>Apparence</label>
+<select id="appTheme">
+<option value="light">☀️ Mode clair</option>
+<option value="dark">🌙 Mode sombre</option>
+</select>
+
+<h3>Agence ZARAKOUSTRA</h3>
+<a class="lnk btn" href="https://wa.me/2250170075417">
+Contacter sur WhatsApp
+</a>
+<a class="lnk btn2" href="mailto:businessci1213@gmail.com">
+Envoyer un e-mail
+</a>
+`;
+
+
+$("xacc").append(panel);
+
+panel.querySelectorAll('[data-open]').forEach(b=>{
+b.addEventListener('click',()=>{
+const target=b.dataset.open;
+
+document.body.classList.remove('settings-open');
+
+if(target==='xagency'){
+$('xag').scrollIntoView();
+return;
+}
+
+if(target==='xname'){
+$('xname').scrollIntoView();
+return;
+}
+
+if(target==='xprofile'){
+const c=[...$('xgrid').querySelectorAll('.card')]
+.find(e=>e.textContent.includes('Partager mon profil'));
+if(c)c.click();
+return;
+}
+
+const card=[...$('xgrid').querySelectorAll('.card')]
+.find(e=>e.textContent.includes(
+({
+xmine:'Mes annonces',
+xrev:'Avis',
+xfaq:'FAQ',
+xnotif:'Notifications',
+xfol:'Abonnés',
+xmoney:'Faire l’argent'
+})[target]||'---'
+));
+
+if(card)card.click();
+});
+});
+  /* met à jour le badge quand les messages changent */
+new MutationObserver(draw).observe($('xnav'),{childList:true,subtree:true});
+</script><script type="module">
+import {getApp} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+import {getAuth,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+import {getFirestore,collection,query,where,onSnapshot,setDoc,deleteDoc,doc} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
+
+const auth=getAuth(getApp()),db=getFirestore(getApp());
+const $=id=>document.getElementById(id);
+function h(tag,text,cls){
+const e=document.createElement(tag);
+if(text!=null)e.textContent=text;
+if(cls)e.className=cls;
+return e;
+}
+const money=i=>Number(i.price).toLocaleString('fr-FR')+' FCFA'+(i.unit?' '+i.unit:'');
+function mask(e){
+const p=String(e||'').split('@');
+return p[1]?p[0].slice(0,2)+'***@'+p[1]:'Abonné';
+}
+
+const st=document.createElement('style');
+st.textContent='body:not([data-tab="acc"]) #xfol{display:none!important}';
+document.head.append(st);
+
+const box=h('section');box.id='xfol';box.hidden=true;
+($('xnotif')||$('xfaq')||$('xrev')||$('xmine')||$('xgrid')).after(box);
+
+const card=h('button',null,'card');card.type='button';
+const cardTitle=h('b','👥 Abonnés');
+card.append(cardTitle);
+card.onclick=()=>{
+['xmine','xrev','xfaq','xnotif'].forEach(k=>{if($(k))$(k).hidden=true;});
+box.hidden=!box.hidden;
+if(!box.hidden)box.scrollIntoView();
+};
+$('xgrid').append(card);
+
+let user=null,items=[],followers=[],myFollows=new Set(),subs=[];
+
+function draw(){
+box.replaceChildren(h('h2','Mes abonnés'));
+cardTitle.textContent='👥 Abonnés ('+followers.length+')';
+if(!user){box.append(h('p','Connecte-toi pour voir tes abonnés.','mu'));return;}
+if(!followers.length){box.append(h('p','Personne ne te suit pour le moment. Publie de bonnes annonces 😉','mu'));return;}
+followers.slice().sort((a,b)=>(b.t||0)-(a.t||0)).forEach(f=>{
+const c=h('div',null,'mod');
+c.append(h('b','Abonné'),
+h('span','Depuis le '+new Date(f.t||0).toLocaleDateString('fr-FR'),'mu'));
+box.append(c);
+});
+}
+
+/* bouton Suivre dans le détail d'une annonce */
+const det=$('detail');
+new MutationObserver(()=>{
+if(det.hidden||det.querySelector('.xfol'))return;
+const t=[...det.children].find(e=>e.tagName==='B');
+const m=det.querySelector(':scope>h2');
+if(!t||!m)return;
+const i=items.find(x=>x.title===t.textContent&&money(x)===m.textContent);
+if(!i||(user&&user.uid===i.uid))return;
+const b=h('button',null,'btn2 xfol');b.type='button';
+const upd=()=>{b.textContent=myFollows.has(i.uid)?'✓ Abonné (se désabonner)':'➕ Suivre ce vendeur';};
+upd();
+b.onclick=async()=>{
+if(!user){alert('Connecte-toi pour suivre un vendeur.');return;}
+const id=i.uid+'_'+user.uid;
+b.disabled=true;
+try{
+if(myFollows.has(i.uid)){await deleteDoc(doc(db,'follows',id));myFollows.delete(i.uid);}
+else{await setDoc(doc(db,'follows',id),{sellerUid:i.uid,followerUid:user.uid,followerEmail:mask(user.email),t:Date.now()});myFollows.add(i.uid);}
+upd();
+}catch(e){alert('Action impossible. Réessaie.');}
+b.disabled=false;
+};
+t.after(b);
+}).observe(det,{childList:true});
+
+onSnapshot(query(collection(db,'products'),where('ok','==',true)),s=>{
+items=s.docs.map(d=>({id:d.id,...d.data()}));
+},()=>{});
+  onAuthStateChanged(auth,u=>{
+subs.forEach(f=>f());subs=[];
+user=u;followers=[];myFollows=new Set();
+draw();
+if(!u)return;
+subs.push(
+onSnapshot(query(collection(db,'follows'),where('sellerUid','==',u.uid)),s=>{
+followers=s.docs.map(d=>({id:d.id,...d.data()}));draw();
+},()=>{}),
+onSnapshot(query(collection(db,'follows'),where('followerUid','==',u.uid)),s=>{
+myFollows=new Set(s.docs.map(d=>d.data().sellerUid));
+},()=>{})
+);
+});
+</script><script>
+(function(){
+const $=id=>document.getElementById(id);
+function h(tag,text,cls){
+const e=document.createElement(tag);
+if(text!=null)e.textContent=text;
+if(cls)e.className=cls;
+return e;
+}
+
+const st=document.createElement('style');
+st.textContent='body:not([data-tab="acc"]) #xmoney{display:none!important}'+
+'#xmoney .lnk{width:100%}';
+document.head.append(st);
+
+const box=h('section');box.id='xmoney';box.hidden=true;
+($('xfol')||$('xnotif')||$('xfaq')||$('xrev')||$('xmine')||$('xgrid')).after(box);
+
+const url=location.origin+location.pathname;
+
+box.append(
+h('h2','Faire l’argent 💰'),
+h('p','Plus il y a de monde sur Zarathoustra, plus tu vends. Invite tes amis et ta famille !','mu')
+);
+
+const wa=h('a','📲 Partager sur WhatsApp','btn lnk');
+wa.href='https://wa.me/?text='+encodeURIComponent('Salut ! Vends et achète facilement sur Zarathoustra : '+url);
+wa.target='_blank';wa.rel='noopener noreferrer';
+
+const cp=h('button','🔗 Copier le lien du site','btn2');cp.type='button';
+cp.onclick=async()=>{
+try{await navigator.clipboard.writeText(url);cp.textContent='✓ Lien copié';}
+catch(e){prompt('Copie ce lien :',url);}
+};
+
+const tips=h('div',null,'mod');
+tips.append(
+h('b','Conseils pour vendre plus vite'),
+h('span','📸 Mets 3 à 4 photos nettes, bien éclairées.'),
+h('span','✍️ Écris un titre clair et une description honnête.'),
+h('span','💬 Réponds vite aux messages des acheteurs.'),
+h('span','✓ Demande le badge « Vendeur vérifié » pour inspirer confiance.')
+);
+
+const soon=h('div',null,'mod');
+soon.append(
+h('b','🚀 Booster une annonce'),
+h('span','Bientôt : mets ton annonce en avant pour être vu en premier.','mu')
+);
+
+box.append(wa,cp,tips,soon);
+
+const card=h('button',null,'card');card.type='button';
+card.append(h('b','💰 Faire l’argent'));
+card.onclick=()=>{
+['xmine','xrev','xfaq','xnotif','xfol'].forEach(k=>{if($(k))$(k).hidden=true;});
+box.hidden=!box.hidden;
+if(!box.hidden)box.scrollIntoView();
+};
+$('xgrid').append(card);
+})();
+</script><script type="module">
+(function(){
+const ids=['xmine','xrev','xfaq','xnotif','xfol','xmoney'];
+document.querySelectorAll('#xgrid .card').forEach(c=>{
+c.addEventListener('click',()=>{
+const before=ids.map(k=>{const e=document.getElementById(k);return e?e.hidden:true;});
+setTimeout(()=>{
+const open=ids.filter(k=>{const e=document.getElementById(k);return e&&!e.hidden;});
+if(open.length>1){
+const fresh=ids.filter((k,i)=>before[i]&&!document.getElementById(k).hidden);
+const keep=fresh[0]||open[open.length-1];
+ids.forEach(k=>{const e=document.getElementById(k);if(e&&k!==keep)e.hidden=true;});
+}
+},0);
+});
+});
+})();
+</script><script type="module">
+import {getApp} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+import {getAuth,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+import {getFirestore,collection,query,where,onSnapshot,getDoc,doc} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
+
+const auth=getAuth(getApp()),db=getFirestore(getApp());
+const $=id=>document.getElementById(id);
+function h(tag,text,cls){
+const e=document.createElement(tag);
+if(text!=null)e.textContent=text;
+if(cls)e.className=cls;
+return e;
+}
+const money=i=>Number(i.price).toLocaleString('fr-FR')+' FCFA'+(i.unit?' '+i.unit:'');
+const base=location.origin+location.pathname;
+const sid=new URLSearchParams(location.search).get('v');
+
+const st=document.createElement('style');
+st.textContent='#xprof{display:none}'+
+'body.xprofmode #xprof{display:flex}'+
+'body:not([data-tab="home"]) #xprof{display:none!important}'+
+'body.xprofmode :is(#q,main>.row,#list,#tl,#terms){display:none!important}'+
+'#xprof .g{display:grid;grid-template-columns:1fr 1fr;gap:10px}';
+document.head.append(st);
+               </script><style>
+#xcats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px 6px}
+#xcats button{min-height:0;padding:0;background:none;border:0;border-radius:0;font-size:12px;font-weight:500;color:var(--tx);display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+#xcats button i{font-style:normal;width:100%;max-width:72px;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;font-size:32px;background:var(--bd);border-radius:16px}
+#xcatview{display:none}
+body.catmode #xcatview{display:flex}
+#xcatview .xg{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.xcw{position:relative;display:flex}
+.xcw button.card{width:100%;padding-bottom:42px}
+.xcw .xarrow{position:absolute;right:8px;bottom:8px;width:32px;height:32px;min-height:0;padding:0;border-radius:50%;background:var(--ac);color:#fff;font-size:20px;line-height:1;display:flex;align-items:center;justify-content:center}
+body:not([data-tab="home"]) :is(#xcats,#xcatview){display:none!important}
+body:is(.sellmode,.catmode,.xprofmode) #xcats{display:none!important}
+body.catmode :is(#q,main>.row,#list,#tl,#tl+button,#terms,#sellp,#salesPanel,#adm,#xprof){display:none!important}
+</style>
+<script type="module">
+import {getApp} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+import {getFirestore,collection,query,where,onSnapshot} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
+const db=getFirestore(getApp());
+const $=id=>document.getElementById(id);
+const B=document.body;
+function h(tag,text,cls){
+const e=document.createElement(tag);
+if(text!=null)e.textContent=text;
+if(cls)e.className=cls;
+return e;
+}
+const money=i=>Number(i.price).toLocaleString('fr-FR')+' FCFA'+(i.unit?' '+i.unit:'');
+const base=location.origin+location.pathname;
+
+/* nouvelles catégories dans les formulaires */
+const NEW=['Beauté & Soins','Bébés & Enfants','Alimentation & Agriculture','Animaux','Emplois','Loisirs & Activités','Réparation & Construction','Entreprise & Industrie'];
+['ca','fc'].forEach(id=>{
+const s=$(id);
+NEW.forEach(v=>{if(![...s.options].some(o=>o.value===v))s.add(new Option(v,v));});
+});
+
+const T=[
+['🚗','Véhicules','Véhicules'],
+['🏠','Immobilier','Immobilier'],
+['📱','Téléphones et tablettes','Téléphones'],
+['💻','Électronique','Électronique'],
+['🛋️','Maison, Meubles & Électroménager','Maison'],
+['👗','Mode','Mode'],
+['💄','Beauté & Soins personnels','Beauté & Soins'],
+['🛠️','Services','Services'],
+['🏗️','Réparation & Construction','Réparation & Construction'],
+['🎮','Loisirs & Activités','Loisirs & Activités'],
+['🧸','Bébés & Enfants','Bébés & Enfants'],
+['🥦','Alimentation, Agriculture & Élevage','Alimentation & Agriculture'],
+['🐕','Animaux','Animaux'],
+['💼','Emplois','Emplois'],
+['🏭','Entreprise & Industrie','Entreprise & Industrie'],
+['📚','Livres & formations','Livres & formations'],
+['➕','Autres','Autres']
+];
+
+const grid=h('div');grid.id='xcats';
+const view=h('section');view.id='xcatview';
+$('list').before(grid,view);
+
+let items=[],cur=null;
+
+T.forEach(t=>{
+const b=h('button');b.type='button';
+b.append(h('i',t[0]),h('span',t[1]));
+b.onclick=()=>{cur=t;B.classList.add('catmode');draw();window.scrollTo(0,0);};
+grid.append(b);
+});
+
+function photo(i){
+const a=(Array.isArray(i.photos)&&i.photos.length?i.photos:(i.photo?[i.photo]:[]))
+.filter(s=>String(s).startsWith('data:image/'));
+if(a.length){
+const m=document.createElement('img');
+m.src=a[0];m.alt=i.title||'';
+m.style.cssText='width:100%;height:120px;object-fit:cover;border-radius:8px';
+return m;
+}
+const d=h('div','Pas de photo','mu');
+d.style.cssText='height:120px;display:flex;align-items:center;justify-content:center;background:var(--bd);border-radius:8px';
+return d;
+}
+
+function openAd(i){
+['q','fc','fv'].forEach(k=>{$(k).value='';$(k).dispatchEvent(new Event('input'));});
+const c=[...$('list').children].find(x=>x.textContent.includes(i.title)&&x.textContent.includes(money(i)));
+if(c)c.click();
+}
+
+function closeCat(){
+B.classList.remove('catmode');
+$('detail').hidden=true;
+window.scrollTo(0,0);
+  }
+  nav.querySelectorAll('button').forEach(b=>{
+if(b!==sb)b.addEventListener('click',()=>B.classList.remove('sellmode'));
+});
+
+/* le bouton Vendre du haut ouvre la même page */
+$('top').addEventListener('click',e=>{
+if(!user)return;
+e.stopImmediatePropagation();
+openSell();
+},true);
+
+/* détails obligatoires avant de publier */
+$('go').addEventListener('click',e=>{
+const m=$('msg');
+if(!$('ph').files.length){
+e.stopImmediatePropagation();
+m.textContent='Ajoute au moins une photo.';
+return;
+}
+if($('de').value.trim().length<10){
+e.stopImmediatePropagation();
+m.textContent='Ajoute une description (10 caractères minimum).';
+}
+},true);
+  </script><script type="module">
+const KEY='969d70c3-3f36-4431-a8c5-671bae2f93e9';
+const $=id=>document.getElementById(id);
+
+async function notify(subject,message){
+try{
+await fetch('https://api.web3forms.com/submit',{
+method:'POST',
+headers:{'Content-Type':'application/json',Accept:'application/json'},
+body:JSON.stringify({access_key:KEY,subject:'Zarakoustra : '+subject,from_name:'Zarakoustra',message})
+});
+}catch(e){}
+}
+
+/* 1. Nouvelle annonce à valider */
+let lastTitle='',sent=false;
+$('go').addEventListener('click',()=>{lastTitle=$('ti').value.trim();sent=false;},true);
+new MutationObserver(()=>{
+if(!sent&&$('msg').textContent.startsWith('Annonce envoyée')){
+sent=true;
+notify('Nouvelle annonce à valider','Titre : '+lastTitle+'\nOuvre le site avec ton compte admin pour la valider.');
+}
+}).observe($('msg'),{childList:true,characterData:true,subtree:true});
+
+/* 2. Annonce signalée */
+const _alert=window.alert.bind(window);
+window.alert=t=>{
+_alert(t);
+if(t==='Signalement envoyé.'){
+const b=document.querySelector('#detail>b');
+notify('Annonce signalée','Annonce : '+(b?b.textContent:'?')+'\nOuvre le site (admin) puis Modération.');
+}
+};
+
+/* 3. Message à l'agence */
+let ag=false,agInfo='';
+$('xag').addEventListener('click',()=>{
+ag=false;
+const s=$('xag').querySelector('select'),i=$('xag').querySelector('input');
+agInfo=(s?s.value:'')+' | '+(i?i.value:'');
+},true);
+new MutationObserver(()=>{
+const ok=[...$('xag').querySelectorAll('p')].some(p=>p.textContent.startsWith('Message envoyé'));
+if(ok&&!ag){
+ag=true;
+notify('Message à l’agence','Motif : '+agInfo+'\nOuvre Mon compte (admin) pour le lire.');
+}
+if(!ok)ag=false;
+}).observe($('xag'),{childList:true,characterData:true,subtree:true});
+</script><script type="module">
+import {getApp} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+import {getAuth,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+const KEY='969d70c3-3f36-4431-a8c5-671bae2f93e9';
+onAuthStateChanged(getAuth(getApp()),u=>{
+if(!u)return;
+const fresh=Date.now()-new Date(u.metadata.creationTime).getTime()<120000;
+let done=false;
+try{done=localStorage.getItem('xnew_'+u.uid)==='1';}catch(e){}
+if(!fresh||done)return;
+try{localStorage.setItem('xnew_'+u.uid,'1');}catch(e){}
+const p=(u.email||'').split('@');
+const mail=p[1]?p[0].slice(0,2)+'***@'+p[1]:'inconnu';
+fetch('https://api.web3forms.com/submit',{
+method:'POST',
+headers:{'Content-Type':'application/json',Accept:'application/json'},
+body:JSON.stringify({access_key:KEY,subject:'Zarakoustra : nouvelle inscription',from_name:'Zarakoustra',message:'Nouveau compte créé : '+mail})
+}).catch(()=>{});
+});
+  /* « Ouvrir l'annonce pour noter » : retour à l'accueil pour voir l'annonce */
+$('salesList').addEventListener('click',e=>{
+const b=e.target.closest('button');
+if(b&&b.textContent.startsWith('Ouvrir'))
+document.querySelector('#xnav button[data-k="home"]').click();
+},true);
+</script><style>
+#adm{display:none!important}
+body[data-tab="acc"][data-sub="xadm"] :is(#adm,#xagadm):not([hidden]):not(:empty){display:flex!important}
+body[data-tab="acc"]:not([data-sub="xadm"]) #xagadm{display:none!important}
+</style>
+<script type="module">
+import {getApp} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+import {getAuth,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+const $=id=>document.getElementById(id);
+const ADMIN='rBxaE8OltfeNwvpUivDdqZqhxjl1';
+const sp=$('settingsPanel');
+const mb=document.createElement('button');
+mb.type='button';mb.className='btn2';mb.dataset.open='xadm';
+mb.textContent='🛡️ Modération';
+mb.hidden=true;
+const ref=sp.querySelector('[data-open="xmine"]');
+if(ref)ref.before(mb);else sp.append(mb);
+
+function count(){
+const b=$('adm').querySelector('b');
+const m=b&&b.textContent.match(/\((\d+)\)/);
+const n=m?Number(m[1]):0;
+mb.textContent='🛡️ Modération'+(n?' ('+n+' à valider)':'');
+}
+new MutationObserver(count).observe($('adm'),{childList:true,subtree:true});
+onAuthStateChanged(getAuth(getApp()),u=>{mb.hidden=!(u&&u.uid===ADMIN);count();});
+</script>
+
+<script>
+(function(){
+const img=document.getElementById('pfimg'),inp=document.getElementById('pfin');
+try{const s=localStorage.getItem('pfphoto');if(s)img.src=s;}catch(e){}
+inp.onchange=()=>{
+const f=inp.files[0];if(!f)return;
+const r=new FileReader();
+r.onload=()=>{const im=new Image();im.onload=()=>{
+const c=document.createElement('canvas');c.width=c.height=120;
+const s=Math.min(im.width,im.height);
+c.getContext('2d').drawImage(im,(im.width-s)/2,(im.height-s)/2,s,s,0,0,120,120);
+const d=c.toDataURL('image/jpeg',0.7);
+img.src=d;try{localStorage.setItem('pfphoto',d);}catch(e){}
+};im.src=r.result;};
+r.readAsDataURL(f);
+};
+})();
+</script><script type="module">
+import {getApp} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+import {getAuth,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+import {getFirestore,collection,collectionGroup,query,where,getDocs,getDoc,setDoc,updateDoc,deleteDoc,doc,onSnapshot} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
+const auth=getAuth(getApp()),db=getFirestore(getApp());
+const $=id=>document.getElementById(id);
+const ADMIN='rBxaE8OltfeNwvpUivDdqZqhxjl1';
+const DOM='@zarakoustra.app';
+function h(tag,text,cls){const e=document.createElement(tag);if(text!=null)e.textContent=text;if(cls)e.className=cls;return e;}
+
+const st=document.createElement('style');
+st.textContent='#xfus{display:none}body[data-tab="acc"][data-sub="xadm"] #xfus:not([hidden]){display:flex}#xfus .lg{white-space:pre-wrap;font-size:13px}';
+document.head.append(st);
+  /* espace admin */
+const sec=h('section');sec.id='xfus';sec.hidden=true;
+const box=h('div');box.style.cssText='display:flex;flex-direction:column;gap:8px';
+const a=document.createElement('input');a.placeholder='Ancien code (A)';
+const b=document.createElement('input');b.placeholder='Nouveau code (B)';
+const go=h('button','Fusionner A vers B (manuel)','btn2');go.type='button';
+const lg=h('p',null,'mu lg');
+sec.append(h('h2','Fusion de comptes'),
+h('b','Demandes en attente'),box,
+h('b','Fusion manuelle'),a,b,go,lg);
+$('adm').after(sec);
+const log=t=>{lg.textContent+=t+'\n';};
+
+async function merge(A,B){
+const ps=await getDocs(query(collection(db,'products'),where('uid','==',A)));
+for(const d of ps.docs){
+await updateDoc(d.ref,{uid:B});
+try{await updateDoc(doc(db,'productContacts',d.id),{uid:B});}catch(e){}
+}
+log('Annonces déplacées : '+ps.size);
+
+const rv=(await getDocs(collectionGroup(db,'reviews'))).docs.filter(d=>d.data().sellerUid===A);
+for(const d of rv)await updateDoc(d.ref,{sellerUid:B});
+log('Avis déplacés : '+rv.length);
+
+const s1=await getDocs(query(collection(db,'sales'),where('sellerUid','==',A)));
+for(const d of s1.docs)await updateDoc(d.ref,{sellerUid:B});
+const s2=await getDocs(query(collection(db,'sales'),where('buyerUid','==',A)));
+for(const d of s2.docs){const x=d.data();await setDoc(doc(db,'sales',x.productId+'_'+B),{...x,buyerUid:B});await deleteDoc(d.ref);}
+log('Ventes et achats : '+(s1.size+s2.size));
+
+let c=0;
+for(const f of ['buyerUid','sellerUid']){
+const q=await getDocs(query(collection(db,'chats'),where(f,'==',A)));
+for(const d of q.docs){await updateDoc(d.ref,{[f]:B});c++;}
+}
+log('Conversations : '+c);
+
+const f1=await getDocs(query(collection(db,'follows'),where('sellerUid','==',A)));
+for(const d of f1.docs){const x=d.data();await setDoc(doc(db,'follows',B+'_'+x.followerUid),{...x,sellerUid:B});await deleteDoc(d.ref);}
+const f2=await getDocs(query(collection(db,'follows'),where('followerUid','==',A)));
+for(const d of f2.docs){const x=d.data();await setDoc(doc(db,'follows',x.sellerUid+'_'+B),{...x,followerUid:B});await deleteDoc(d.ref);}
+log('Abonnés / abonnements : '+(f1.size+f2.size));
+
+const v=await getDoc(doc(db,'verified',A));
+if(v.exists()){await setDoc(doc(db,'verified',B),{t:Date.now()});await deleteDoc(v.ref);log('Badge vérifié déplacé');}
+log('✅ Fusion terminée');
+}
+const errTxt=e=>e&&e.code==='permission-denied'?'règles Firestore non publiées ou incomplètes.':(e&&e.message)||'inconnue';
+
+go.onclick=async()=>{
+const A=a.value.trim(),B=b.value.trim();
+if(!A||!B||A===B){lg.textContent='Écris deux codes différents.';return;}
+if(!confirm('Fusionner tout ce qui est à A vers B ?'))return;
+go.disabled=true;lg.textContent='';
+try{await merge(A,B);}catch(e){log('❌ Erreur : '+errTxt(e));}
+go.disabled=false;
+};
+
+function drawReq(docs){
+box.replaceChildren();
+if(!docs.length){box.append(h('p','Aucune demande pour le moment.','mu'));return;}
+docs.forEach(d=>{
+const r=d.data(),B=d.id;
+const c=h('div',null,'mod');
+c.append(h('b','Numéro : '+r.phone),h('span','Nouveau code B : '+B,'mu'));
+const run=h('button','Fusionner','btn');run.type='button';
+run.onclick=async()=>{
+const p=await getDoc(doc(db,'phones',r.phone));
+if(!p.exists()){alert('Ancien code introuvable.');return;}
+const A=p.data().uid;
+if(!confirm('Fusionner l’ancien compte vers le nouveau ?'))return;
+run.disabled=true;lg.textContent='';
+try{await merge(A,B);await updateDoc(p.ref,{uid:B});await deleteDoc(d.ref);}
+catch(e){log('❌ Erreur : '+errTxt(e));run.disabled=false;}
+};
+const ig=h('button','Ignorer','btn2');ig.type='button';
+ig.onclick=()=>deleteDoc(d.ref);
+c.append(run,ig);box.append(c);
+});
+}
+
+let unsub=null;
+onAuthStateChanged(auth,async u=>{
+if(unsub){unsub();unsub=null;}
+const adm=!!(u&&u.uid===ADMIN);
+sec.hidden=!adm;
+if(adm)unsub=onSnapshot(collection(db,'mergeRequests'),s=>drawReq(s.docs),()=>{});
+
+/* enregistre le numéro, ou crée une demande de fusion */
+if(!u||!u.email||!u.email.endsWith(DOM))return;
+const n=u.email.slice(0,-DOM.length);
+try{await setDoc(doc(db,'phones',n),{uid:u.uid,t:Date.now()});return;}catch(e){}
+const fresh=Date.now()-new Date(u.metadata.creationTime).getTime()<120000;
+if(fresh){try{await setDoc(doc(db,'mergeRequests',u.uid),{phone:n,t:Date.now()});}catch(e){}}
+});
+</script><script type="module">
+import {getApp} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+import {getAuth,createUserWithEmailAndPassword,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+import {getFirestore,setDoc,doc} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
+const auth=getAuth(getApp()),db=getFirestore(getApp());
+const $=id=>document.getElementById(id);
+const BAD=/admin|zarakoustra|zarathoustra|officiel/i;
+
+const st=document.createElement('style');
+st.textContent='body:not([data-tab="acc"]) #xsignup{display:none!important}'+
+'#xsignup .vbtn{background:#BFE3F8;color:#0B2545}'+
+'#xsignup .vbtn.on{background:#0050FF;color:#fff}';
+document.head.append(st);
+
+function inp(ph,type,ac){const i=document.createElement('input');i.placeholder=ph;i.type=type;if(ac)i.autocomplete=ac;return i;}
+  /* la page */
+const sec=document.createElement('section');sec.id='xsignup';sec.hidden=true;
+const back=document.createElement('button');back.type='button';back.className='btn2';back.textContent='← Retour à la connexion';
+const title=document.createElement('h2');title.textContent='Créer un compte';
+const nom=inp('Nom','text','family-name'),pre=inp('Prénom','text','given-name'),
+em=inp('E-mail','email','email'),
+wa=inp('Numéro WhatsApp (ex : 0707070707)','tel','tel'),
+p1=inp('Mot de passe (6 caractères minimum)','password','new-password'),
+p2=inp('Confirmer le mot de passe','password','new-password');
+wa.inputMode='numeric';nom.maxLength=20;pre.maxLength=20;
+const lab=document.createElement('label');lab.className='chk';
+const cg=document.createElement('input');cg.type='checkbox';
+lab.append(cg,document.createTextNode(' J’accepte les conditions d’utilisation'));
+const ok=document.createElement('button');ok.type='button';ok.className='vbtn';ok.textContent='Valider';
+const m=document.createElement('p');m.className='mu';
+sec.append(back,title,nom,pre,em,wa,p1,p2,lab,ok,m);
+$('authp').after(sec);
+
+/* vérification */
+function phone(){
+let d=wa.value.replace(/\D/g,'');
+if(d.startsWith('00'))d=d.slice(2);
+if(d.length===10)d='225'+d;
+return /^\d{11,13}$/.test(d)?d:null;
+}
+function problem(){
+if(nom.value.trim().length<2)return 'Écris ton nom.';
+if(pre.value.trim().length<2)return 'Écris ton prénom.';
+if(BAD.test(nom.value+' '+pre.value))return 'Ce nom n’est pas autorisé.';
+if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em.value.trim()))return 'E-mail invalide.';
+if(!phone())return 'Numéro WhatsApp invalide (10 chiffres).';
+if(p1.value.length<6)return 'Mot de passe trop court (6 minimum).';
+if(p1.value!==p2.value)return 'Les deux mots de passe ne sont pas identiques.';
+if(!cg.checked)return 'Accepte les conditions d’utilisation.';
+return '';
+}
+function refresh(){ok.classList.toggle('on',!problem());}
+[nom,pre,em,wa,p1,p2].forEach(i=>i.addEventListener('input',refresh));
+cg.addEventListener('change',refresh);
+
+/* ouverture / retour */
+$('signup').addEventListener('click',e=>{
+e.stopImmediatePropagation();
+$('authp').hidden=true;sec.hidden=false;
+window.scrollTo(0,0);
+},true);
+back.onclick=()=>{sec.hidden=true;$('authp').hidden=false;};
+new MutationObserver(()=>{
+if(!sec.hidden&&!$('authp').hidden)$('authp').hidden=true;
+}).observe($('authp'),{attributes:true,attributeFilter:['hidden']});
+
+/* création */
+ok.onclick=async()=>{
+const p=problem();
+if(p){m.textContent=p;return;}
+const name=(pre.value.trim()+' '+nom.value.trim()).slice(0,30);
+const w=wa.value.trim(),mail=em.value.trim();
+ok.disabled=true;m.textContent='Création en cours…';
+try{
+const c=await createUserWithEmailAndPassword(auth,mail,p1.value);
+try{await setDoc(doc(db,'profiles',c.user.uid),{name,t:Date.now()});}catch(e){}
+try{localStorage.setItem('zk_wa',w);}catch(e){}
+const tl=$('tel');if(tl&&!tl.value)tl.value=w;
+}catch(e){
+const k=(e&&e.code)||'';
+m.textContent=k.includes('email-already')?'Cet e-mail a déjà un compte.':
+k.includes('invalid-email')?'E-mail invalide.':
+k.includes('weak')?'Mot de passe trop court (6 minimum).':
+'Une erreur est survenue. Réessaie.';
+}
+ok.disabled=false;
+};
+
+/* après connexion : on ferme la page et on vide les champs */
+onAuthStateChanged(auth,u=>{
+if(!u)return;
+sec.hidden=true;
+[nom,pre,em,wa,p1,p2].forEach(i=>{i.value='';});
+cg.checked=false;m.textContent='';refresh();
+try{const w=localStorage.getItem('zk_wa');if(w&&!$('tel').value)$('tel').value=w;}catch(e){}
+});
+</script><script type="module">
+import {getApp} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+import {getAuth,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+import {getFirestore,collection,query,where,onSnapshot,doc,getDoc,setDoc} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
+
+const auth=getAuth(getApp()),db=getFirestore(getApp());
+const $=id=>document.getElementById(id);
+const base=location.origin+location.pathname;
+const money=i=>Number(i.price).toLocaleString('fr-FR')+' FCFA'+(i.unit?' '+i.unit:'');
+const img=$('pfimg');
+const DEF="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%23fff'/%3E%3Ccircle cx='20' cy='15' r='7' fill='%233E5C76'/%3E%3Cellipse cx='20' cy='36' rx='13' ry='10' fill='%233E5C76'/%3E%3C/svg%3E";
+  /* photo sur la page du profil vendeur */
+const sid=new URLSearchParams(location.search).get('v');
+const sec=$('xprof');
+if(sid&&sec){
+let av=null;
+const put=()=>{
+if(!av||sec.querySelector('.xav'))return;
+const h2=[...sec.children].find(e=>e.tagName==='H2'&&e.textContent.startsWith('👤'));
+if(!h2)return;
+const im=document.createElement('img');im.className='xav';im.src=av;im.alt='';
+im.style.cssText='width:96px;height:96px;border-radius:50%;object-fit:cover;border:3px solid #000;align-self:center';
+h2.before(im);
+};
+avatar(sid).then(p=>{av=p;put();});
+new MutationObserver(put).observe(sec,{childList:true});
+}
+</script><script>
+(function(){
+const $=id=>document.getElementById(id);
+const inp=$('pfin'),img=$('pfimg'),S=240;
+const TINTS={
+nb:[[0,0,0],[255,255,255]],
+sepia:[[40,20,5],[255,235,200]],
+bleu:[[5,20,60],[150,220,255]],
+rose:[[60,5,35],[255,190,225]],
+vert:[[5,40,20],[190,255,200]],
+violet:[[30,5,60],[220,190,255]]
+};
+let im=null,st={z:1,x:0,y:0,hue:0,bri:100,tint:null};
+
+const css=document.createElement('style');
+css.textContent=
+'#pfed{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;padding:12px}'+
+'#pfed[hidden]{display:none}'+
+'#pfed .box{background:#fff;color:#0B2545;border-radius:16px;padding:14px;width:100%;max-width:340px;max-height:100%;overflow-y:auto;display:flex;flex-direction:column;gap:10px;align-items:center}'+
+'#pfed canvas{width:240px;height:240px;border-radius:50%;border:4px solid #000;touch-action:none;background:#ddd}'+
+'#pfed label{width:100%;font-size:13px;font-weight:700;display:flex;flex-direction:column;gap:4px}'+
+'#pfed input[type=range]{width:100%;min-height:0;padding:0;border:0}'+
+'#pfed .ch{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}'+
+'#pfed .ch button{min-height:34px;font-size:13px;padding:0 10px;border:1px solid #000;background:#fff;color:#000;border-radius:999px}'+
+'#pfed .ch button.on{background:#000;color:#fff}'+
+'#pfed .act{display:flex;gap:8px;width:100%}'+
+'#pfed .act button{flex:1}';
+document.head.append(css);
+
+const ed=document.createElement('div');ed.id='pfed';ed.hidden=true;
+ed.innerHTML='<div class="box"><b>Modifier ma photo</b>'+
+'<canvas id="pfcv" width="'+S+'" height="'+S+'"></canvas>'+
+'<span style="font-size:12px">Glisse la photo pour la déplacer</span>'+
+'<label>Zoom (découper)<input id="pfz" type="range" min="100" max="300" value="100"></label>'+
+'<label>Luminosité<input id="pfb" type="range" min="60" max="140" value="100"></label>'+
+'<label>Changer les couleurs<input id="pfh" type="range" min="0" max="360" value="0"></label>'+
+'<div class="ch" id="pfpre"></div>'+
+'<div class="act"><button type="button" class="btn2" id="pfx">Annuler</button>'+
+'<button type="button" class="btn" id="pfok">Enregistrer</button></div></div>';
+document.body.append(ed);
+
+const cv=$('pfcv'),cx=cv.getContext('2d',{willReadFrequently:true});
+
+function mark(){[...$('pfpre').children].forEach(b=>b.classList.toggle('on',b.dataset.k===(st.tint||'')));}
+[['Normal',''],['N&B','nb'],['Sépia','sepia'],['Bleu','bleu'],['Rose','rose'],['Vert','vert'],['Violet','violet']]
+.forEach(([n,k])=>{
+const b=document.createElement('button');b.type='button';b.textContent=n;b.dataset.k=k;
+b.onclick=()=>{st.tint=k||null;st.hue=0;$('pfh').value=0;mark();draw();};
+$('pfpre').append(b);
+});
+
+function scale(){return Math.max(S/im.width,S/im.height)*st.z;}
+function draw(){
+if(!im)return;
+const sc=scale(),w=im.width*sc,h=im.height*sc;
+st.x=Math.min(0,Math.max(S-w,st.x));
+st.y=Math.min(0,Math.max(S-h,st.y));
+cx.fillStyle='#fff';cx.fillRect(0,0,S,S);
+cx.drawImage(im,st.x,st.y,w,h);
+const d=cx.getImageData(0,0,S,S),p=d.data;
+const a=st.hue*Math.PI/180,c=Math.cos(a),s=Math.sin(a),bri=st.bri/100;
+const t=st.tint?TINTS[st.tint]:null;
+for(let i=0;i<p.length;i+=4){
+let r=p[i],g=p[i+1],b=p[i+2];
+if(t){
+const y=(0.299*r+0.587*g+0.114*b)/255;
+r=t[0][0]+(t[1][0]-t[0][0])*y;
+g=t[0][1]+(t[1][1]-t[0][1])*y;
+b=t[0][2]+(t[1][2]-t[0][2])*y;
+}else if(st.hue){
+const r2=r*(0.213+c*0.787-s*0.213)+g*(0.715-c*0.715-s*0.715)+b*(0.072-c*0.072+s*0.928);
+const g2=r*(0.213-c*0.213+s*0.143)+g*(0.715+c*0.285+s*0.140)+b*(0.072-c*0.072-s*0.283);
+const b2=r*(0.213-c*0.213-s*0.787)+g*(0.715-c*0.715+s*0.715)+b*(0.072+c*0.928+s*0.072);
+r=r2;g=g2;b=b2;
+}
+p[i]=Math.max(0,Math.min(255,r*bri));
+p[i+1]=Math.max(0,Math.min(255,g*bri));
+p[i+2]=Math.max(0,Math.min(255,b*bri));
+}
+cx.putImageData(d,0,0);
+  }
+  /* réglages */
+$('pfz').oninput=e=>{
+const old=scale();
+const mx=(S/2-st.x)/old,my=(S/2-st.y)/old;
+st.z=e.target.value/100;
+const sc=scale();
+st.x=S/2-mx*sc;st.y=S/2-my*sc;
+draw();
+};
+$('pfb').oninput=e=>{st.bri=+e.target.value;draw();};
+$('pfh').oninput=e=>{st.hue=+e.target.value;st.tint=null;mark();draw();};
+
+/* déplacer avec le doigt */
+let drag=null;
+cv.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,ox:st.x,oy:st.y};cv.setPointerCapture(e.pointerId);});
+cv.addEventListener('pointermove',e=>{
+if(!drag)return;
+const k=S/cv.getBoundingClientRect().width;
+st.x=drag.ox+(e.clientX-drag.x)*k;
+st.y=drag.oy+(e.clientY-drag.y)*k;
+draw();
+});
+['pointerup','pointercancel'].forEach(t=>cv.addEventListener(t,()=>{drag=null;}));
+
+/* choix de la photo : ouvre l'éditeur */
+inp.addEventListener('change',e=>{
+e.stopImmediatePropagation();
+const f=inp.files[0];if(!f)return;
+const r=new FileReader();
+r.onload=()=>{
+const i=new Image();
+i.onload=()=>{
+im=i;
+const sc=Math.max(S/i.width,S/i.height);
+st={z:1,x:(S-i.width*sc)/2,y:(S-i.height*sc)/2,hue:0,bri:100,tint:null};
+$('pfz').value=100;$('pfb').value=100;$('pfh').value=0;
+mark();draw();ed.hidden=false;
+};
+i.src=r.result;
+};
+r.readAsDataURL(f);
+inp.value='';
+},true);
+
+$('pfx').onclick=()=>{ed.hidden=true;};
+$('pfok').onclick=()=>{
+const d=cv.toDataURL('image/jpeg',0.85);
+img.src=d;
+try{localStorage.setItem('pfphoto',d);}catch(e){}
+ed.hidden=true;
+};
+})();
+</script><script type="module">
+import {getApp} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+import {getAuth,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+import {getFirestore,collection,query,where,getDocs,getDoc,doc} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
+
+const auth=getAuth(getApp()),db=getFirestore(getApp());
+const $=id=>document.getElementById(id);
+const DISMISS='zk_onb_hidden';
+
+const st=document.createElement('style');
+st.textContent=`
+#xonb{border:2px solid #000;border-radius:14px;background:#fff;box-shadow:4px 4px 0 #000}
+#xonb .xstep{display:flex;align-items:center;gap:10px;font-size:15px}
+#xonb .xdot{width:26px;height:26px;border-radius:50%;border:2px solid #000;display:flex;align-items:center;justify-content:center;font-size:14px;flex:none}
+#xonb .xdot.ok{background:#5BB8EA}
+#xonb .xbar{height:10px;border-radius:6px;background:var(--bd);overflow:hidden;border:1px solid #000}
+#xonb .xbar i{display:block;height:100%;background:#0050FF;width:0}
+body:not([data-tab="home"]) #xonb{display:none!important}
+.xempty{text-align:center;padding:16px 8px}
+`;
+document.head.append(st);
+
+const box=document.createElement('section');
+box.id='xonb';box.hidden=true;
+$('q').before(box);
+
+let user=null;
+
+async function check(u){
+const [av,pr,ps]=await Promise.all([
+getDoc(doc(db,'avatars',u.uid)).then(d=>d.exists()).catch(()=>false),
+getDoc(doc(db,'profiles',u.uid)).then(d=>d.exists()&&!!d.data().name).catch(()=>false),
+getDocs(query(collection(db,'products'),where('uid','==',u.uid))).then(s=>s.size>0).catch(()=>false)
+]);
+return [
+{ok:av,txt:'Ajouter ta photo de profil'},
+{ok:pr,txt:'Choisir ton nom'},
+{ok:ps,txt:'Publier ta première annonce'}
+];
+}
+
+async function draw(){
+if(!user||localStorage.getItem(DISMISS)==='1'){box.hidden=true;return;}
+const steps=await check(user);
+const n=steps.filter(s=>s.ok).length;
+if(n===steps.length){box.hidden=true;return;}
+box.hidden=false;
+box.replaceChildren();
+
+const t=document.createElement('b');
+t.textContent='Bienvenue sur ZARAKOUSTRA 👋';
+const p=document.createElement('p');
+p.className='mu';
+p.textContent='Termine ces 3 étapes pour bien démarrer ('+n+'/3).';
+const bar=document.createElement('div');bar.className='xbar';
+const fill=document.createElement('i');fill.style.width=(n/3*100)+'%';
+bar.append(fill);
+box.append(t,p,bar);
+
+steps.forEach(s=>{
+const r=document.createElement('div');r.className='xstep';
+const d=document.createElement('span');
+d.className='xdot'+(s.ok?' ok':'');
+d.textContent=s.ok?'✓':'';
+const x=document.createElement('span');x.textContent=s.txt;
+r.append(d,x);
+box.append(r);
+});
+
+const hide=document.createElement('button');
+hide.type='button';hide.className='btn2';hide.textContent='Masquer ce guide';
+hide.onclick=()=>{localStorage.setItem(DISMISS,'1');box.hidden=true;};
+box.append(hide);
+}
+
+onAuthStateChanged(auth,u=>{user=u;draw();});
+new MutationObserver(()=>{
+if(document.body.dataset.tab==='home')draw();
+}).observe(document.body,{attributes:true,attributeFilter:['data-tab']});
+  /* message plus engageant quand une liste est vide */
+new MutationObserver(()=>{
+const p=[...$('list').children].find(e=>e.tagName==='P'&&e.textContent.startsWith('Aucune annonce pour'));
+if(!p)return;
+p.className='xempty mu';
+p.replaceChildren();
+const t=document.createElement('b');t.textContent='Pas encore d’annonce ici';
+const s=document.createElement('p');s.className='mu';
+s.textContent='Sois le premier à publier dans cette catégorie ou modifie tes filtres.';
+const b=document.createElement('button');
+b.type='button';b.className='btn';b.textContent='➕ Publier une annonce';
+b.onclick=()=>$('top').click();
+p.append(t,s,b);
+}).observe($('list'),{childList:true});
+</script>
+</body>
+</html>
