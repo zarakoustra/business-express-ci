@@ -1052,3 +1052,139 @@ theme.onchange=applyTheme;
 applyTheme();
 })();
 </script>
+<style>
+onAuthStateChanged(auth,u=>{
+if(unsub){unsub();unsub=null;}
+draw([],u);
+if(!u)return;
+unsub=onSnapshot(query(collection(db,'products'),where('uid','==',u.uid)),s=>{
+draw(s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.t||0)-(a.t||0)),u);
+},()=>{mine.append(h('p','Impossible de charger tes annonces.','mu'));});
+});
+</script><script type="module">
+import {getApp} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+import {getAuth,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+import {getFirestore,collectionGroup,onSnapshot} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
+
+const auth=getAuth(getApp()),db=getFirestore(getApp());
+const $=id=>document.getElementById(id);
+function h(tag,text,cls){
+const e=document.createElement(tag);
+if(text!=null)e.textContent=text;
+if(cls)e.className=cls;
+return e;
+}
+const stars=n=>'★'.repeat(n)+'☆'.repeat(5-n);
+
+const st=document.createElement('style');
+st.textContent='body:not([data-tab="acc"]) #xrev{display:none!important}';
+document.head.append(st);
+
+const rev=h('section');rev.id='xrev';rev.hidden=true;
+($('xmine')||$('xgrid')).after(rev);
+
+const card=h('button',null,'card');card.type='button';
+const cardTitle=h('b','⭐ Avis');
+card.append(cardTitle);
+card.onclick=()=>{
+if($('xmine'))$('xmine').hidden=true;
+rev.hidden=!rev.hidden;
+if(!rev.hidden)rev.scrollIntoView();
+};
+$('xgrid').append(card);
+
+let unsub=null;
+function draw(list,user){
+rev.replaceChildren(h('h2','Avis reçus'));
+cardTitle.textContent='⭐ Avis ('+list.length+')';
+if(!user){rev.append(h('p','Connecte-toi pour voir tes avis.','mu'));return;}
+if(!list.length){rev.append(h('p','Aucun avis pour le moment. Les avis arrivent après une vente confirmée.','mu'));return;}
+const avg=list.reduce((s,r)=>s+(r.rating||0),0)/list.length;
+rev.append(h('p','Note moyenne : ★ '+avg.toFixed(1)+' / 5 ('+list.length+' avis)','ok'));
+list.forEach(r=>{
+const c=h('div',null,'mod');
+c.append(h('b',stars(r.rating||0)));
+if(r.comment)c.append(h('span',r.comment));
+if(r.t&&r.t.seconds)c.append(h('span',new Date(r.t.seconds*1000).toLocaleDateString('fr-FR'),'mu'));
+rev.append(c);
+});
+}
+
+onAuthStateChanged(auth,u=>{
+if(unsub){unsub();unsub=null;}
+draw([],u);
+if(!u)return;
+unsub=onSnapshot(collectionGroup(db,'reviews'),s=>{
+const l=s.docs.map(d=>({id:d.id,...d.data()}))
+.filter(r=>r.sellerUid===u.uid)
+.sort((a,b)=>(b.t?.seconds||0)-(a.t?.seconds||0));
+draw(l,u);
+},()=>{rev.append(h('p','Impossible de charger tes avis.','mu'));});
+});
+</script><script>
+(function(){
+const $=id=>document.getElementById(id);
+function h(tag,text,cls){
+const e=document.createElement(tag);
+if(text!=null)e.textContent=text;
+if(cls)e.className=cls;
+return e;
+}
+
+const st=document.createElement('style');
+st.textContent='body:not([data-tab="acc"]) #xfaq{display:none!important}'+
+'#xfaq details{border:1px solid var(--bd);border-radius:10px;padding:10px}'+
+'#xfaq summary{font-weight:700;cursor:pointer}'+
+'#xfaq details p{margin:8px 0 0}';
+document.head.append(st);
+
+const faq=h('section');faq.id='xfaq';faq.hidden=true;
+($('xrev')||$('xmine')||$('xgrid')).after(faq);
+
+const QA=[
+['Comment publier une annonce ?','Connecte-toi, appuie sur « Vendre » en haut, remplis le formulaire (photos, titre, prix, ville) puis clique sur « Publier mon annonce ».'],
+['Pourquoi mon annonce n’est pas visible ?','Chaque annonce est vérifiée avant d’être mise en ligne. Tu peux voir son statut dans « Mes annonces ».'],
+['Comment contacter un vendeur ?','Ouvre l’annonce, puis appuie sur « Message » ou « Voir le numéro du vendeur ». Il faut être connecté.'],
+['Comment éviter les arnaques ?','Vois toujours le produit avant de payer et n’envoie jamais d’argent à l’avance. Si quelque chose te semble suspect, utilise « Signaler cette annonce ».'],
+['Comment laisser un avis ?','Demande la confirmation de vente depuis l’annonce. Quand le vendeur confirme, tu peux noter le vendeur.'],
+['Comment contacter l’agence ?','Dans « Mon compte », utilise le formulaire « Contacter l’agence » ou écris-nous sur WhatsApp.']
+];
+
+faq.append(h('h2','Questions fréquentes'));
+QA.forEach(([q,a])=>{
+const d=document.createElement('details');
+d.append(h('summary',q),h('p',a,'mu'));
+faq.append(d);
+});
+
+const card=h('button',null,'card');card.type='button';
+card.append(h('b','❓ FAQ'));
+card.onclick=()=>{
+['xmine','xrev'].forEach(k=>{if($(k))$(k).hidden=true;});
+faq.hidden=!faq.hidden;
+if(!faq.hidden)faq.scrollIntoView();
+};
+$('xgrid').append(card);
+})();
+</script><script type="module">
+import {getApp} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+import {getAuth,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+import {getFirestore,collection,query,where,onSnapshot} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
+
+const auth=getAuth(getApp()),db=getFirestore(getApp());
+const $=id=>document.getElementById(id);
+function h(tag,text,cls){
+const e=document.createElement(tag);
+if(text!=null)e.textContent=text;
+if(cls)e.className=cls;
+return e;
+}
+
+const st=document.createElement('style');
+st.textContent='body:not([data-tab="acc"]) #xnotif{display:none!important}'+
+'#xgrid .card{position:relative}'+
+'#xgrid .nbadge{position:absolute;top:6px;right:6px;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:#E53935;color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}';
+document.head.append(st);
+
+const box=h('section');box.id='xnotif';box.hidden=true;
+($('xfaq')||$('xrev')||$('xmine')||$('xgrid')).after(box);
