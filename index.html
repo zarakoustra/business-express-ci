@@ -1037,3 +1037,18 @@ const xag=h('section');xag.id='xag';
 const xagadm=h('section');xagadm.id='xagadm';
 $('xacc').after(xag,xagadm);
 </script>
+<script type="module">
+(function(){
+const $=id=>document.getElementById(id);
+const theme=$("appTheme");
+if(!theme)return;
+function applyTheme(){
+if(theme.value==='dark')document.documentElement.dataset.theme='dark';
+else delete document.documentElement.dataset.theme;
+try{localStorage.setItem("zarathoustra_theme",theme.value);}catch(e){}
+}
+try{theme.value=localStorage.getItem("zarathoustra_theme")||"light";}catch(e){}
+theme.onchange=applyTheme;
+applyTheme();
+})();
+</script>
