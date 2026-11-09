@@ -162,3 +162,74 @@ body[data-tab="acc"].settings-open #xacc > :not(#settingsPanel){
 #xagadm:empty{display:none!important}
 </style>
 </head>
+<body>
+<header>
+<label class="pf">
+<span class="pft">Profil</span>
+<span class="pfa">
+<img id="pfimg" alt="Profil" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%23fff'/%3E%3Ccircle cx='20' cy='15' r='7' fill='%233E5C76'/%3E%3Cellipse cx='20' cy='36' rx='13' ry='10' fill='%233E5C76'/%3E%3C/svg%3E">
+<i class="pfc">📷</i>
+</span>
+<input id="pfin" type="file" accept="image/*" hidden>
+</label>
+<h1>ZARAKOUSTRA</h1>
+<button id="top" type="button">Connexion</button>
+</header>
+<main>
+<section id="authp" hidden>
+<h2>Connexion</h2>
+<input id="em" type="email" placeholder="E-mail" autocomplete="email">
+<input id="pw" type="password" placeholder="Mot de passe (6 caractères minimum)">
+<label class="chk"><input type="checkbox" id="cg"> J’accepte les conditions d’utilisation</label>
+<button class="btn" id="login" type="button">Se connecter</button>
+<button class="btn2" id="signup" type="button">Créer un compte</button>
+<p class="mu" id="amsg"></p>
+</section>
+<section id="sellp" hidden>
+<h2>Publier une annonce</h2>
+<p class="mu" id="who"></p>
+<details><summary class="mu">Mon identifiant</summary>
+<p class="mu" id="uidp" style="user-select:all;word-break:break-all"></p></details>
+<p class="mu">Ton annonce sera visible après validation.</p>
+<label>Photos (4 maximum)<input id="ph" type="file" accept="image/*" multiple></label>
+<div class="strip" id="pv"></div>
+<label>Titre<input id="ti" maxlength="80"></label>
+<label>Catégorie<select id="ca"></select></label>
+<label>Ville<select id="vi"></select></label>
+<label>Prix (FCFA)<input id="pr" type="number" inputmode="numeric"></label>
+<label>Type de prix<select id="un"></select></label>
+<label>Description<textarea id="de" rows="3" maxlength="500"></textarea></label>
+<label>Lien facultatif<input id="li" type="url" placeholder="https://"></label>
+<label>Ton nom<input id="se" maxlength="40"></label>
+<label>Ton numéro WhatsApp<input id="tel" type="tel" placeholder="0707070707"></label>
+<button class="btn" id="go" type="button">Publier mon annonce</button>
+<p class="mu" id="msg"></p>
+<button class="btn2" id="logout" type="button">Se déconnecter</button>
+</section>
+<section id="salesPanel" hidden>
+<h2>Mes ventes et achats</h2>
+<p class="mu">Les avis sont autorisés uniquement après confirmation de la vente par le vendeur.</p>
+<div id="salesList"></div>
+</section>
+<section id="adm" hidden></section>
+<input id="q" placeholder="Rechercher une annonce…" aria-label="Rechercher">
+<div class="row">
+<select id="fc" aria-label="Catégorie"></select>
+<select id="fv" aria-label="Ville"></select>
+</div>
+<section id="detail" hidden></section>
+<div id="list"></div>
+<section id="terms" hidden>
+<h2>Conditions d’utilisation</h2>
+<p>1. Ce site met en relation vendeurs et acheteurs. Il n’est pas partie aux ventes.</p>
+<p>2. Les produits illégaux, fausses annonces et arnaques sont interdits.</p>
+<p>3. Les vendeurs doivent fournir des informations exactes.</p>
+<p>4. Acheteurs : vois le produit avant de payer et n’envoie jamais d’argent à l’avance.</p>
+<p>5. Le numéro de téléphone est réservé aux utilisateurs connectés.</p>
+<p>6. L’administrateur peut refuser ou supprimer une annonce abusive, ou bloquer un compte.</p>
+<p>7. Tu peux signaler toute annonce suspecte.</p>
+<button class="btn2" id="tclose" type="button">Fermer</button>
+</section>
+<button class="btn2" id="tl" type="button">Conditions d’utilisation</button>
+<section id="settingsPanel"></section>
+</main>
