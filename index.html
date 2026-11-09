@@ -5,105 +5,160 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#A8DDF7">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap">
-<link rel="stylesheet" href="css/style.css">
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon-192.png">
-<title>ZARATHOUSTRA</title>
+<title>ZARAKOUSTRA</title>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-MZ78EHSL6R"></script>
+<script>
+window.dataLayer=window.dataLayer||[];
+function gtag(){dataLayer.push(arguments);}
+gtag('js',new Date());
+gtag('config','G-MZ78EHSL6R');
+</script>
+<style>
+:root{
+  --bg:#F4FAFF;--tx:#0B2545;--mu:#3E5C76;
+  --bd:#CFE8F7;--cd:#FFFFFF;--nv:#A8DDF7;
+  --hd:#0B2545;--ac:#0B6FA8;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  background:var(--bg);color:var(--tx);font-family:system-ui,sans-serif;
+}
+header{
+  background:var(--nv);color:var(--hd);padding:10px 14px;
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+}
+h1{margin:0;font-size:19px}
+main{
+  max-width:560px;margin:auto;padding:16px;
+  display:flex;flex-direction:column;gap:12px;
+}
+h2{margin:4px 0}
+input,textarea,select{
+  width:100%;min-height:44px;padding:8px 12px;
+  font-size:16px;border:1px solid var(--bd);border-radius:10px;
+  background:var(--cd);color:var(--tx);
+}
+button{
+  min-height:48px;font-size:16px;font-weight:700;border-radius:12px;
+  padding:0 16px;border:0;cursor:pointer;
+}
+header button{min-height:40px;background:#fff;color:#0B2545}
+header #top{
+  flex:0 0 auto;padding:0 10px;font-size:14px;min-height:40px;
+  background:transparent;color:#000;border:2px solid #000;
+}
+.btn{background:#5BB8EA;color:#0B2545}
+.btn2{background:var(--cd);color:var(--ac);border:1px solid var(--ac)}
+.lnk{
+  display:flex;align-items:center;justify-content:center;text-decoration:none;
+  min-height:48px;border-radius:12px;font-weight:700;
+}
+section{
+  background:var(--cd);border:1px solid var(--bd);border-radius:12px;
+  padding:12px;display:flex;flex-direction:column;gap:8px;
+}
+.row{display:flex;gap:8px}
+#list{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+button.card{
+  min-height:0;padding:8px;font-weight:400;text-align:left;
+  background:var(--cd);border:1px solid var(--bd);
+  display:flex;flex-direction:column;gap:4px;color:var(--tx);font-size:15px;
+}
+button.card b{font-size:16px}
+.mu{color:var(--mu);margin:0;font-size:14px}
+.ok{color:var(--ac);font-weight:700;font-size:13px;margin:0}
+.strip{display:flex;gap:8px;overflow-x:auto}
+.strip img{height:200px;width:auto;border-radius:8px;flex:none}
+.safe{
+  border:1px solid var(--ac);border-radius:10px;padding:10px;font-size:14px;margin:0;
+}
+.mod{
+  display:flex;flex-direction:column;gap:6px;border:1px solid var(--bd);
+  border-radius:10px;padding:8px;font-size:14px;
+}
+.chk{display:flex;gap:8px;align-items:center;font-size:14px}
+.chk input{width:auto;min-height:0}
+#terms p{margin:0;font-size:14px}
+[hidden]{display:none!important}
+
+/* Photo de profil */
+.pf{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
+.pft{font-size:11px;font-weight:700;order:2;margin-top:2px}
+.pfa{position:relative;width:44px;height:44px}
+.pfa img{
+  width:100%;height:100%;border-radius:50%;object-fit:cover;
+  border:3px solid #000;
+}
+.pfc{
+  position:absolute;right:-6px;bottom:-4px;font-size:12px;font-style:normal;
+  background:#fff;border-radius:50%;padding:2px;border:1.5px solid #000;
+}
+
+/* Titre ZARAKOUSTRA */
+header h1{
+  width:max-content;
+  flex:0 0 auto;
+  margin:0 auto;
+  padding:6px 0.5cm;
+  text-indent:0;
+  text-align:center;
+  border:3px solid #000;
+  border-radius:14px;
+  background:#fff;
+  box-shadow:4px 4px 0 #000;
+  animation:zkneon 2s infinite;
+  font-family:'Montserrat','Arial Black',Arial,sans-serif;
+  font-weight:900;
+  font-size:clamp(18px,5vw,26px);
+  letter-spacing:.03em;
+  line-height:1.2;
+  text-transform:uppercase;
+  white-space:nowrap;
+  min-width:0;
+  color:#0B2545;
+  text-shadow:
+    -2px -2px 0 #000,2px -2px 0 #000,
+    -2px 2px 0 #000,2px 2px 0 #000,
+    0 3px 0 #000;
+}
+@keyframes zkneon{
+0%,100%{box-shadow:0 0 8px #00E5FF,inset 0 0 8px rgba(0,229,255,.45)}
+50%{box-shadow:0 0 16px #00E5FF,inset 0 0 12px rgba(0,229,255,.7)}
+}
+@media (prefers-reduced-motion:reduce){header h1{animation:none}}
+
+/* Thème sombre et paramètres */
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#101820;
+  --tx:#F1F5F9;
+  --mu:#AAB8C5;
+  --bd:#34495A;
+  --cd:#1B2935;
+  --nv:#243C50;
+  --hd:#FFFFFF;
+  --ac:#65BDEB;
+}
+#settingsPanel{
+  display:none;
+  flex-direction:column;
+  gap:12px;
+}
+body[data-tab="acc"].settings-open #settingsPanel{
+  display:flex;
+}
+body[data-tab="acc"].settings-open #xacc > :not(#settingsPanel){
+  display:none !important;
+}
+#settingsPanel label{
+  display:block;
+  font-weight:600;
+}
+
+#xagadm:empty{display:none!important}
+</style>
 </head>
-<body>
-<header>
-<label class="pf">
-<span class="pft">Profil</span>
-<span class="pfa">
-<img id="pfimg" alt="Profil" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%23fff'/%3E%3Ccircle cx='20' cy='15' r='7' fill='%233E5C76'/%3E%3Cellipse cx='20' cy='36' rx='13' ry='10' fill='%233E5C76'/%3E%3C/svg%3E">
-<i class="pfc">📷</i>
-</span>
-<input id="pfin" type="file" accept="image/*" hidden>
-</label>
-<h1>ZARAKOUSTRA</h1>
-<button id="top" type="button">Connexion</button>
-</header>
-<main>
-<section id="authp" hidden>
-<h2>Connexion</h2>
-<input id="em" type="email" placeholder="E-mail" autocomplete="email">
-<input id="pw" type="password" placeholder="Mot de passe (6 caractères minimum)">
-<label class="chk"><input type="checkbox" id="cg"> J’accepte les conditions d’utilisation</label>
-<button class="btn" id="login" type="button">Se connecter</button>
-<button class="btn2" id="signup" type="button">Créer un compte</button>
-<p class="mu" id="amsg"></p>
-</section>
-<section id="sellp" hidden>
-<h2>Publier une annonce</h2>
-<p class="mu" id="who"></p>
-<details><summary class="mu">Mon identifiant</summary>
-<p class="mu" id="uidp" style="user-select:all;word-break:break-all"></p></details>
-<p class="mu">Ton annonce sera visible après validation.</p>
-<label>Photos (4 maximum)<input id="ph" type="file" accept="image/*" multiple></label>
-<div class="strip" id="pv"></div>
-<label>Titre<input id="ti" maxlength="80"></label>
-<label>Catégorie<select id="ca"></select></label>
-<label>Ville<select id="vi"></select></label>
-<label>Prix (FCFA)<input id="pr" type="number" inputmode="numeric"></label>
-<label>Type de prix<select id="un"></select></label>
-<label>Description<textarea id="de" rows="3" maxlength="500"></textarea></label>
-<label>Lien facultatif<input id="li" type="url" placeholder="https://"></label>
-<label>Ton nom<input id="se" maxlength="40"></label>
-<label>Ton numéro WhatsApp<input id="tel" type="tel" placeholder="0707070707"></label>
-<button class="btn" id="go" type="button">Publier mon annonce</button>
-<p class="mu" id="msg"></p>
-<button class="btn2" id="logout" type="button">Se déconnecter</button>
-</section>
-<section id="salesPanel" hidden>
-<h2>Mes ventes et achats</h2>
-<p class="mu">Les avis sont autorisés uniquement après confirmation de la vente par le vendeur.</p>
-<div id="salesList"></div>
-</section>
-<section id="adm" hidden></section>
-<input id="q" placeholder="Rechercher une annonce…" aria-label="Rechercher">
-<div class="row">
-<select id="fc" aria-label="Catégorie"></select>
-<select id="fv" aria-label="Ville"></select>
-</div>
-<section id="detail" hidden></section>
-<div id="list"></div>
-<section id="terms" hidden>
-<h2>Conditions d’utilisation</h2>
-<p>1. Ce site met en relation vendeurs et acheteurs. Il n’est pas partie aux ventes.</p>
-<p>2. Les produits illégaux, fausses annonces et arnaques sont interdits.</p>
-<p>3. Les vendeurs doivent fournir des informations exactes.</p>
-<p>4. Acheteurs : vois le produit avant de payer et n’envoie jamais d’argent à l’avance.</p>
-<p>5. Le numéro de téléphone est réservé aux utilisateurs connectés.</p>
-<p>6. L’administrateur peut refuser ou supprimer une annonce abusive, ou bloquer un compte.</p>
-<p>7. Tu peux signaler toute annonce suspecte.</p>
-<button class="btn2" id="tclose" type="button">Fermer</button>
-</section>
-<button class="btn2" id="tl" type="button">Conditions d’utilisation</button>
-</main>
-<script src="js/part03.js" type="module"></script>
-<script src="js/part04.js" type="module"></script>
-<script src="js/part05.js"></script>
-<script src="js/part06.js" type="module"></script>
-<script src="js/part07.js" type="module"></script>
-<script src="js/part08.js" type="module"></script>
-<script src="js/part09.js" type="module"></script>
-<script src="js/part10.js"></script>
-<script src="js/part11.js" type="module"></script>
-<script src="js/part12.js" type="module"></script>
-<script src="js/part13.js"></script>
-<script src="js/part14.js" type="module"></script>
-<script src="js/part15.js" type="module"></script>
-<script src="js/part16.js" type="module"></script>
-<script src="js/part17.js" type="module"></script>
-<script src="js/part18.js" type="module"></script>
-<script src="js/part19.js" type="module"></script>
-<script src="js/part20.js" type="module"></script>
-<script src="js/part21.js" type="module"></script>
-<script src="js/part22.js" type="module"></script>
-<script src="js/part23.js" type="module"></script>
-<script src="js/part24.js"></script>
-<script src="js/part25.js" type="module"></script>
-<script src="js/part26.js" type="module"></script>
-<script src="js/part27.js" type="module"></script>
-<script src="js/part28.js"></script>
-<script src="js/part29.js" type="module"></script>
