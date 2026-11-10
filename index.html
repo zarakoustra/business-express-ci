@@ -2858,6 +2858,133 @@ document.addEventListener('click', function (e) {
     }
   },300);
 })();
+  </script><script>
+(function(){
+  function hideCard(){
+    var cards=[...document.querySelectorAll('div')].filter(function(d){
+      return d.textContent.indexOf('Compte connecté')!==-1 && d.textContent.indexOf('Mes annonces')===-1;
+    });
+    var el=cards[cards.length-1];
+    if(el) el.style.display='none';
+  }
+
+  function openSettings(){
+    var gear=[...document.querySelectorAll('button')].find(function(b){
+      return b.textContent.indexOf('⚙')!==-1;
+    });
+    if(gear) gear.click();
+  }
+
+  function renameBack(){
+    [...document.querySelectorAll('button')].forEach(function(b){
+      if(b.textContent.indexOf('Retour à Mon compte')!==-1){
+        b.textContent='← Retour à l’accueil';
+        b.onclick=function(){
+          var home=document.querySelector('#xnav button');
+          if(home) home.click();
+        };
+      }
+    });
+  }
+
+  function init(){
+    hideCard();
+    renameBack();
+    var acc=document.querySelector('#xnav button[data-k="acc"]');
+    if(acc && !acc.dataset.zk){
+      acc.dataset.zk='1';
+      acc.addEventListener('click',function(){
+        setTimeout(function(){
+          hideCard();
+          openSettings();
+        },150);
+      });
+    }
+  }
+
+  var tries=0;
+  var timer=setInterval(function(){
+    init(); tries++;
+    if(tries>60) clearInterval(timer);
+  },500);
+})();
+  </script><script>
+(function(){
+  var groups=[
+    {t:'👤 Mon profil', k:['Mon nom','Partager mon profil','Mes abonnés']},
+    {t:'📦 Mon activité', k:['Mes annonces','Mes ventes et achats','Mes avis','Gagner des jetons']},
+    {t:'🛡️ Aide et sécurité', k:['Questions fréquentes','Contacter','Modération']},
+    {t:'🔐 Compte', k:['Notifications','Changer mon mot de passe']}
+  ];
+
+  function findH(text){
+    return [...document.querySelectorAll('h3')].find(function(h){return h.textContent.trim()===text;});
+  }
+
+  function header(text){
+    var h=document.createElement('h4');
+    h.textContent=text;
+    h.style.cssText='font-size:15px;font-weight:700;color:#5a6b7b;margin:22px 0 10px;text-transform:uppercase;letter-spacing:.5px;';
+    return h;
+  }
+
+  function run(){
+    var mon=findH('Mon espace');
+    if(!mon||mon.dataset.zk) return;
+    mon.dataset.zk='1';
+    var box=mon.parentElement;
+    var pref=findH('Préférences');
+
+    var btns=[...box.querySelectorAll('button')].filter(function(b){
+      return b.textContent.indexOf('Retour')===-1 &&
+             (mon.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+    });
+
+    function insert(el){
+      if(pref && pref.parentNode) pref.parentNode.insertBefore(el,pref);
+      else box.appendChild(el);
+    }
+
+    var used=[];
+    groups.forEach(function(g){
+      var items=btns.filter(function(b){
+        return g.k.some(function(k){return b.textContent.indexOf(k)!==-1;});
+      });
+      if(!items.length) return;
+      insert(header(g.t));
+      items.forEach(function(b){
+        b.style.display=b.style.display==='none'?'none':'block';
+        b.style.width='100%';
+        b.style.marginBottom='10px';
+        insert(b);
+        used.push(b);
+      });
+    });
+
+    var rest=btns.filter(function(b){return used.indexOf(b)===-1;});
+    if(rest.length){
+      insert(header('🧭 Autres'));
+      rest.forEach(function(b){ insert(b); });
+    }
+
+    // Corrige le bouton « Contacter l’agence » (cadre coupé)
+    btns.forEach(function(b){
+      if(b.textContent.indexOf('Contacter')!==-1){
+        b.style.padding='14px';
+        b.style.minHeight='52px';
+        b.style.fontSize='18px';
+        b.style.fontWeight='bold';
+        b.style.lineHeight='1.3';
+      }
+    });
+  }
+
+  var tries=0;
+  var timer=setInterval(function(){
+    run(); tries++;
+    if(tries>60||(findH('Mon espace')||{}).dataset&&findH('Mon espace').dataset.zk) clearInterval(timer);
+  },500);
+})();
   </script>
 </body>
 </html>
