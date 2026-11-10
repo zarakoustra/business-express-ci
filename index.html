@@ -2843,6 +2843,21 @@ document.addEventListener('click', function (e) {
     if(done||tries>60) clearInterval(timer);
   },500);
 })();
+  </script><script>
+(function(){
+  var t=setInterval(function(){
+    var acc=document.querySelector('#xnav button[data-k="acc"]');
+    if(!acc) return;
+    clearInterval(t);
+    var walker=document.createTreeWalker(acc,NodeFilter.SHOW_TEXT);
+    var n;
+    while((n=walker.nextNode())){
+      if(n.nodeValue.indexOf('Mon compte')!==-1){
+        n.nodeValue=n.nodeValue.replace('Mon compte','Paramètres');
+      }
+    }
+  },300);
+})();
   </script>
 </body>
 </html>
