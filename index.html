@@ -1122,13 +1122,14 @@ panel.innerHTML=`
 <button class="btn2" data-open="xfaq">❓ Questions fréquentes</button>
 <button class="btn2" data-open="xnotif">🔔 Notifications</button>
 <button class="btn2" data-open="xfol">👥 Mes abonnés</button>
-<button class="btn2" onclick="document.getElementById('xmoney').style.display='block'">💰 Faire l’argent</button>
+<button class="btn2" onclick="document.getElementById('xmoney').style.display='block'">💰 Gagner des jetons</button>
 <button class="btn2" data-open="xprofile">📤 Partager mon profil</button>
 <button class="btn2" data-open="xname">✏️ Mon nom</button>
 <a class="btn2" href="https://wa.me/2250170075417?text=Bonjour%2C%20je%20signale%20un%20compte%20suspect%20sur%20ZARAKOUSTRA" target="_blank" style="display:block; text-align:center; text-decoration:none;">🚩 Contacter l’agence</a>
 <div id="xmoney" style="display:none;">
+<div id="xmoney" style="display:none;">
   <button class="btn2" onclick="this.parentElement.style.display='none'">← Retour</button>
-  <h3>Faire l’argent</h3>
+  <h3>Gagner des jetons</h3>
   <p>Partage ton lien de vendeur sur WhatsApp pour que tes amis découvrent tes annonces.</p>
 </div><h3>Préférences</h3>
 
@@ -2747,6 +2748,51 @@ document.addEventListener('click', function (e) {
     window.open('https://wa.me/2250170075417?text=Bonjour%2C%20je%20signale%20un%20compte%20suspect%20sur%20ZARAKOUSTRA', '_blank');
   }
 }, true);
+</script><script>
+(function(){
+  var labels=['Mes ventes et achats','Notifications','Mes abonnés','Partager mon profil'];
+  function findBtn(text){
+    return [...document.querySelectorAll('button')].find(function(b){return b.textContent.indexOf(text)!==-1;});
+  }
+  function openItem(label){
+    var acc=document.querySelector('#xnav button[data-k="acc"]');
+    if(acc) acc.click();
+    setTimeout(function(){
+      var b=findBtn(label);
+      if(b) b.click();
+    },150);
+  }
+  // Cacher ces 4 boutons dans la liste Mon espace (ils restent utilisables par le menu)
+  labels.forEach(function(l){
+    var b=findBtn(l);
+    if(b && b.closest('#xnav')===null) b.style.display='none';
+  });
+  var vendre=[...document.querySelectorAll('button')].find(function(b){return b.textContent.trim()==='Vendre';});
+  if(!vendre) return;
+  var menuBtn=document.createElement('button');
+  menuBtn.className=vendre.className;
+  menuBtn.textContent='⋮';
+  menuBtn.style.cssText='font-size:22px;font-weight:bold;margin-right:8px;';
+  vendre.parentNode.insertBefore(menuBtn,vendre);
+  var panel=document.createElement('div');
+  panel.style.cssText='position:fixed;display:none;z-index:9999;background:#fff;border:1px solid #0a6aa1;border-radius:12px;padding:8px;min-width:230px;box-shadow:0 4px 12px rgba(0,0,0,.2);';
+  labels.forEach(function(l){
+    var it=document.createElement('button');
+    it.textContent=l;
+    it.style.cssText='display:block;width:100%;text-align:left;background:none;border:none;padding:12px;font-size:16px;font-weight:bold;color:#0a6aa1;';
+    it.onclick=function(){panel.style.display='none';openItem(l);};
+    panel.appendChild(it);
+  });
+  document.body.appendChild(panel);
+  menuBtn.onclick=function(e){
+    e.stopPropagation();
+    var r=menuBtn.getBoundingClientRect();
+    panel.style.top=(r.bottom+6)+'px';
+    panel.style.right=(window.innerWidth-r.right)+'px';
+    panel.style.display=panel.style.display==='none'?'block':'none';
+  };
+  document.addEventListener('click',function(){panel.style.display='none';});
+})();
 </script>
 </body>
 </html>
