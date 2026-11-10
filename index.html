@@ -3196,38 +3196,6 @@ document.addEventListener('click', function (e) {
 
   var p=document.createElement('p');
   p.textContent='Achète, vends et trouve tout ce qu’il te faut près de toi. Par où veux-tu commencer ?';
-  p.style.cssText='margin:0;font-size:15px;color:#3E5C76;';
-
-  function btn(label,fn,primary){
-    var b=document.createElement('button');
-    b.textContent=label;
-    b.style.cssText='min-height:48px;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;border:'+(primary?'0':'1px solid #0B6FA8')+';background:'+(primary?'#5BB8EA':'#fff')+';color:#0B2545;';
-    b.onclick=function(){ close(); fn(); };
-    return b;
-  }
-
-  var later=document.createElement('button');
-  later.textContent='Plus tard';
-  later.style.cssText='background:none;border:none;color:#3E5C76;font-size:14px;cursor:pointer;min-height:36px;';
-  later.onclick=close;
-
-  box.append(
-    h,p,
-    btn('➕ Publier une annonce',function(){ clickBy('Vendre'); },true),
-    btn('🗂️ Voir les catégories',function(){
-      var q=document.getElementById('q');
-      if(q) q.scrollIntoView({behavior:'smooth',block:'start'});
-    }),
-    btn('📤 Partager l’appli',function(){
-      var t='Découvre ZARAKOUSTRA, la place de marché où acheter et vendre facilement : '+location.href;
-      window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank');
-    }),
-    later
-  );
-  overlay.append(box);
-  overlay.addEventListener('click',function(e){ if(e.target===overlay) close(); });
-  document.body.appendChild(overlay);
-})();
 </script>
 </body>
 </html>
