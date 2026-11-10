@@ -3056,6 +3056,136 @@ document.addEventListener('click', function (e) {
     if(back) back.click();
   });
 })();
+  </script><script>
+(function(){
+  var KEY='zk_seen', ALERT='zk_alert', ALERT_CITY='zk_alert_city';
+  var CATS=['Téléphones','Électronique','Mode','Maison','Véhicules','Immobilier','Services','Livres & formations','Autres'];
+  var CITIES=['Abidjan','Bouaké','Yamoussoukro','Daloa','San-Pédro','Korhogo','Autre'];
+  var list=document.getElementById('list');
+  if(!list) return;
+
+  var bar=document.createElement('div');
+  bar.style.cssText='display:flex;flex-direction:column;gap:8px;';
+
+  var banner=document.createElement('div');
+  banner.style.cssText='display:none;background:#E8F6FF;border:1px solid #0B6FA8;border-radius:12px;padding:10px;font-weight:700;color:#0B2545;font-size:15px;cursor:pointer;';
+
+  var alertBox=document.createElement('div');
+  alertBox.style.cssText='display:flex;flex-direction:column;gap:6px;font-size:14px;color:#0B2545;';
+  var lbl=document.createElement('span');
+  lbl.textContent='🔔 Me prévenir :';
+
+  var row=document.createElement('div');
+  row.style.cssText='display:flex;gap:8px;';
+  var selCat=document.createElement('select');
+  selCat.style.cssText='flex:1;min-height:40px;border:1px solid #CFE8F7;border-radius:10px;padding:6px;font-size:15px;';
+  selCat.add(new Option('Toutes catégories',''));
+  CATS.forEach(function(c){ selCat.add(new Option(c,c)); });
+  var selCity=document.createElement('select');
+  selCity.style.cssText='flex:1;min-height:40px;border:1px solid #CFE8F7;border-radius:10px;padding:6px;font-size:15px;';
+  selCity.add(new Option('Toutes villes',''));
+  CITIES.forEach(function(c){ selCity.add(new Option(c,c)); });
+  try{
+    selCat.value=localStorage.getItem(ALERT)||'';
+    selCity.value=localStorage.getItem(ALERT_CITY)||'';
+  }catch(e){}
+
+  function saveAlerts(){
+    try{
+      localStorage.setItem(ALERT,selCat.value);
+      localStorage.setItem(ALERT_CITY,selCity.value);
+    }catch(e){}
+    check();
+  }
+  selCat.onchange=saveAlerts;
+  selCity.onchange=saveAlerts;
+
+  row.append(selCat,selCity);
+  alertBox.append(lbl,row);
+  bar.append(banner,alertBox);
+  list.parentNode.insertBefore(bar,list);
+
+  function readSeen(){
+    try{ return JSON.parse(localStorage.getItem(KEY)||'null'); }catch(e){ return null; }
+  }
+  function writeSeen(a){
+    try{ localStorage.setItem(KEY,JSON.stringify(a.slice(-500))); }catch(e){}
+  }
+  function cards(){ return [...list.querySelectorAll('button.card')]; }
+  function keyOf(c){
+    return [...c.children].filter(function(x){return x.className!=='zk-new';})
+      .slice(1,4).map(function(x){return x.textContent;}).join('|');
+  }
+  function infoOf(c){
+    var m=c.querySelector('span.mu');
+    var p=m?m.textContent.split(' · '):[];
+    return {city:(p[0]||'').trim(), cat:(p[p.length-1]||'').trim()};
+  }
+  function markSeen(c){
+    var s=readSeen()||[];
+    var k=keyOf(c);
+    if(s.indexOf(k)===-1){ s.push(k); writeSeen(s); }
+    var b=c.querySelector('.zk-new');
+    if(b) b.remove();
+  }
+
+  function check(){
+    var cs=cards();
+    var seen=readSeen();
+    if(seen===null){
+      if(cs.length) writeSeen(cs.map(keyOf));
+      banner.style.display='none';
+      return;
+    }
+    var newOnes=cs.filter(function(c){ return seen.indexOf(keyOf(c))===-1; });
+
+    cs.forEach(function(c){
+      var badge=c.querySelector('.zk-new');
+      var isNew=newOnes.indexOf(c)!==-1;
+      if(isNew && !badge){
+        var t=document.createElement('span');
+        t.className='zk-new';
+        t.textContent='🆕 Nouveau';
+        t.style.cssText='font-size:12px;font-weight:700;color:#fff;background:#0B6FA8;border-radius:6px;padding:2px 6px;align-self:flex-start;';
+        c.prepend(t);
+      } else if(!isNew && badge){
+        badge.remove();
+      }
+    });
+
+    var n=newOnes.length;
+    if(!n){ banner.style.display='none'; return; }
+
+    var wantCat=selCat.value, wantCity=selCity.value;
+    var hits=(wantCat||wantCity)?newOnes.filter(function(c){
+      var i=infoOf(c);
+      return (!wantCat||i.cat===wantCat) && (!wantCity||i.city===wantCity);
+    }).length:0;
+
+    var parts=['🆕 '+n+' nouvelle'+(n>1?'s':'')+' annonce'+(n>1?'s':'')];
+    if(hits){
+      var label=[wantCat,wantCity].filter(Boolean).join(' · ');
+      parts.push('🔔 '+hits+' pour '+label);
+    }
+    banner.textContent=parts.join(' · ')+' — touche pour voir';
+    banner.style.display='block';
+  }
+
+  banner.onclick=function(){
+    var first=cards().find(function(c){return c.querySelector('.zk-new');});
+    cards().forEach(markSeen);
+    banner.style.display='none';
+    if(first) first.scrollIntoView({behavior:'smooth',block:'center'});
+  };
+
+  list.addEventListener('click',function(e){
+    var c=e.target.closest('button.card');
+    if(c) markSeen(c);
+  },true);
+
+  new MutationObserver(function(){ check(); }).observe(list,{childList:true});
+  check();
+})();
   </script>
 </body>
 </html>
