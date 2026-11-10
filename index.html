@@ -3317,59 +3317,6 @@ document.addEventListener('click', function (e) {
   setInterval(update,1500);
   update();
 })();
-  </script><script>
-(function(){
-  var CITIES=['Abidjan','Bouaké','Yamoussoukro','Daloa','San-Pédro','Korhogo','Autre'];
-  var KEY='zk_my_city';
-  var list=document.getElementById('list');
-  var fv=document.getElementById('fv');
-  if(!list||!fv) return;
-
-  /* 1. Près de toi : choisir sa ville pour filtrer l'accueil */
-  var bar=document.createElement('div');
-  bar.style.cssText='display:flex;gap:8px;align-items:center;font-size:14px;color:#0B2545;';
-  var lbl=document.createElement('span');
-  lbl.textContent='📍 Près de toi :';
-  var sel=document.createElement('select');
-  sel.style.cssText='flex:1;min-height:40px;border:1px solid #CFE8F7;border-radius:10px;padding:6px;font-size:15px;';
-  sel.add(new Option('Choisis ta ville',''));
-  CITIES.forEach(function(c){ sel.add(new Option(c,c)); });
-  try{ sel.value=localStorage.getItem(KEY)||''; }catch(e){}
-
-  function apply(){
-    if(!sel.value) return;
-    fv.value=sel.value;
-    fv.dispatchEvent(new Event('input',{bubbles:true}));
-    fv.dispatchEvent(new Event('change',{bubbles:true}));
-  }
-  sel.onchange=function(){
-    try{ localStorage.setItem(KEY,sel.value); }catch(e){}
-    apply();
-  };
-  bar.append(lbl,sel);
-  list.parentNode.insertBefore(bar,list);
-  setTimeout(apply,800);
-
-  /* 3. Conseils photo sous le champ photos */
-  var ph=document.getElementById('ph');
-  if(ph){
-    var tip=document.createElement('p');
-    tip.textContent='📸 Conseil : photo de jour, fond neutre, produit entier. Une annonce avec photo est bien plus vue.';
-    tip.style.cssText='margin:4px 0 0;font-size:13px;color:#0B6FA8;font-weight:700;';
-    ph.parentElement.after(tip);
-  }
-
-  /* 3 bis. Avertir si on publie sans photo */
-  document.addEventListener('click',function(e){
-    var go=e.target.closest&&e.target.closest('#go');
-    if(!go) return;
-    if(document.querySelectorAll('#pv img').length>0) return;
-    if(!confirm('Ton annonce n’a aucune photo. Les annonces avec photo sont beaucoup plus vues. Publier quand même ?')){
-      e.stopImmediatePropagation();
-      e.preventDefault();
-    }
-  },true);
-})();
-  </script>
+</script>
 </body>
 </html>
