@@ -2734,6 +2734,15 @@ b.type='button';b.className='btn';b.textContent='➕ Publier une annonce';
 b.onclick=()=>$('top').click();
 p.append(t,s,b);
 }).observe($('list'),{childList:true});
+</script><script>
+document.addEventListener('click', function (e) {
+  var el = e.target.closest('button, a, div');
+  if (el && el.textContent.indexOf('Contacter l') !== -1) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    window.open('https://wa.me/2250170075417?text=Bonjour%2C%20je%20signale%20un%20compte%20suspect%20sur%20ZARAKOUSTRA', '_blank');
+  }
+}, true);
 </script>
 </body>
 </html>
