@@ -107,7 +107,8 @@ text-shadow:
 -2px -2px 0 #000,2px -2px 0 #000,
 -2px 2px 0 #000,2px 2px 0 #000,
 0 3px 0 #000;
-  }@keyframes zkneon{
+  }
+  @keyframes zkneon{
 0%,100%{box-shadow:0 0 8px #00E5FF,inset 0 0 8px rgba(0,229,255,.45)}
 50%{box-shadow:0 0 16px #00E5FF,inset 0 0 12px rgba(0,229,255,.7)}
 }
@@ -412,7 +413,8 @@ p.append(d);
 }
 p.append(el('p','⚠️ Vois le produit avant de payer et n’envoie jamais d’argent à l’avance.','safe'));
 p.scrollIntoView();
-}function mergeSales(){
+           }
+  function mergeSales(){
 sales=[...new Map([...buyerSales,...sellerSales].map(x=>[x.id,x])).values()];
 renderSales();
 }
@@ -485,7 +487,8 @@ const b=el('button',blocked.has(s.uid)?'Débloquer':'Bloquer cet utilisateur','b
 b.onclick=()=>{if(blocked.has(s.uid))deleteDoc(doc(db,'blocked',s.uid));else if(confirm('Bloquer cet utilisateur ?'))setDoc(doc(db,'blocked',s.uid),{t:Date.now()});};
 c.append(v,b);a.append(c);
 });
-  }function err(e){
+  }
+  function err(e){
 const c=e?.code||'';
 $('amsg').textContent=c.includes('email-already')?'Cet e-mail a déjà un compte.':
 c.includes('weak')?'Mot de passe trop court (6 minimum).':
@@ -536,7 +539,8 @@ for(const f of fl.slice(0,4)){
 try{const d=await shrink(f);photos.push(d);const m=document.createElement('img');m.src=d;$('pv').append(m);}
 catch(x){msg('Une photo est illisible.');}
 }
-};$('go').onclick=async()=>{
+};
+  $('go').onclick=async()=>{
 const v=k=>$(k).value.trim(),price=parseInt(v('pr'),10),n=phone(v('tel')),lk=v('li');
 if(!user)return;
 if(!v('ti')||!(price>0)){msg('Mets un titre et un prix.');return;}
@@ -611,7 +615,7 @@ body[data-tab="acc"] :is(#q,main>.row,#list,#terms,#tl,#detail){display:none!imp
 .xb.ot{align-self:flex-start;background:#fff;border:1px solid var(--bd)}
 .xrow button{flex:1}
 `;
-document.head.append(st);
+  document.head.append(st);
 
 let user=null,items=[],chats=[],bch=[],sch=[],unsubs=[];
 let tab='home',thread=null,unsubThread=null;
@@ -677,16 +681,6 @@ if(!l.length){
 xfav.append(h('p','Aucune annonce enregistrée. Ouvre une annonce et appuie sur « Enregistrer ».','mu'));
 return;
 }
-xfav.append(h('p',`Tu suis ${l.length} annonce${l.length>1?'s':''}. Reviens voir si elles sont toujours disponibles.`,'ok'));
-l.forEach(i=>{
-const c=h('div',null,'mod');
-c.append(h('b',money(i)),h('span',i.title),h('span',(i.city||'')+' · '+(i.cat||''),'mu'));
-const row=h('div',null,'row');
-row.append(btn('Voir','btn',()=>openAd(i)),btn('Retirer','btn2',()=>{toggleFav(i.id);renderFav();}));
-c.append(row);xfav.append(c);
-});
-              }
-}
 l.forEach(i=>{
 const c=h('div',null,'mod');
 c.append(h('b',money(i)),h('span',i.title),h('span',(i.city||'')+' · '+(i.cat||''),'mu'));
@@ -718,22 +712,6 @@ onSnapshot(query(collection(db,'products'),where('ok','==',true)),s=>{
 items=s.docs.map(d=>({id:d.id,...d.data()}));
 if(tab==='fav')renderFav();
 },()=>{});
-  /* Compteur sur l'onglet Enregistré */
-function badgeFav(){
-const b=[...document.querySelectorAll('#xnav button')].find(x=>x.textContent.includes('Enregistré'));
-if(!b)return;
-b.style.position='relative';
-let s=b.querySelector('.zk-fb');
-if(!favs.length){if(s)s.remove();return;}
-if(!s){
-s=document.createElement('span');
-s.className='zk-fb';
-s.style.cssText='position:absolute;top:0;right:12px;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:#0B6FA8;color:#fff;font-size:12px;font-weight:700;line-height:20px;text-align:center;';
-b.append(s);
-}
-s.textContent=favs.length;
-}
-setInterval(badgeFav,800);
   /* Messages */
 async function startChat(i){
 if(!user){
@@ -915,7 +893,8 @@ let e=b.querySelector('.xbadge');
 if(!n){if(e)e.remove();return;}
 if(!e){e=document.createElement('i');e.className='xbadge';b.append(e);}
 e.textContent=n;
-  }function check(){
+  }
+  function check(){
 if(!uid||!ready.b||!ready.s)return;
 const chats=[...new Map([...bch,...sch].map(c=>[c.id,c])).values()];
 let known=rd('xknown_'+uid,null);
@@ -1065,7 +1044,7 @@ drawAdm(s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.t||0)-(a.t||0)));
 }
 });
 
-$('tl').after(`<a href="https://wa.me/2250170075417?text=Bonjour%2C%20je%20signale%20un%20compte%20suspect%20sur%20ZARAKOUSTRA" target="_blank" style="display:block; text-align:center; padding:14px; border:1px solid #0a6aa1; border-radius:12px; color:#0a6aa1; font-weight:bold; text-decoration:none;">🚩 Contacter l’agence (compte suspect, arnaque)</a>`);
+$('tl').after(btn('🚩 Contacter l’agence (compte suspect, arnaque)','btn2',()=>{
 document.querySelector('#xnav button[data-k="acc"]').click();
 setTimeout(()=>xag.scrollIntoView(),50);
 }));
@@ -1148,16 +1127,12 @@ panel.innerHTML=`
 <button class="btn2" data-open="xfaq">❓ Questions fréquentes</button>
 <button class="btn2" data-open="xnotif">🔔 Notifications</button>
 <button class="btn2" data-open="xfol">👥 Mes abonnés</button>
-<button class="btn2" onclick="document.getElementById('xmoney').style.display='block'">💰 Gagner des jetons</button>
+<button class="btn2" data-open="xmoney">💰 Faire l’argent</button>
 <button class="btn2" data-open="xprofile">📤 Partager mon profil</button>
 <button class="btn2" data-open="xname">✏️ Mon nom</button>
-<a class="btn2" href="https://wa.me/2250170075417?text=Bonjour%2C%20je%20signale%20un%20compte%20suspect%20sur%20ZARAKOUSTRA" target="_blank" style="display:block; text-align:center; text-decoration:none;">🚩 Contacter l’agence</a>
-<div id="xmoney" style="display:none;">
-<div id="xmoney" style="display:none;">
-  <button class="btn2" onclick="this.parentElement.style.display='none'">← Retour</button>
-  <h3>Gagner des jetons</h3>
-  <p>Partage ton lien de vendeur sur WhatsApp pour que tes amis découvrent tes annonces.</p>
-</div><h3>Préférences</h3>
+<button class="btn2" data-open="xagency">🚩 Contacter l’agence</button>
+
+<h3>Préférences</h3>
 
 <label for="appLanguage">Langue</label>
 <select id="appLanguage">
@@ -1166,11 +1141,13 @@ panel.innerHTML=`
 <option value="es">🇪🇸 Español</option>
 <option value="de">🇩🇪 Deutsch</option>
 </select>
+
 <label>Apparence</label>
 <select id="appTheme">
 <option value="light">☀️ Mode clair</option>
 <option value="dark">🌙 Mode sombre</option>
 </select>
+
 <h3>Agence ZARAKOUSTRA</h3>
 <a class="lnk btn" href="https://wa.me/2250170075417">
 Contacter sur WhatsApp
@@ -1179,6 +1156,7 @@ Contacter sur WhatsApp
 Envoyer un e-mail
 </a>
 `;
+
 
 $("xacc").append(panel);
 
@@ -1299,7 +1277,8 @@ try{await deleteDoc(doc(db,'productContacts',i.id));}catch(e){}
 c.append(del);
 mine.append(c);
 });
-  }onAuthStateChanged(auth,u=>{
+  }
+  onAuthStateChanged(auth,u=>{
 if(unsub){unsub();unsub=null;}
 draw([],u);
 if(!u)return;
@@ -1716,18 +1695,7 @@ sec.append(h('h2','Profil vendeur'),h('p','Chargement…','mu'));
 
 let isVerified=false;
 getDoc(doc(db,'verified',sid)).then(d=>{isVerified=d.exists();}).catch(()=>{});
-let rating=null;
-(async function loadRating(){
-try{
-const ps=await getDocs(query(collection(db,'products'),where('uid','==',sid),where('ok','==',true)));
-let sum=0,n=0;
-for(const p of ps.docs){
-const rs=await getDocs(collection(db,'products',p.id,'reviews'));
-rs.forEach(r=>{const v=r.data().rating;if(typeof v==='number'){sum+=v;n++;}});
-}
-rating=n?{avg:sum/n,n}:{avg:0,n:0};
-}catch(e){ rating={avg:0,n:0}; }
-}());
+
 function photo(i){
 const a=(Array.isArray(i.photos)&&i.photos.length?i.photos:(i.photo?[i.photo]:[]))
 .filter(s=>String(s).startsWith('data:image/'));
@@ -1749,7 +1717,7 @@ const back=h('button','← Voir tout le site','btn2');back.type='button';
 back.onclick=()=>document.body.classList.remove('xprofmode');
 sec.append(back);
 sec.append(h('h2','👤 '+(l[0]?l[0].seller:'Vendeur')));
-if(isVerified)sec.append(h('p','✓ Vendeur vérifié','ok'));if(rating&&rating.n)sec.append(h('p','★ '+rating.avg.toFixed(1)+' · '+rating.n+' avis','ok'));
+if(isVerified)sec.append(h('p','✓ Vendeur vérifié','ok'));
 if(!l.length){
 sec.append(h('p','Ce vendeur n’a pas encore d’annonce en ligne.','mu'));
 return;
@@ -1944,7 +1912,8 @@ sb.onclick=openSell;
 
 nav.querySelectorAll('button').forEach(b=>{
 if(b!==sb)b.addEventListener('click',()=>B.classList.remove('sellmode'));
-});nav.querySelectorAll('button').forEach(b=>{
+});
+  nav.querySelectorAll('button').forEach(b=>{
 if(b!==sb)b.addEventListener('click',()=>B.classList.remove('sellmode'));
 });
 
@@ -2091,6 +2060,7 @@ const T=[
 ['📚','Livres & formations','Livres & formations'],
 ['➕','Autres','Autres']
 ];
+
 const grid=h('div');grid.id='xcats';
 const view=h('section');view.id='xcatview';
 $('list').before(grid,view);
@@ -2103,6 +2073,7 @@ b.append(h('i',t[0]),h('span',t[1]));
 b.onclick=()=>{cur=t;B.classList.add('catmode');draw();window.scrollTo(0,0);};
 grid.append(b);
 });
+
 function photo(i){
 const a=(Array.isArray(i.photos)&&i.photos.length?i.photos:(i.photo?[i.photo]:[]))
 .filter(s=>String(s).startsWith('data:image/'));
@@ -2115,15 +2086,20 @@ return m;
 const d=h('div','Pas de photo','mu');
 d.style.cssText='height:120px;display:flex;align-items:center;justify-content:center;background:var(--bd);border-radius:8px';
 return d;
-}function openAd(i){
+}
+
+function openAd(i){
 ['q','fc','fv'].forEach(k=>{$(k).value='';$(k).dispatchEvent(new Event('input'));});
 const c=[...$('list').children].find(x=>x.textContent.includes(i.title)&&x.textContent.includes(money(i)));
 if(c)c.click();
-}function closeCat(){
+}
+
+function closeCat(){
 B.classList.remove('catmode');
 $('detail').hidden=true;
 window.scrollTo(0,0);
-  }function draw(){
+  }
+  function draw(){
 if(!cur)return;
 const l=items.filter(i=>i.cat===cur[2]).sort((a,b)=>(b.t||0)-(a.t||0));
 view.replaceChildren();
@@ -2363,7 +2339,7 @@ st.textContent='body:not([data-tab="acc"]) #xsignup{display:none!important}'+
 document.head.append(st);
 
 function inp(ph,type,ac){const i=document.createElement('input');i.placeholder=ph;i.type=type;if(ac)i.autocomplete=ac;return i;}
-  /* la page */
+/* la page */
 const sec=document.createElement('section');sec.id='xsignup';sec.hidden=true;
 const back=document.createElement('button');back.type='button';back.className='btn2';back.textContent='← Retour à la connexion';
 const title=document.createElement('h2');title.textContent='Créer un compte';
@@ -2455,8 +2431,7 @@ const base=location.origin+location.pathname;
 const money=i=>Number(i.price).toLocaleString('fr-FR')+' FCFA'+(i.unit?' '+i.unit:'');
 const img=$('pfimg');
 const DEF="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%23fff'/%3E%3Ccircle cx='20' cy='15' r='7' fill='%233E5C76'/%3E%3Cellipse cx='20' cy='36' rx='13' ry='10' fill='%233E5C76'/%3E%3C/svg%3E";
- 
-  /* lecture d'une photo (avec mémoire) */
+/* lecture d'une photo (avec mémoire) */
 const cache=new Map();
 async function avatar(uid){
 if(cache.has(uid))return cache.get(uid);
@@ -2507,7 +2482,7 @@ cache.set(u.uid,d);
 alert('Ta photo n’a pas pu être enregistrée en ligne. Réessaie.');
 }
 });
-  
+
 /* annonces (pour retrouver le vendeur) */
 let items=[];
 onSnapshot(query(collection(db,'products'),where('ok','==',true)),s=>{
@@ -2761,8 +2736,7 @@ box.append(hide);
 onAuthStateChanged(auth,u=>{user=u;draw();});
 new MutationObserver(()=>{
 if(document.body.dataset.tab==='home')draw();
-}).observe(document.body,{attributes:true,attributeFilter:['data-tab']});
-  /* message plus engageant quand une liste est vide */
+/* message plus engageant quand une liste est vide */
 new MutationObserver(()=>{
 const p=[...$('list').children].find(e=>e.tagName==='P'&&e.textContent.startsWith('Aucune annonce pour'));
 if(!p)return;
@@ -2776,306 +2750,7 @@ b.type='button';b.className='btn';b.textContent='➕ Publier une annonce';
 b.onclick=()=>$('top').click();
 p.append(t,s,b);
 }).observe($('list'),{childList:true});
-</script><script>
-document.addEventListener('click', function (e) {
-  var el = e.target.closest('button, a, div');
-  if (el && el.textContent.indexOf('Contacter l') !== -1) {
-    e.preventDefault();
-    e.stopImmediatePropagation();
-    window.open('https://wa.me/2250170075417?text=Bonjour%2C%20je%20signale%20un%20compte%20suspect%20sur%20ZARAKOUSTRA', '_blank');
-  }
-}, true);
-</script><script>
-(function(){
-  var CLOUD='kv5ajdsn', PRESET='app_upload', KEY='zk_cover_url';
-  var labels=['Mes ventes et achats','Notifications','Mes abonnés','Partager mon profil'];
-  var items=labels.concat(['Changer la photo de couverture']);
-  var done=false;
-
-  // Couverture (fond de l'écran d'accueil)
-  var layer=document.createElement('div');
-  layer.style.cssText='position:fixed;inset:0;z-index:-1;background-size:cover;background-position:center;background-repeat:no-repeat;pointer-events:none;';
-  document.body.appendChild(layer);
-  function applyCover(url){
-    layer.style.backgroundImage=url?'url("'+url+'")':'none';
-    layer.style.opacity=url?'0.69':'1';
-  }
-  try{ applyCover(localStorage.getItem(KEY)); }catch(e){}
-
-  var input=document.createElement('input');
-  input.type='file'; input.accept='image/*'; input.style.display='none';
-  document.body.appendChild(input);
-  input.onchange=function(){
-    var file=input.files && input.files[0];
-    if(!file) return;
-    var fd=new FormData();
-    fd.append('file',file);
-    fd.append('upload_preset',PRESET);
-    fetch('https://api.cloudinary.com/v1_1/'+CLOUD+'/image/upload',{method:'POST',body:fd})
-      .then(function(r){return r.json();})
-      .then(function(d){
-        if(!d.secure_url) throw new Error('upload');
-        try{ localStorage.setItem(KEY,d.secure_url); }catch(e){}
-        applyCover(d.secure_url);
-        alert('Photo de couverture mise à jour.');
-      })
-      .catch(function(){ alert('Échec de l’envoi, réessaie.'); })
-      .finally(function(){ input.value=''; });
-  };
-
-  // Menu ⋮ à gauche de « Vendre »
-  function findBtn(text){
-    return [...document.querySelectorAll('button')].find(function(b){return b.textContent.trim().indexOf(text)!==-1;});
-  }
-  function openItem(label){
-    var acc=document.querySelector('#xnav button[data-k="acc"]');
-    if(acc) acc.click();
-    setTimeout(function(){ var b=findBtn(label); if(b) b.click(); },200);
-  }
-  function build(){
-    if(done) return;
-    var vendre=[...document.querySelectorAll('button')].find(function(b){return b.textContent.trim()==='Vendre';});
-    if(!vendre) return;
-    done=true;
-
-    labels.forEach(function(l){
-      var b=findBtn(l);
-      if(b && b.classList.contains('btn2')) b.style.display='none';
-    });
-
-    var menuBtn=document.createElement('button');
-    menuBtn.textContent='⋮';
-    menuBtn.style.cssText='font-size:24px;font-weight:bold;margin-right:8px;padding:4px 12px;border:2px solid #000;border-radius:10px;background:#fff;color:#000;cursor:pointer;';
-    vendre.parentNode.insertBefore(menuBtn,vendre);
-
-    var panel=document.createElement('div');
-    panel.style.cssText='position:fixed;display:none;z-index:9999;background:#fff;border:1px solid #0a6aa1;border-radius:12px;padding:8px;min-width:250px;box-shadow:0 4px 12px rgba(0,0,0,.2);';
-    items.forEach(function(l){
-      var it=document.createElement('button');
-      it.textContent=l;
-      it.style.cssText='display:block;width:100%;text-align:left;background:none;border:none;padding:12px;font-size:16px;font-weight:bold;color:#0a6aa1;';
-      it.onclick=function(e){
-        e.stopPropagation();
-        panel.style.display='none';
-        if(l==='Changer la photo de couverture') input.click();
-        else openItem(l);
-      };
-      panel.appendChild(it);
-    });
-    document.body.appendChild(panel);
-
-    menuBtn.onclick=function(e){
-      e.stopPropagation();
-      var r=menuBtn.getBoundingClientRect();
-      panel.style.top=(r.bottom+6)+'px';
-      panel.style.right=(window.innerWidth-r.right)+'px';
-      panel.style.display=panel.style.display==='none'?'block':'none';
-    };
-    document.addEventListener('click',function(){panel.style.display='none';});
-  }
-
-  var tries=0;
-  var timer=setInterval(function(){
-    build(); tries++;
-    if(done||tries>60) clearInterval(timer);
-  },500);
-})();
-  </script><script>
-(function(){
-  var t=setInterval(function(){
-    var acc=document.querySelector('#xnav button[data-k="acc"]');
-    if(!acc) return;
-    clearInterval(t);
-    var walker=document.createTreeWalker(acc,NodeFilter.SHOW_TEXT);
-    var n;
-    while((n=walker.nextNode())){
-      if(n.nodeValue.indexOf('Mon compte')!==-1){
-        n.nodeValue=n.nodeValue.replace('Mon compte','Paramètres');
-      }
-    }
-  },300);
-})();
-  </script><script>
-(function(){
-  function hideCard(){
-    var cards=[...document.querySelectorAll('div')].filter(function(d){
-      return d.textContent.indexOf('Compte connecté')!==-1 && d.textContent.indexOf('Mes annonces')===-1;
-    });
-    var el=cards[cards.length-1];
-    if(el) el.style.display='none';
-  }
-
-  function openSettings(){
-    var gear=[...document.querySelectorAll('button')].find(function(b){
-      return b.textContent.indexOf('⚙')!==-1;
-    });
-    if(gear) gear.click();
-  }
-
-  function renameBack(){
-    [...document.querySelectorAll('button')].forEach(function(b){
-      if(b.textContent.indexOf('Retour à Mon compte')!==-1){
-        b.textContent='← Retour à l’accueil';
-        b.onclick=function(){
-          var home=document.querySelector('#xnav button');
-          if(home) home.click();
-        };
-      }
-    });
-  }
-
-  function init(){
-    hideCard();
-    renameBack();
-    var acc=document.querySelector('#xnav button[data-k="acc"]');
-    if(acc && !acc.dataset.zk){
-      acc.dataset.zk='1';
-      acc.addEventListener('click',function(){
-        setTimeout(function(){
-          hideCard();
-          openSettings();
-        },150);
-      });
-    }
-  }
-
-  var tries=0;
-  var timer=setInterval(function(){
-    init(); tries++;
-    if(tries>60) clearInterval(timer);
-  },500);
-})();
-  </script><script>
-(function(){
-  var groups=[
-    {t:'👤 Mon profil', k:['Mon nom','Partager mon profil','Mes abonnés']},
-    {t:'📦 Mon activité', k:['Mes annonces','Mes ventes et achats','Mes avis','Gagner des jetons']},
-    {t:'🛡️ Aide et sécurité', k:['Questions fréquentes','Contacter','Modération']},
-    {t:'🔐 Compte', k:['Notifications','Changer mon mot de passe']}
-  ];
-
-  function findH(text){
-    return [...document.querySelectorAll('h3')].find(function(h){return h.textContent.trim()===text;});
-  }
-
-  function header(text){
-    var h=document.createElement('h4');
-    h.textContent=text;
-    h.style.cssText='font-size:15px;font-weight:700;color:#5a6b7b;margin:22px 0 10px;text-transform:uppercase;letter-spacing:.5px;';
-    return h;
-  }
-
-  function run(){
-    var mon=findH('Mon espace');
-    if(!mon||mon.dataset.zk) return;
-    mon.dataset.zk='1';
-    var box=mon.parentElement;
-    var pref=findH('Préférences');
-
-    var btns=[...box.querySelectorAll('button')].filter(function(b){
-      return b.textContent.indexOf('Retour')===-1 &&
-             (mon.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
-    });
-
-    function insert(el){
-      if(pref && pref.parentNode) pref.parentNode.insertBefore(el,pref);
-      else box.appendChild(el);
-    }
-
-    var used=[];
-    groups.forEach(function(g){
-      var items=btns.filter(function(b){
-        return g.k.some(function(k){return b.textContent.indexOf(k)!==-1;});
-      });
-      if(!items.length) return;
-      insert(header(g.t));
-      items.forEach(function(b){
-        b.style.display=b.style.display==='none'?'none':'block';
-        b.style.width='100%';
-        b.style.marginBottom='10px';
-        insert(b);
-        used.push(b);
-      });
-    });
-
-    var rest=btns.filter(function(b){return used.indexOf(b)===-1;});
-    if(rest.length){
-      insert(header('🧭 Autres'));
-      rest.forEach(function(b){ insert(b); });
-    }
-
-    // Corrige le bouton « Contacter l’agence » (cadre coupé)
-    btns.forEach(function(b){
-      if(b.textContent.indexOf('Contacter')!==-1){
-        b.style.padding='14px';
-        b.style.minHeight='52px';
-        b.style.fontSize='18px';
-        b.style.fontWeight='bold';
-        b.style.lineHeight='1.3';
-      }
-    });
-  }
-
-  var tries=0;
-  var timer=setInterval(function(){
-    run(); tries++;
-    if(tries>60||(findH('Mon espace')||{}).dataset&&findH('Mon espace').dataset.zk) clearInterval(timer);
-  },500);
-})();
-  </script><script>
-(function(){
-  var waUrl='https://wa.me/2250170075417?text=Bonjour%2C%20je%20signale%20un%20compte%20suspect%20sur%20ZARAKOUSTRA';
-  var tries=0;
-  var t=setInterval(function(){
-    tries++;
-    var anchor=[...document.querySelectorAll('button')].find(function(b){
-      return b.textContent.indexOf('Partager mon profil')!==-1 && b.parentElement && b.parentElement.parentElement===document.body;
-    });
-    var h=[...document.querySelectorAll('h3')].find(function(x){return x.textContent.trim()==='Mon espace';});
-    if(!anchor||!h){ if(tries>60) clearInterval(t); return; }
-    clearInterval(t);
-
-    var panel=anchor.parentElement;
-    var pwBtn=[...document.querySelectorAll('button')].find(function(b){
-      return b.textContent.indexOf('Changer mon mot de passe')!==-1;
-    });
-
-    function addItem(label,fn){
-      var it=document.createElement('button');
-      it.textContent=label;
-      it.style.cssText='display:block;width:100%;text-align:left;background:none;border:none;padding:12px;font-size:16px;font-weight:bold;color:#0a6aa1;';
-      it.onclick=function(e){
-        e.stopPropagation();
-        panel.style.display='none';
-        fn();
-      };
-      panel.appendChild(it);
-    }
-
-    addItem('🚩 Contacter l’agence',function(){
-      window.open(waUrl,'_blank');
-    });
-    addItem('🔐 Changer mon mot de passe',function(){
-      if(pwBtn) pwBtn.click();
-    });
-
-    // Supprimer l'écran Paramètres
-    h.parentElement.style.display='none';
-  },500);
-})();
-  </script><script>
-(function(){
-  var tries=0;
-  var t=setInterval(function(){
-    tries++;
-    var acc=document.querySelector('#xnav button[data-k="acc"]');
-    if(acc){
-      acc.style.display='none';
-      clearInterval(t);
-    }
-    if(tries>60) clearInterval(t);
-  },300);
-})();
- </script>
+</script>
 </body>
 </html>
+}).observe(document.body,{attributes:true,attributeFilter:['data-tab']});
