@@ -1716,7 +1716,18 @@ sec.append(h('h2','Profil vendeur'),h('p','Chargement…','mu'));
 
 let isVerified=false;
 getDoc(doc(db,'verified',sid)).then(d=>{isVerified=d.exists();}).catch(()=>{});
-
+let rating=null;
+(async function loadRating(){
+try{
+const ps=await getDocs(query(collection(db,'products'),where('uid','==',sid),where('ok','==',true)));
+let sum=0,n=0;
+for(const p of ps.docs){
+const rs=await getDocs(collection(db,'products',p.id,'reviews'));
+rs.forEach(r=>{const v=r.data().rating;if(typeof v==='number'){sum+=v;n++;}});
+}
+rating=n?{avg:sum/n,n}:{avg:0,n:0};
+}catch(e){ rating={avg:0,n:0}; }
+}());
 function photo(i){
 const a=(Array.isArray(i.photos)&&i.photos.length?i.photos:(i.photo?[i.photo]:[]))
 .filter(s=>String(s).startsWith('data:image/'));
@@ -1738,7 +1749,7 @@ const back=h('button','← Voir tout le site','btn2');back.type='button';
 back.onclick=()=>document.body.classList.remove('xprofmode');
 sec.append(back);
 sec.append(h('h2','👤 '+(l[0]?l[0].seller:'Vendeur')));
-if(isVerified)sec.append(h('p','✓ Vendeur vérifié','ok'));
+if(isVerified)sec.append(h('p','✓ Vendeur vérifié','ok'));if(rating&&rating.n)sec.append(h('p','★ '+rating.avg.toFixed(1)+' · '+rating.n+' avis','ok'));
 if(!l.length){
 sec.append(h('p','Ce vendeur n’a pas encore d’annonce en ligne.','mu'));
 return;
