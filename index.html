@@ -3186,6 +3186,67 @@ document.addEventListener('click', function (e) {
   new MutationObserver(function(){ check(); }).observe(list,{childList:true});
   check();
 })();
+  </script><script>
+(function(){
+  var KEY='zk_welcomed';
+  try{ if(localStorage.getItem(KEY)==='1') return; }catch(e){ return; }
+
+  function clickBy(text){
+    var b=[...document.querySelectorAll('button')].find(function(x){
+      return x.textContent.indexOf(text)!==-1;
+    });
+    if(b) b.click();
+  }
+
+  function close(){
+    try{ localStorage.setItem(KEY,'1'); }catch(e){}
+    overlay.remove();
+  }
+
+  var overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(11,37,69,.6);z-index:10000;display:flex;align-items:center;justify-content:center;padding:16px;';
+
+  var box=document.createElement('div');
+  box.style.cssText='background:#fff;border-radius:16px;padding:20px;max-width:360px;width:100%;display:flex;flex-direction:column;gap:12px;box-shadow:0 8px 24px rgba(0,0,0,.3);';
+
+  var h=document.createElement('h2');
+  h.textContent='Bienvenue sur ZARAKOUSTRA 👋';
+  h.style.cssText='margin:0;font-size:20px;color:#0B2545;';
+
+  var p=document.createElement('p');
+  p.textContent='Achète, vends et trouve tout ce qu’il te faut près de toi. Par où veux-tu commencer ?';
+  p.style.cssText='margin:0;font-size:15px;color:#3E5C76;';
+
+  function btn(label,fn,primary){
+    var b=document.createElement('button');
+    b.textContent=label;
+    b.style.cssText='min-height:48px;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;border:'+(primary?'0':'1px solid #0B6FA8')+';background:'+(primary?'#5BB8EA':'#fff')+';color:#0B2545;';
+    b.onclick=function(){ close(); fn(); };
+    return b;
+  }
+
+  var later=document.createElement('button');
+  later.textContent='Plus tard';
+  later.style.cssText='background:none;border:none;color:#3E5C76;font-size:14px;cursor:pointer;min-height:36px;';
+  later.onclick=close;
+
+  box.append(
+    h,p,
+    btn('➕ Publier une annonce',function(){ clickBy('Vendre'); },true),
+    btn('🗂️ Voir les catégories',function(){
+      var q=document.getElementById('q');
+      if(q) q.scrollIntoView({behavior:'smooth',block:'start'});
+    }),
+    btn('📤 Partager l’appli',function(){
+      var t='Découvre ZARAKOUSTRA, la place de marché où acheter et vendre facilement : '+location.href;
+      window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank');
+    }),
+    later
+  );
+  overlay.append(box);
+  overlay.addEventListener('click',function(e){ if(e.target===overlay) close(); });
+  document.body.appendChild(overlay);
+})();
   </script>
 </body>
 </html>
