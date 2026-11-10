@@ -3039,6 +3039,23 @@ document.addEventListener('click', function (e) {
     if(tries>60) clearInterval(t);
   },300);
 })();
+  </script><script>
+(function(){
+  try{
+    if(location.hash) history.replaceState(null,'',location.pathname+location.search);
+    Object.keys(localStorage).forEach(function(k){
+      if(/view|screen|page|last|seller|profil|profile|route|tab/i.test(k)) localStorage.removeItem(k);
+    });
+    Object.keys(sessionStorage).forEach(function(k){
+      if(/view|screen|page|last|seller|profil|profile|route|tab/i.test(k)) sessionStorage.removeItem(k);
+    });
+  }catch(e){}
+  window.addEventListener('load',function(){
+    var home=document.querySelector('#xnav button[data-k="home"]')||document.querySelector('#xnav button');
+    var back=[...document.querySelectorAll('button')].find(function(b){return b.textContent.indexOf('Voir tout le site')!==-1;});
+    if(back) back.click();
+  });
+})();
   </script>
 </body>
 </html>
