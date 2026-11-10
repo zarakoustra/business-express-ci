@@ -2815,6 +2815,101 @@ document.addEventListener('click', function (e) {
     if(done||tries>60) clearInterval(timer);
   },500);
 })();
+  </script><script>
+(function(){
+  var CLOUD='kv5ajdsn', PRESET='app_upload', KEY='zk_cover_url';
+  var labels=['Mes ventes et achats','Notifications','Mes abonnés','Partager mon profil'];
+  var items=labels.concat(['Changer la photo de couverture']);
+  var done=false;
+
+  // Couverture (fond de l'écran d'accueil)
+  var layer=document.createElement('div');
+  layer.style.cssText='position:fixed;inset:0;z-index:-1;background-size:cover;background-position:center;background-repeat:no-repeat;pointer-events:none;';
+  document.body.appendChild(layer);
+  function applyCover(url){
+    layer.style.backgroundImage=url?'url("'+url+'")':'none';
+    layer.style.opacity=url?'0.35':'1';
+  }
+  try{ applyCover(localStorage.getItem(KEY)); }catch(e){}
+
+  var input=document.createElement('input');
+  input.type='file'; input.accept='image/*'; input.style.display='none';
+  document.body.appendChild(input);
+  input.onchange=function(){
+    var file=input.files && input.files[0];
+    if(!file) return;
+    var fd=new FormData();
+    fd.append('file',file);
+    fd.append('upload_preset',PRESET);
+    fetch('https://api.cloudinary.com/v1_1/'+CLOUD+'/image/upload',{method:'POST',body:fd})
+      .then(function(r){return r.json();})
+      .then(function(d){
+        if(!d.secure_url) throw new Error('upload');
+        try{ localStorage.setItem(KEY,d.secure_url); }catch(e){}
+        applyCover(d.secure_url);
+        alert('Photo de couverture mise à jour.');
+      })
+      .catch(function(){ alert('Échec de l’envoi, réessaie.'); })
+      .finally(function(){ input.value=''; });
+  };
+
+  // Menu ⋮ à gauche de « Vendre »
+  function findBtn(text){
+    return [...document.querySelectorAll('button')].find(function(b){return b.textContent.trim().indexOf(text)!==-1;});
+  }
+  function openItem(label){
+    var acc=document.querySelector('#xnav button[data-k="acc"]');
+    if(acc) acc.click();
+    setTimeout(function(){ var b=findBtn(label); if(b) b.click(); },200);
+  }
+  function build(){
+    if(done) return;
+    var vendre=[...document.querySelectorAll('button')].find(function(b){return b.textContent.trim()==='Vendre';});
+    if(!vendre) return;
+    done=true;
+
+    labels.forEach(function(l){
+      var b=findBtn(l);
+      if(b && b.classList.contains('btn2')) b.style.display='none';
+    });
+
+    var menuBtn=document.createElement('button');
+    menuBtn.textContent='⋮';
+    menuBtn.style.cssText='font-size:24px;font-weight:bold;margin-right:8px;padding:4px 12px;border:2px solid #000;border-radius:10px;background:#fff;color:#000;cursor:pointer;';
+    vendre.parentNode.insertBefore(menuBtn,vendre);
+
+    var panel=document.createElement('div');
+    panel.style.cssText='position:fixed;display:none;z-index:9999;background:#fff;border:1px solid #0a6aa1;border-radius:12px;padding:8px;min-width:250px;box-shadow:0 4px 12px rgba(0,0,0,.2);';
+    items.forEach(function(l){
+      var it=document.createElement('button');
+      it.textContent=l;
+      it.style.cssText='display:block;width:100%;text-align:left;background:none;border:none;padding:12px;font-size:16px;font-weight:bold;color:#0a6aa1;';
+      it.onclick=function(e){
+        e.stopPropagation();
+        panel.style.display='none';
+        if(l==='Changer la photo de couverture') input.click();
+        else openItem(l);
+      };
+      panel.appendChild(it);
+    });
+    document.body.appendChild(panel);
+
+    menuBtn.onclick=function(e){
+      e.stopPropagation();
+      var r=menuBtn.getBoundingClientRect();
+      panel.style.top=(r.bottom+6)+'px';
+      panel.style.right=(window.innerWidth-r.right)+'px';
+      panel.style.display=panel.style.display==='none'?'block':'none';
+    };
+    document.addEventListener('click',function(){panel.style.display='none';});
+  }
+
+  var tries=0;
+  var timer=setInterval(function(){
+    build(); tries++;
+    if(done||tries>60) clearInterval(timer);
+  },500);
+})();
   </script>
 </body>
 </html>
