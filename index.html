@@ -1039,7 +1039,7 @@ drawAdm(s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.t||0)-(a.t||0)));
 }
 });
 
-$('tl').after(btn('🚩 Contacter l’agence (compte suspect, arnaque)','btn2',()=>{
+$('tl').after(`<a href="https://wa.me/2250170075417?text=Bonjour%2C%20je%20signale%20un%20compte%20suspect%20sur%20ZARAKOUSTRA" target="_blank" style="display:block; text-align:center; padding:14px; border:1px solid #0a6aa1; border-radius:12px; color:#0a6aa1; font-weight:bold; text-decoration:none;">🚩 Contacter l’agence (compte suspect, arnaque)</a>`);
 document.querySelector('#xnav button[data-k="acc"]').click();
 setTimeout(()=>xag.scrollIntoView(),50);
 }));
