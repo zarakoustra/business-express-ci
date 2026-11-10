@@ -1122,11 +1122,15 @@ panel.innerHTML=`
 <button class="btn2" data-open="xfaq">❓ Questions fréquentes</button>
 <button class="btn2" data-open="xnotif">🔔 Notifications</button>
 <button class="btn2" data-open="xfol">👥 Mes abonnés</button>
-<button class="btn2" data-open="xmoney">💰 Faire l’argent</button>
+<button class="btn2" onclick="document.getElementById('xmoney').style.display='block'">💰 Faire l’argent</button>
 <button class="btn2" data-open="xprofile">📤 Partager mon profil</button>
 <button class="btn2" data-open="xname">✏️ Mon nom</button>
-<button class="btn2" data-open="xagency">🚩 Contacter l’agence</button>
-<h3>Préférences</h3>
+<a class="btn2" href="https://wa.me/2250170075417?text=Bonjour%2C%20je%20signale%20un%20compte%20suspect%20sur%20ZARAKOUSTRA" target="_blank" style="display:block; text-align:center; text-decoration:none;">🚩 Contacter l’agence</a>
+<div id="xmoney" style="display:none;">
+  <button class="btn2" onclick="this.parentElement.style.display='none'">← Retour</button>
+  <h3>Faire l’argent</h3>
+  <p>Partage ton lien de vendeur sur WhatsApp pour que tes amis découvrent tes annonces.</p>
+</div><h3>Préférences</h3>
 
 <label for="appLanguage">Langue</label>
 <select id="appLanguage">
