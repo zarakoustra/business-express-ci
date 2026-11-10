@@ -2985,6 +2985,60 @@ document.addEventListener('click', function (e) {
     if(tries>60||(findH('Mon espace')||{}).dataset&&findH('Mon espace').dataset.zk) clearInterval(timer);
   },500);
 })();
+  </script><script>
+(function(){
+  var waUrl='https://wa.me/2250170075417?text=Bonjour%2C%20je%20signale%20un%20compte%20suspect%20sur%20ZARAKOUSTRA';
+  var tries=0;
+  var t=setInterval(function(){
+    tries++;
+    var anchor=[...document.querySelectorAll('button')].find(function(b){
+      return b.textContent.indexOf('Partager mon profil')!==-1 && b.parentElement && b.parentElement.parentElement===document.body;
+    });
+    var h=[...document.querySelectorAll('h3')].find(function(x){return x.textContent.trim()==='Mon espace';});
+    if(!anchor||!h){ if(tries>60) clearInterval(t); return; }
+    clearInterval(t);
+
+    var panel=anchor.parentElement;
+    var pwBtn=[...document.querySelectorAll('button')].find(function(b){
+      return b.textContent.indexOf('Changer mon mot de passe')!==-1;
+    });
+
+    function addItem(label,fn){
+      var it=document.createElement('button');
+      it.textContent=label;
+      it.style.cssText='display:block;width:100%;text-align:left;background:none;border:none;padding:12px;font-size:16px;font-weight:bold;color:#0a6aa1;';
+      it.onclick=function(e){
+        e.stopPropagation();
+        panel.style.display='none';
+        fn();
+      };
+      panel.appendChild(it);
+    }
+
+    addItem('🚩 Contacter l’agence',function(){
+      window.open(waUrl,'_blank');
+    });
+    addItem('🔐 Changer mon mot de passe',function(){
+      if(pwBtn) pwBtn.click();
+    });
+
+    // Supprimer l'écran Paramètres
+    h.parentElement.style.display='none';
+  },500);
+})();
+  </script><script>
+(function(){
+  var tries=0;
+  var t=setInterval(function(){
+    tries++;
+    var acc=document.querySelector('#xnav button[data-k="acc"]');
+    if(acc){
+      acc.style.display='none';
+      clearInterval(t);
+    }
+    if(tries>60) clearInterval(t);
+  },300);
+})();
   </script>
 </body>
 </html>
