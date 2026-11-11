@@ -2917,6 +2917,66 @@ document.addEventListener('click',e=>{
   msg.textContent='';
   m.hidden=false;
 },true);
+</script><script type="module">
+const LABEL='Gagner du jeton';
+const RE=/Faire l[’']argent/;
+
+/* 1. Renommer le bouton et le titre */
+function rename(root){
+  const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
+  let n;
+  while(n=w.nextNode()){
+    if(RE.test(n.data))n.data=n.data.replace(RE,LABEL);
+  }
+}
+rename(document.body);
+new MutationObserver(ms=>{
+  ms.forEach(m=>m.addedNodes.forEach(x=>{
+    if(x.nodeType===1)rename(x);
+    else if(x.nodeType===3&&RE.test(x.data))x.data=x.data.replace(RE,LABEL);
+  }));
+}).observe(document.body,{childList:true,subtree:true});
+
+/* 2. Fenêtre explicative */
+const css=document.createElement('style');
+css.textContent=`
+#xjeton{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;justify-content:center}
+#xjeton[hidden]{display:none}
+#xjeton .box{background:#fff;color:#0B2545;width:100%;max-width:520px;max-height:85vh;overflow-y:auto;border-radius:18px 18px 0 0;padding:18px;padding-bottom:calc(18px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:10px}
+#xjeton h3{margin:0;font-size:19px;text-align:center}
+#xjeton p{margin:0;font-size:15px;line-height:1.45}
+#xjeton .st{background:#F4FAFF;border:1px solid #CFE8F7;border-radius:12px;padding:10px}
+#xjeton .st b{display:block;margin-bottom:4px}
+#xjeton button{min-height:50px;font-size:16px;font-weight:700;border-radius:12px;border:1px solid #0B6FA8;background:#5BB8EA;color:#0B2545;cursor:pointer}
+`;
+document.head.append(css);
+
+const m=document.createElement('div');
+m.id='xjeton';m.hidden=true;
+m.innerHTML=
+'<div class="box">'+
+'<h3>💰 Comment gagner du jeton</h3>'+
+'<p>Zarakoustra te permet de vendre les choses que tu ne utilises plus ou que tu produis toi-même.</p>'+
+'<div class="st"><b>1. Publie une annonce</b><p>Appuie sur « Vendre », ajoute 3 à 4 photos nettes, un titre clair et un prix honnête.</p></div>'+
+'<div class="st"><b>2. Réponds vite aux acheteurs</b><p>Les messages reçus apparaissent dans l’onglet Message. Une réponse rapide donne confiance.</p></div>'+
+'<div class="st"><b>3. Fais-toi des avis</b><p>Après une vente confirmée, tes acheteurs peuvent te noter. De bons avis font vendre plus.</p></div>'+
+'<div class="st"><b>4. Demande le badge « Vendeur vérifié »</b><p>Il rassure les acheteurs et met tes annonces en avant.</p></div>'+
+'<div class="st"><b>5. Partage ton profil</b><p>Envoie ton lien à tes amis et à ta famille, et invite-les à s’abonner à toi.</p></div>'+
+'<p>Plus il y a de monde sur Zarakoustra, plus tu as de chances de vendre.</p>'+
+'<button type="button" id="xjclose">Compris</button>'+
+'</div>';
+document.body.append(m);
+document.getElementById('xjclose').onclick=()=>{m.hidden=true;};
+m.addEventListener('click',e=>{if(e.target===m)m.hidden=true;});
+
+/* 3. Intercepter le clic sur le bouton */
+document.addEventListener('click',e=>{
+  const b=e.target.closest('button');
+  if(!b||!RE.test(b.textContent)&&!b.textContent.includes(LABEL))return;
+  e.preventDefault();
+  e.stopImmediatePropagation();
+  m.hidden=false;
+},true);
 </script>
 </body>
 </html>
