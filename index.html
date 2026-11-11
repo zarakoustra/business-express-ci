@@ -647,7 +647,7 @@ xfav.hidden=xmsg.hidden=xacc.hidden=true;
 main.prepend(xfav,xmsg,xacc);
 
 const nav=h('nav');nav.id='xnav';
-[['home','🏠','Accueil'],['fav','♡','Enregistré'],['msg','💬','Message'],['acc','👤','Mon compte']]
+[['home','🏠','Accueil'],['fav','♡','Enregistré'],['msg','💬','Message'],['acc','⚙️','Paramètres']]
 .forEach(([k,ic,tx])=>{
 const b=h('button');b.type='button';b.dataset.k=k;
 b.append(h('span',ic),document.createTextNode(tx));
