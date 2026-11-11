@@ -2750,6 +2750,47 @@ b.type='button';b.className='btn';b.textContent='➕ Publier une annonce';
 b.onclick=()=>$('top').click();
 p.append(t,s,b);
 }).observe($('list'),{childList:true});
-</script> 
+</script><script type="module">
+import {getApp} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+import {getAuth,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+import {getFirestore,doc,getDoc} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
+
+const auth=getAuth(getApp()),db=getFirestore(getApp());
+const img=document.getElementById('pfimg');
+
+const isDef=s=>!s||String(s).startsWith('data:image/svg+xml');
+function readLocal(){try{return localStorage.getItem('pfphoto');}catch(e){return null;}}
+
+let target=null;
+
+function paint(){
+  const want=target||(readLocal())||img.dataset.def;
+  if(img.getAttribute('src')!==want)img.src=want;
+}
+img.dataset.def=img.getAttribute('src');
+
+/* Empêche les autres scripts de remettre l'image par défaut */
+new MutationObserver(()=>{
+  const s=img.getAttribute('src');
+  if(!isDef(s)){target=s;return;}
+  if(!isDef(target))paint();
+}).observe(img,{attributes:true,attributeFilter:['src']});
+
+onAuthStateChanged(auth,async u=>{
+  target=null;
+  if(u){
+    try{
+      const d=await getDoc(doc(db,'avatars',u.uid));
+      if(d.exists()&&d.data().photo){
+        target=d.data().photo;
+        try{localStorage.setItem('pfphoto',target);}catch(e){}
+      }
+    }catch(e){}
+  }
+  paint();
+});
+
+paint();
+</script>
 </body>
 </html>
