@@ -2866,6 +2866,124 @@ list=s.docs.map(d=>({id:d.id,...d.data()}));
 draw();
 },()=>{});
 draw();
+</script><style>
+.xcover{margin-top:14px;border:2px solid #000;border-radius:14px;overflow:hidden;background:var(--cd)}
+.xcover img{width:100%;height:200px;object-fit:cover;display:block}
+</style>
+
+<script type="module">
+import {getApp} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+import {getAuth,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+import {getFirestore,doc,setDoc,deleteDoc,onSnapshot} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
+
+const app=getApp(),auth=getAuth(app),db=getFirestore(app);
+const $=id=>document.getElementById(id);
+
+/* Retire l'ancien bloc « Photos de la communauté » s'il est encore là */
+document.getElementById('hcomm')?.remove();
+
+let user=null,myCover=null,coverPhoto=null,unsubMine=null;
+const sid=new URLSearchParams(location.search).get('v');
+
+/* ---------- 1. Boutons dans Mon compte → Paramètres ---------- */
+const panel=$('settingsPanel');
+const cbtn=document.createElement('button');cbtn.type='button';cbtn.className='btn2';
+const cdel=document.createElement('button');cdel.type='button';cdel.className='btn2';
+cdel.textContent='Retirer ma photo de couverture';
+const file=document.createElement('input');file.type='file';file.accept='image/*';file.hidden=true;
+panel.append(cbtn,cdel,file);
+
+function drawSettings(){
+cbtn.hidden=!user;
+cbtn.textContent=myCover?'🖼️ Changer ma photo de couverture':'🖼️ Ajouter une photo de couverture';
+cdel.hidden=!(user&&myCover);
+}
+
+function shrink(f){
+return new Promise((ok,ko)=>{
+const r=new FileReader();
+r.onload=()=>{
+const im=new Image();
+im.onload=()=>{
+const s=Math.min(1,1000/Math.max(im.width,im.height));
+const c=document.createElement('canvas');
+c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);
+c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+let d=c.toDataURL('image/jpeg',0.6);
+if(d.length>390000)d=c.toDataURL('image/jpeg',0.4);
+ok(d);
+};
+im.onerror=ko;im.src=r.result;
+};
+r.onerror=ko;r.readAsDataURL(f);
+});
+}
+
+cbtn.onclick=()=>{
+if(!user){alert('Connecte-toi pour ajouter une photo de couverture.');return;}
+file.click();
+};
+
+file.onchange=async()=>{
+const f=file.files[0];
+file.value='';
+if(!f||!user)return;
+try{
+const d=await shrink(f);
+await setDoc(doc(db,'covers',user.uid),{photo:d,t:Date.now()});
+alert('Photo de couverture enregistrée ✓');
+}catch(e){
+alert('Photo non enregistrée. Essaie avec une autre photo.');
+}
+};
+
+cdel.onclick=async()=>{
+if(!user||!confirm('Retirer ta photo de couverture ?'))return;
+try{await deleteDoc(doc(db,'covers',user.uid));}
+catch(e){alert('Suppression impossible.');}
+};
+
+onAuthStateChanged(auth,u=>{
+user=u;
+if(unsubMine){unsubMine();unsubMine=null;}
+myCover=null;
+if(u){
+unsubMine=onSnapshot(doc(db,'covers',u.uid),s=>{
+myCover=s.exists()?s.data().photo:null;
+drawSettings();
+},()=>{});
+}
+drawSettings();
+});
+drawSettings();
+
+/* ---------- 2. Photo de couverture en bas du profil vendeur ---------- */
+const sec=$('xprof');
+
+function sync(){
+if(!sec||!sid)return;
+const cur=sec.querySelector('.xcover');
+if(!coverPhoto){if(cur)cur.remove();return;}
+if(cur){
+const im=cur.querySelector('img');
+if(im.getAttribute('src')!==coverPhoto)im.src=coverPhoto;
+if(sec.lastElementChild!==cur)sec.append(cur);
+return;
+}
+const w=document.createElement('div');w.className='xcover';
+const im=document.createElement('img');
+im.src=coverPhoto;im.alt='Photo de couverture';
+w.append(im);
+sec.append(w);
+}
+
+if(sec&&sid){
+new MutationObserver(sync).observe(sec,{childList:true});
+onSnapshot(doc(db,'covers',sid),s=>{
+coverPhoto=s.exists()?s.data().photo:null;
+sync();
+},()=>{});
+}
 </script>
 </body>
 </html>
