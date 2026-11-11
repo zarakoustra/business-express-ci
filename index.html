@@ -2849,6 +2849,74 @@ document.addEventListener('click',e=>{
   document.querySelector('#xnav button[data-k="home"]').click();
   window.scrollTo(0,0);
 },true);
+</script><script type="module">
+import {getApp} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+import {getAuth} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+const auth=getAuth(getApp());
+
+const css=document.createElement('style');
+css.textContent=`
+#xshare{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;justify-content:center}
+#xshare[hidden]{display:none}
+#xshare .box{background:#fff;color:#0B2545;width:100%;max-width:520px;border-radius:18px 18px 0 0;padding:16px;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:10px}
+#xshare .box h3{margin:0;text-align:center;font-size:18px}
+#xshare .box a,#xshare .box button{min-height:50px;font-size:16px;font-weight:700;border-radius:12px;display:flex;align-items:center;justify-content:center;text-decoration:none;border:1px solid #0B6FA8;background:#fff;color:#0B6FA8;cursor:pointer}
+#xshare .box .sm{margin:0;font-size:13px;color:#3E5C76;text-align:center;min-height:18px}
+`;
+document.head.append(css);
+
+const m=document.createElement('div');
+m.id='xshare';m.hidden=true;
+m.innerHTML=
+'<div class="box">'+
+'<h3>Partager mon profil</h3>'+
+'<a id="xsw" target="_blank" rel="noopener noreferrer">💬 WhatsApp</a>'+
+'<a id="xst" target="_blank" rel="noopener noreferrer">✈️ Telegram</a>'+
+'<button type="button" id="xsi">📸 Instagram</button>'+
+'<button type="button" id="xsc">🔗 Copier le lien</button>'+
+'<p class="sm" id="xsm"></p>'+
+'<button type="button" id="xsx">Fermer</button>'+
+'</div>';
+document.body.append(m);
+
+const msg=document.getElementById('xsm');
+const TEXT='Découvre ce que je vends sur Zarakoustra 👉 ';
+let link='';
+
+function setLinks(){
+  document.getElementById('xsw').href='https://wa.me/?text='+encodeURIComponent(TEXT+link);
+  document.getElementById('xst').href='https://t.me/share/url?url='+encodeURIComponent(link)+'&text='+encodeURIComponent(TEXT);
+}
+
+async function copy(){
+  try{
+    await navigator.clipboard.writeText(link);
+    msg.textContent='Lien copié ✓';
+  }catch(e){
+    prompt('Copie ce lien :',link);
+  }
+}
+
+document.getElementById('xsi').onclick=async()=>{
+  await copy();
+  msg.textContent='Lien copié ✓ Colle-le dans ton message ou ta story Instagram.';
+  window.open('https://www.instagram.com/','_blank','noopener');
+};
+document.getElementById('xsc').onclick=copy;
+document.getElementById('xsx').onclick=()=>{m.hidden=true;};
+
+document.addEventListener('click',e=>{
+  const c=e.target.closest('button.card');
+  if(!c||!c.textContent.includes('Partager mon profil'))return;
+  e.preventDefault();
+  e.stopImmediatePropagation();
+  const u=auth.currentUser;
+  if(!u){alert('Connecte-toi pour partager ton profil.');return;}
+  link=location.origin+location.pathname+'?v='+u.uid;
+  setLinks();
+  msg.textContent='';
+  m.hidden=false;
+},true);
 </script>
 </body>
 </html>
