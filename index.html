@@ -3292,6 +3292,65 @@ body[data-tab="home"] #xwall.on ~ main input::placeholder{color:#000!important;o
 body[data-tab="home"] #xwall.on ~ main select option{color:#000!important}
 body[data-tab="home"] #xwall.on ~ header h1,
 body[data-tab="home"] #xwall.on ~ header #top{color:#000!important}
+</style><style>
+body[data-tab="home"] #xcats{
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  gap:14px 4px!important;justify-items:center!important}
+body[data-tab="home"] #xcats button{
+  min-width:0!important;width:100%!important;align-items:center!important;
+  padding:0!important;margin:0!important}
+body[data-tab="home"] #xcats button i{
+  width:64px!important;height:64px!important;max-width:64px!important;
+  aspect-ratio:auto!important;font-size:28px!important;flex:none!important}
+body[data-tab="home"] #xcats button span{
+  font-size:14px!important;line-height:1.15!important;max-width:100%!important;
+  text-align:center!important;overflow-wrap:anywhere!important;hyphens:auto}
+</style><style>
+:root,
+:root[data-theme="light"],
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0E1A2F;      /* fond général bleu nuit */
+  --tx:#F1F5F9;      /* texte clair */
+  --mu:#A9B8D0;      /* texte secondaire */
+  --bd:#2A3F63;      /* bordures */
+  --cd:#172741;      /* cartes */
+  --nv:#1C2F55;      /* en-tête */
+  --hd:#FFFFFF;      /* texte de l'en-tête */
+  --ac:#FF8A1F;      /* orange */
+}
+
+/* En-tête et barre du bas */
+header{background:var(--nv)!important;color:#fff!important}
+header #top{background:transparent!important;color:#fff!important;border:2px solid #FF8A1F!important}
+#xdots{background:transparent!important;color:#fff!important;border:2px solid #FF8A1F!important}
+#xnav{background:#13223D!important;border-top:1px solid #2A3F63!important}
+#xnav button{color:#A9B8D0!important}
+#xnav button.on{color:#FF8A1F!important}
+
+/* Boutons */
+.btn{background:#FF8A1F!important;color:#fff!important;border:0}
+.btn2{background:transparent!important;color:#FF8A1F!important;border:2px solid #FF8A1F!important}
+button.card{background:var(--cd)!important;color:var(--tx)!important;border:1px solid var(--bd)!important}
+
+/* Champs de saisie */
+input,textarea,select{background:#0E1A2F!important;color:#F1F5F9!important;border:1px solid #2A3F63!important}
+input::placeholder,textarea::placeholder{color:#8193B0!important}
+
+/* Menu ⋮ et fenêtres */
+#xmenu .xmb{background:#172741!important;color:#F1F5F9!important}
+#xmenu .xmb .xmi{background:transparent!important;color:#FF8A1F!important;border:1px solid #FF8A1F!important}
+#xmenu .xmb .xclose{background:#FF8A1F!important;color:#fff!important}
+#xmenu .xmb h3,#xmenu .xmb .xs{color:#F1F5F9!important}
+#xmenu .xmb select{background:#0E1A2F!important;color:#F1F5F9!important;border:1px solid #2A3F63!important}
+
+/* Tiroirs, messages et annonces */
+section{background:var(--cd)!important;border:1px solid var(--bd)!important;color:var(--tx)}
+.mod{background:#0E1A2F!important;border-color:#2A3F63!important}
+.xb.me{background:#FF8A1F!important;color:#fff!important}
+.xb.ot{background:#0E1A2F!important;color:#F1F5F9!important;border-color:#2A3F63!important}
+.ok{color:#FF8A1F!important}
+.safe{border-color:#FF8A1F!important}
 </style>
 </body>
 </html>
