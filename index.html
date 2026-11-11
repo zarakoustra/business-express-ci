@@ -2977,6 +2977,46 @@ document.addEventListener('click',e=>{
   e.stopImmediatePropagation();
   m.hidden=false;
 },true);
+</script><script type="module">
+/* 1. Logos dans la fenêtre de partage */
+const logos={
+  xsw:['https://cdn.simpleicons.org/whatsapp/25D366','WhatsApp'],
+  xst:['https://cdn.simpleicons.org/telegram/26A5E4','Telegram'],
+  xsi:['https://cdn.simpleicons.org/instagram/E4405F','Instagram']
+};
+Object.entries(logos).forEach(([id,[src,name]])=>{
+  const b=document.getElementById(id);
+  if(!b)return;
+  b.innerHTML='<img src="'+src+'" alt="" width="24" height="24" style="vertical-align:middle;margin-right:8px"> '+name;
+});
+
+/* 2. Mode sombre partout */
+const css=document.createElement('style');
+css.textContent=`
+:root[data-theme="dark"] body{background:var(--bg)!important;color:var(--tx)!important}
+:root[data-theme="dark"] header h1{background:var(--cd)!important;color:var(--hd)!important}
+:root[data-theme="dark"] #xnav{background:var(--cd)!important;border-color:var(--bd)!important}
+:root[data-theme="dark"] #xnav button{color:var(--mu)}
+:root[data-theme="dark"] #xnav button.on{color:var(--ac)}
+:root[data-theme="dark"] #xshare .box,
+:root[data-theme="dark"] #xjeton .box{background:var(--cd)!important;color:var(--tx)!important}
+:root[data-theme="dark"] #xshare .box a,
+:root[data-theme="dark"] #xshare .box button{background:var(--cd)!important;color:var(--ac)!important;border-color:var(--ac)!important}
+:root[data-theme="dark"] #xshare .box .sm{color:var(--mu)}
+:root[data-theme="dark"] #xjeton .st{background:var(--bg)!important;border-color:var(--bd)!important}
+:root[data-theme="dark"] #xjeton p{color:var(--tx)}
+:root[data-theme="dark"] #xjeton button{color:#0B2545}
+:root[data-theme="dark"] .xbox .xb.ot{background:var(--cd)!important;color:var(--tx)}
+:root[data-theme="dark"] #xcats button{color:var(--tx)}
+:root[data-theme="dark"] #xcats button i{background:var(--nv)}
+:root[data-theme="dark"] .card,
+:root[data-theme="dark"] button.card{background:var(--cd)!important;color:var(--tx)!important;border-color:var(--bd)!important}
+:root[data-theme="dark"] .mod{background:var(--cd)!important;border-color:var(--bd)!important}
+:root[data-theme="dark"] .safe{background:var(--cd)!important;color:var(--tx)!important}
+:root[data-theme="dark"] .strip img{background:var(--cd)}
+:root[data-theme="dark"] .pfc{background:var(--cd)!important;color:var(--tx)}
+`;
+document.head.append(css);
 </script>
 </body>
 </html>
