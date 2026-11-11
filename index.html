@@ -3366,6 +3366,45 @@ body[data-tab="home"] #xcats button i{
 body[data-tab="home"] #xcats button span{
   font-size:15px!important;line-height:1.15!important;max-width:100%!important;
   text-align:center!important;overflow-wrap:anywhere!important;hyphens:auto}
-</style>
+</style><script type="module">
+import {getApp} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+import {getAuth,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+import {getFirestore,doc,getDoc} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
+
+const auth=getAuth(getApp()),db=getFirestore(getApp());
+const img=document.getElementById('pfimg');
+const DEF="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%23fff'/%3E%3Ccircle cx='20' cy='15' r='7' fill='%233E5C76'/%3E%3Cellipse cx='20' cy='36' rx='13' ry='10' fill='%233E5C76'/%3E%3C/svg%3E";
+
+let saved=null;
+try{saved=localStorage.getItem('pfphoto');}catch(e){}
+
+function show(){
+  const want=saved||DEF;
+  if(img.src!==want)img.src=want;
+}
+show();
+
+/* Si un autre script remet l'image par défaut, on restaure la photo */
+new MutationObserver(()=>{
+  if(saved&&img.src!==saved)img.src=saved;
+}).observe(img,{attributes:true,attributeFilter:['src']});
+
+onAuthStateChanged(auth,async u=>{
+  if(!u){
+    /* déconnecté : photo par défaut */
+    saved=null;
+    show();
+    return;
+  }
+  try{
+    const d=await getDoc(doc(db,'avatars',u.uid));
+    if(d.exists()&&d.data().photo){
+      saved=d.data().photo;
+      try{localStorage.setItem('pfphoto',saved);}catch(e){}
+      show();
+    }
+  }catch(e){}
+});
+</script>
 </body>
 </html>
