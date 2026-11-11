@@ -3255,6 +3255,48 @@ onSnapshot(query(collection(db,'products'),where('ok','==',true)),s=>{
 onAuthStateChanged(auth,u=>{
   user=u;load();draw();badge();
 });
+</script><script type="module">
+import {getApp} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+import {getFirestore,collection,query,where,onSnapshot} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
+
+const db=getFirestore(getApp());
+const sid=new URLSearchParams(location.search).get('v');
+
+if(sid){
+  let last=0;
+  const DAY=86400000;
+
+  function label(){
+    if(!last)return null;
+    const d=Date.now()-last;
+    if(d<DAY)return '🟢 Actif aujourd’hui';
+    const n=Math.floor(d/DAY);
+    if(n<=30)return '⚪ Actif il y a '+n+' jour'+(n>1?'s':'');
+    return null;
+  }
+
+  function put(){
+    const sec=document.getElementById('xprof');
+    if(!sec)return;
+    const txt=label();
+    let p=sec.querySelector('.xact');
+    if(!txt){if(p)p.remove();return;}
+    if(!p){
+      p=document.createElement('p');
+      p.className='xact ok';
+      const h2=[...sec.children].find(e=>e.tagName==='H2');
+      if(h2)h2.after(p);else sec.prepend(p);
+    }
+    if(p.textContent!==txt)p.textContent=txt;
+  }
+
+  onSnapshot(query(collection(db,'products'),where('uid','==',sid),where('ok','==',true)),s=>{
+    last=Math.max(0,...s.docs.map(d=>d.data().t||0));
+    put();
+  },()=>{});
+
+  new MutationObserver(put).observe(document.body,{childList:true,subtree:true});
+}
 </script>
 </body>
 </html>
