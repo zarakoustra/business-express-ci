@@ -2984,6 +2984,10 @@ coverPhoto=s.exists()?s.data().photo:null;
 sync();
 },()=>{});
 }
-</script>
+</script><style>
+.xcover{display:none!important}
+body.xprofmode .xcover{display:block!important;margin-top:14px}
+.xcover img{width:100%;height:200px;max-height:200px;object-fit:cover;display:block}
+</style>
 </body>
 </html>
