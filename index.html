@@ -3017,6 +3017,97 @@ css.textContent=`
 :root[data-theme="dark"] .pfc{background:var(--cd)!important;color:var(--tx)}
 `;
 document.head.append(css);
+</script><script type="module">
+import {getApp} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+import {getAuth,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+import {getFirestore,collection,query,where,onSnapshot,updateDoc,doc,increment} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
+
+const auth=getAuth(getApp()),db=getFirestore(getApp());
+const $=id=>document.getElementById(id);
+const money=i=>Number(i.price).toLocaleString('fr-FR')+' FCFA'+(i.unit?' '+i.unit:'');
+const DAY=86400000;
+
+const css=document.createElement('style');
+css.textContent='.xst{font-size:13px;color:var(--mu);margin:2px 0}.xbump{min-height:40px;font-size:14px}';
+document.head.append(css);
+
+let user=null,items=[],mine=[],convs={},unsubs=[];
+const seen=new Set();
+
+/* Annonces publiques (pour retrouver l'annonce ouverte) */
+onSnapshot(query(collection(db,'products'),where('ok','==',true)),s=>{
+  items=s.docs.map(d=>({id:d.id,...d.data()}));
+},()=>{});
+
+/* Données du vendeur connecté */
+onAuthStateChanged(auth,u=>{
+  user=u;
+  unsubs.forEach(f=>f());unsubs=[];
+  mine=[];convs={};
+  if(!u){decorate();return;}
+  unsubs.push(onSnapshot(query(collection(db,'products'),where('uid','==',u.uid)),s=>{
+    mine=s.docs.map(d=>({id:d.id,...d.data()}));
+    decorate();
+  },()=>{}));
+  unsubs.push(onSnapshot(query(collection(db,'chats'),where('sellerUid','==',u.uid)),s=>{
+    convs={};
+    s.docs.forEach(d=>{const p=d.data().productId;convs[p]=(convs[p]||0)+1;});
+    decorate();
+  },()=>{}));
+});
+
+/* 1. Statistiques et bouton « Remonter » dans Mes annonces */
+function decorate(){
+  const box=$('xmine');if(!box)return;
+  box.querySelectorAll(':scope>.mod').forEach(c=>{
+    const t=c.querySelector('b');if(!t)return;
+    const i=mine.find(x=>x.title===t.textContent);if(!i)return;
+
+    let s=c.querySelector('.xst');
+    if(!s){s=document.createElement('span');s.className='xst';c.insertBefore(s,c.querySelector('button'));}
+    s.textContent='👁 '+(i.views||0)+' vues · 💬 '+(convs[i.id]||0)+' conversation(s) · 📞 '+(i.phoneClicks||0)+' clic(s) sur le numéro';
+
+    let b=c.querySelector('.xbump');
+    if(!b){b=document.createElement('button');b.type='button';b.className='btn2 xbump';b.textContent='🔄 Remonter en haut';c.insertBefore(b,c.querySelector('button'));}
+    b.dataset.id=i.id;
+    b.onclick=()=>bump(b.dataset.id);
+  });
+}
+new MutationObserver(decorate).observe($('xmine'),{childList:true});
+
+async function bump(id){
+  const i=mine.find(x=>x.id===id);if(!i)return;
+  const left=DAY-(Date.now()-(i.bumpedAt||0));
+  if(left>0){alert('Tu pourras remonter cette annonce dans '+Math.ceil(left/3600000)+' h.');return;}
+  try{
+    await updateDoc(doc(db,'products',id),{t:Date.now(),bumpedAt:Date.now()});
+    alert('Annonce remontée en haut ✓');
+  }catch(e){alert('Impossible de remonter l’annonce.');}
+}
+
+/* 2. Compteur de vues et de clics sur le numéro */
+const det=$('detail');
+function currentItem(){
+  const t=det.querySelector(':scope>b'),m=det.querySelector(':scope>h2');
+  if(!t||!m)return null;
+  return items.find(x=>x.title===t.textContent&&money(x)===m.textContent)||null;
+}
+new MutationObserver(()=>{
+  if(det.hidden)return;
+  const i=currentItem();if(!i)return;
+  if(user&&user.uid===i.uid)return;
+  const key='v'+i.id;
+  if(seen.has(key))return;seen.add(key);
+  updateDoc(doc(db,'products',i.id),{views:increment(1)}).catch(()=>{});
+}).observe(det,{childList:true});
+
+document.addEventListener('click',e=>{
+  const b=e.target.closest('button');
+  if(!b||!b.textContent.includes('Voir le numéro'))return;
+  const i=currentItem();
+  if(!i||!user||user.uid===i.uid)return;
+  updateDoc(doc(db,'products',i.id),{phoneClicks:increment(1)}).catch(()=>{});
+},true);
 </script>
 </body>
 </html>
