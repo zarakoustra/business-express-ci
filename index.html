@@ -3108,6 +3108,153 @@ document.addEventListener('click',e=>{
   if(!i||!user||user.uid===i.uid)return;
   updateDoc(doc(db,'products',i.id),{phoneClicks:increment(1)}).catch(()=>{});
 },true);
+</script><script type="module">
+import {getApp} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+import {getAuth,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+import {getFirestore,collection,query,where,onSnapshot} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
+
+const auth=getAuth(getApp()),db=getFirestore(getApp());
+const $=id=>document.getElementById(id);
+const ALL='Toutes les villes';
+const CITIES=[ALL,'Abidjan','Bouaké','Yamoussoukro','Daloa','San-Pédro','Korhogo','Autre'];
+const money=i=>Number(i.price).toLocaleString('fr-FR')+' FCFA'+(i.unit?' '+i.unit:'');
+function h(tag,text,cls){const e=document.createElement(tag);if(text!=null)e.textContent=text;if(cls)e.className=cls;return e;}
+
+const css=document.createElement('style');
+css.textContent=`
+#xal{display:none}
+#xal:not([hidden]){display:flex}
+#xalbtn{position:relative;display:flex;align-items:center;justify-content:space-between}
+.xbadge{min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:#E53935;color:#fff;font-size:12px;font-style:normal;font-weight:700;display:inline-flex;align-items:center;justify-content:center;margin-left:8px}
+.xnew{color:#E53935;font-weight:700;font-size:12px}
+`;
+document.head.append(css);
+
+let user=null,items=[],alerts=[],seen=[],newIds=[];
+const key=k=>'x'+k+'_'+(user?user.uid:'anon');
+
+function load(){
+  try{alerts=JSON.parse(localStorage.getItem(key('alerts')))||[];}catch(e){alerts=[];}
+  try{seen=JSON.parse(localStorage.getItem(key('alseen')))||[];}catch(e){seen=[];}
+}
+function save(){
+  localStorage.setItem(key('alerts'),JSON.stringify(alerts));
+  localStorage.setItem(key('alseen'),JSON.stringify(seen));
+}
+function matches(i,a){
+  const cityOk=!a.city||a.city===ALL||i.city===a.city;
+  const txt=((i.title||'')+' '+(i.desc||'')).toLowerCase();
+  return cityOk && txt.includes(a.kw.toLowerCase()) && (i.t||0)>a.t;
+}
+function found(){
+  return items.filter(i=>alerts.some(a=>matches(i,a))).sort((x,y)=>(y.t||0)-(x.t||0));
+}
+function unseen(){return found().filter(i=>!seen.includes(i.id));}
+function markSeen(id){if(!seen.includes(id)){seen.push(id);save();}}
+
+/* Bouton dans Paramètres */
+const sp=$('settingsPanel');
+const bell=h('button','🔔 Mes alertes de recherche','btn2');
+bell.id='xalbtn';bell.type='button';
+const ref=sp.querySelector('[data-open="xmine"]');
+if(ref)ref.before(bell);else sp.append(bell);
+
+/* Section des alertes */
+const sec=h('section');sec.id='xal';sec.hidden=true;
+const kw=document.createElement('input');kw.placeholder='Ex : iPhone';kw.maxLength=40;
+const sel=document.createElement('select');CITIES.forEach(c=>sel.add(new Option(c,c)));
+const add=h('button','Créer l’alerte','btn');add.type='button';
+const msg=h('p',null,'mu');
+const list=h('div');
+const res=h('div');
+sec.append(
+  h('h2','Mes alertes de recherche'),
+  h('p','Je te préviens quand une nouvelle annonce correspond. Les annonces déjà publiées ne sont pas comptées.','mu'),
+  kw,sel,add,msg,
+  h('b','Mes alertes'),list,
+  h('b','Annonces trouvées'),res
+);
+sp.after(sec);
+
+add.onclick=()=>{
+  if(!user){msg.textContent='Connecte-toi pour créer une alerte.';return;}
+  const k=kw.value.trim();
+  if(k.length<2){msg.textContent='Écris au moins 2 lettres.';return;}
+  if(alerts.length>=10){msg.textContent='Maximum 10 alertes.';return;}
+  alerts.push({id:Date.now().toString(36),kw:k,city:sel.value,t:Date.now()});
+  save();kw.value='';msg.textContent='Alerte créée ✓';
+  draw();badge();
+};
+
+function openAd(i){
+  markSeen(i.id);
+  sec.hidden=true;
+  ['q','fc','fv'].forEach(k=>{$(k).value='';$(k).dispatchEvent(new Event('input'));});
+  document.querySelector('#xnav button[data-k="home"]').click();
+  setTimeout(()=>{
+    const c=[...$('list').children].find(x=>x.textContent.includes(i.title)&&x.textContent.includes(money(i)));
+    if(c)c.click();
+  },150);
+}
+
+function draw(){
+  list.replaceChildren();
+  if(!alerts.length)list.append(h('p','Aucune alerte pour le moment.','mu'));
+  alerts.forEach(a=>{
+    const row=h('div',null,'mod');
+    const n=items.filter(i=>matches(i,a)).length;
+    row.append(
+      h('span','🔎 '+a.kw+' · '+(a.city===ALL?'toutes les villes':a.city)),
+      h('span',n+' annonce(s) trouvée(s) depuis la création','mu')
+    );
+    const d=h('button','Supprimer','btn2');d.type='button';
+    d.onclick=()=>{alerts=alerts.filter(x=>x.id!==a.id);save();draw();badge();};
+    row.append(d);
+    list.append(row);
+  });
+
+  res.replaceChildren();
+  const f=found();
+  if(!f.length)res.append(h('p','Aucune annonce correspondante.','mu'));
+  f.slice(0,20).forEach(i=>{
+    const row=h('div',null,'mod');
+    row.append(h('b',money(i)),h('span',i.title+' · '+(i.city||'')));
+    if(newIds.includes(i.id))row.append(h('span','● Nouveau','xnew'));
+    const v=h('button','Voir l’annonce','btn');v.type='button';
+    v.onclick=()=>openAd(i);
+    row.append(v);
+    res.append(row);
+  });
+}
+
+function badge(){
+  const n=unseen().length;
+  [document.querySelector('#xnav button[data-k="acc"]'),bell].filter(Boolean).forEach(b=>{
+    let e=b.querySelector('.xbadge');
+    if(!n){if(e)e.remove();return;}
+    if(!e){e=h('i',null,'xbadge');b.append(e);}
+    e.textContent=n;
+  });
+}
+
+/* Ouvrir la section : les nouvelles annonces sont marquées comme vues */
+bell.onclick=()=>{
+  newIds=unseen().map(i=>i.id);
+  found().forEach(i=>markSeen(i.id));
+  sec.hidden=false;
+  draw();badge();
+  sec.scrollIntoView();
+};
+
+onSnapshot(query(collection(db,'products'),where('ok','==',true)),s=>{
+  items=s.docs.map(d=>({id:d.id,...d.data()}));
+  badge();
+  if(!sec.hidden)draw();
+},()=>{});
+
+onAuthStateChanged(auth,u=>{
+  user=u;load();draw();badge();
+});
 </script>
 </body>
 </html>
