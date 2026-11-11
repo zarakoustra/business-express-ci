@@ -2750,6 +2750,122 @@ b.type='button';b.className='btn';b.textContent='➕ Publier une annonce';
 b.onclick=()=>$('top').click();
 p.append(t,s,b);
 }).observe($('list'),{childList:true});
+</script><style>
+#hcomm{display:flex;flex-direction:column;gap:8px}
+#hcomm .hct{font-weight:700;margin:0;font-size:16px}
+#hcomm .hstrip{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px}
+#hcomm .hi{flex:none;width:150px;border:2px solid #000;border-radius:12px;background:var(--cd);
+overflow:hidden;display:flex;flex-direction:column}
+#hcomm .hi img{width:100%;height:150px;object-fit:cover;display:block}
+#hcomm .hi span{font-size:13px;font-weight:700;padding:6px 8px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#hcomm .hi button{margin:6px 8px 8px;min-height:36px;font-size:13px;padding:0 8px}
+#hcomm .hmu{font-size:14px;color:var(--mu);margin:0}
+body:not([data-tab="home"]) #hcomm{display:none!important}
+body:is(.sellmode,.catmode,.xprofmode) #hcomm{display:none!important}
+</style>
+
+<script type="module">
+import {getApp} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+import {getAuth,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+import {getFirestore,collection,doc,getDoc,setDoc,deleteDoc,onSnapshot,query,orderBy} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
+
+const app=getApp(),auth=getAuth(app),db=getFirestore(app);
+const $=id=>document.getElementById(id);
+const ADMIN='rBxaE8OltfeNwvpUivDdqZqhxjl1';
+function h(tag,text,cls){const e=document.createElement(tag);if(text!=null)e.textContent=text;if(cls)e.className=cls;return e;}
+
+/* Retire l'ancienne photo d'accueil partagée */
+document.getElementById('hbanner')?.remove();
+
+let user=null,list=[];
+
+const box=h('section');box.id='hcomm';
+const title=h('b','Photos de la communauté','hct');
+const strip=h('div',null,'hstrip');
+const add=h('button','📷 Ajouter ma photo','btn2');add.type='button';
+const file=document.createElement('input');
+file.type='file';file.accept='image/*';file.hidden=true;
+box.append(title,strip,add,file);
+document.querySelector('main').prepend(box);
+
+function shrink(f){
+return new Promise((ok,ko)=>{
+const r=new FileReader();
+r.onload=()=>{
+const im=new Image();
+im.onload=()=>{
+const s=Math.min(1,800/Math.max(im.width,im.height));
+const c=document.createElement('canvas');
+c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);
+c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+let d=c.toDataURL('image/jpeg',0.6);
+if(d.length>300000)d=c.toDataURL('image/jpeg',0.4);
+ok(d);
+};
+im.onerror=ko;im.src=r.result;
+};
+r.onerror=ko;r.readAsDataURL(f);
+});
+}
+
+function draw(){
+strip.replaceChildren();
+if(!list.length){
+strip.append(h('p','Aucune photo pour le moment. Sois le premier !','hmu'));
+}
+list.forEach(p=>{
+const c=h('div',null,'hi');
+const im=document.createElement('img');im.src=p.photo;im.alt=p.name||'';
+c.append(im,h('span',p.name||'Utilisateur'));
+if(user&&(user.uid===p.uid||user.uid===ADMIN)){
+const isMine=user.uid===p.uid;
+const b=h('button',isMine?'Retirer':'Retirer (admin)','btn2');b.type='button';
+b.onclick=async()=>{
+if(!confirm('Retirer cette photo ?'))return;
+try{await deleteDoc(doc(db,'homePhotos',p.uid));}
+catch(e){alert('Suppression impossible.');}
+};
+c.append(b);
+}
+strip.append(c);
+});
+const mine=!!(user&&list.some(p=>p.uid===user.uid));
+add.textContent=mine?'🔄 Remplacer ma photo':'📷 Ajouter ma photo';
+}
+
+add.onclick=()=>{
+if(!user){
+alert('Connecte-toi pour ajouter ta photo.');
+document.querySelector('#xnav button[data-k="acc"]').click();
+return;
+}
+file.click();
+};
+
+file.onchange=async()=>{
+const f=file.files[0];
+file.value='';
+if(!f)return;
+try{
+const d=await shrink(f);
+let name='Utilisateur';
+try{
+const pr=await getDoc(doc(db,'profiles',user.uid));
+if(pr.exists()&&pr.data().name)name=pr.data().name;
+}catch(e){}
+await setDoc(doc(db,'homePhotos',user.uid),{photo:d,name,uid:user.uid,t:Date.now()});
+alert('Photo ajoutée à l’accueil ✓');
+}catch(e){
+alert('Photo non enregistrée. Essaie avec une autre photo.');
+}
+};
+
+onAuthStateChanged(auth,u=>{user=u;draw();});
+onSnapshot(query(collection(db,'homePhotos'),orderBy('t','desc')),s=>{
+list=s.docs.map(d=>({id:d.id,...d.data()}));
+draw();
+},()=>{});
+draw();
 </script>
 </body>
 </html>
