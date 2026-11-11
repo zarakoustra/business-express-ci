@@ -2830,6 +2830,25 @@ document.addEventListener('click',e=>{
     window.scrollTo(0,0);
   },50);
 },true);
+</script><script type="module">
+let fromHome=false;
+
+document.addEventListener('click',e=>{
+  if(e.target.closest('#xnav button[data-k="acc"]')) fromHome=false;
+  if(e.target.closest('#xnav button[data-k="home"]')) fromHome=false;
+  const b=e.target.closest('button');
+  if(b&&b.textContent.includes('compte suspect')) fromHome=true;
+},true);
+
+document.addEventListener('click',e=>{
+  const back=e.target.closest('#subback');
+  if(!back||!fromHome)return;
+  e.preventDefault();
+  e.stopPropagation();
+  fromHome=false;
+  document.querySelector('#xnav button[data-k="home"]').click();
+  window.scrollTo(0,0);
+},true);
 </script>
 </body>
 </html>
