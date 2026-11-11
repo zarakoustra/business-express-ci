@@ -3165,6 +3165,113 @@ mbox.append(x);
 
 menu.hidden=false;
 };
+</script><style>
+#xwall{position:fixed;inset:0;z-index:-1;display:none;background-size:cover;background-position:center;background-repeat:no-repeat;overflow:hidden}
+#xwall::before{content:"";position:absolute;inset:0;background:var(--bg);opacity:.72}
+body[data-tab="home"] #xwall.on{display:block}
+body:is(.sellmode,.catmode,.xprofmode) #xwall{display:none!important}
+</style>
+
+<script type="module">
+import {getApp} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+import {getAuth,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+import {getFirestore,doc,setDoc,deleteDoc,onSnapshot} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
+
+const app=getApp(),auth=getAuth(app),db=getFirestore(app);
+const $=id=>document.getElementById(id);
+
+/* Fond d'écran (derrière le contenu, visible seulement sur l'accueil) */
+const wall=document.createElement('div');wall.id='xwall';
+document.body.prepend(wall);
+
+/* Champ fichier caché, utilisé depuis le menu ⋮ */
+const file=document.createElement('input');
+file.type='file';file.accept='image/*';file.hidden=true;
+document.body.append(file);
+
+let user=null,mine=null,unsub=null;
+
+function apply(){
+wall.style.backgroundImage=mine?`url("${mine}")`:'';
+wall.classList.toggle('on',!!mine);
+}
+
+function shrink(f){
+return new Promise((ok,ko)=>{
+const r=new FileReader();
+r.onload=()=>{
+const im=new Image();
+im.onload=()=>{
+const s=Math.min(1,1000/Math.max(im.width,im.height));
+const c=document.createElement('canvas');
+c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);
+c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+let d=c.toDataURL('image/jpeg',0.6);
+if(d.length>390000)d=c.toDataURL('image/jpeg',0.4);
+ok(d);
+};
+im.onerror=ko;im.src=r.result;
+};
+r.onerror=ko;r.readAsDataURL(f);
+});
+}
+
+file.onchange=async()=>{
+const f=file.files[0];
+file.value='';
+if(!f||!user)return;
+try{
+const d=await shrink(f);
+await setDoc(doc(db,'wallpapers',user.uid),{photo:d,t:Date.now()});
+alert('Fond d’écran enregistré ✓');
+}catch(e){
+alert('Fond d’écran non enregistré. Essaie avec une autre photo.');
+}
+};
+
+/* Boutons ajoutés dans le menu ⋮ à chaque ouverture */
+$('xdots')?.addEventListener('click',()=>{
+setTimeout(()=>{
+const mbox=document.querySelector('#xmenu .xmb');
+if(!mbox)return;
+
+const title=document.createElement('h3');
+title.textContent='Fond d’écran';
+const change=document.createElement('button');
+change.type='button';change.className='xmi';
+change.textContent='🖼️ Changer mon fond d’écran';
+change.onclick=()=>{
+if(!user){alert('Connecte-toi pour changer ton fond d’écran.');return;}
+document.getElementById('xmenu').hidden=true;
+file.click();
+};
+const remove=document.createElement('button');
+remove.type='button';remove.className='xmi';
+remove.textContent='Retirer mon fond d’écran';
+remove.onclick=async()=>{
+if(!user||!mine)return;
+if(!confirm('Retirer ton fond d’écran ?'))return;
+try{await deleteDoc(doc(db,'wallpapers',user.uid));}
+catch(e){alert('Suppression impossible.');}
+};
+
+const close=mbox.querySelector('.xclose');
+if(close){close.before(title,change,remove);}
+else mbox.append(title,change,remove);
+},0);
+});
+
+/* Lecture du fond de l'utilisateur connecté */
+onAuthStateChanged(auth,u=>{
+user=u;
+if(unsub){unsub();unsub=null;}
+mine=null;apply();
+if(!u)return;
+unsub=onSnapshot(doc(db,'wallpapers',u.uid),s=>{
+mine=s.exists()?s.data().photo:null;
+apply();
+},()=>{});
+});
 </script>
 </body>
 </html>
