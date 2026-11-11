@@ -1121,19 +1121,24 @@ const panel=document.createElement("section");
 panel.id="settingsPanel";
 panel.innerHTML=`
 <h2>Paramètres</h2>
+
 <h3>Mon espace</h3>
 <button class="btn2" data-open="xmine">📋 Mes annonces</button>
+<button class="btn2" data-open="xsales">🛒 Mes ventes et achats</button>
 <button class="btn2" data-open="xrev">⭐ Mes avis</button>
+<button class="btn2" data-open="xfol">👥 Abonnés</button>
+<button class="btn2" data-open="xmoney">💰 Faire l’argent</button>
+
+<h3>Mon profil</h3>
+<button class="btn2" data-open="xname">✏️ Modifier mon nom</button>
+<button class="btn2" data-open="xprofile">📤 Partager mon profil</button>
+
+<h3>Aide et sécurité</h3>
 <button class="btn2" data-open="xfaq">❓ Questions fréquentes</button>
 <button class="btn2" data-open="xnotif">🔔 Notifications</button>
-<button class="btn2" data-open="xfol">👥 Mes abonnés</button>
-<button class="btn2" data-open="xmoney">💰 Faire l’argent</button>
-<button class="btn2" data-open="xprofile">📤 Partager mon profil</button>
-<button class="btn2" data-open="xname">✏️ Mon nom</button>
 <button class="btn2" data-open="xagency">🚩 Contacter l’agence</button>
 
 <h3>Préférences</h3>
-
 <label for="appLanguage">Langue</label>
 <select id="appLanguage">
 <option value="fr">🇫🇷 Français</option>
@@ -1149,12 +1154,8 @@ panel.innerHTML=`
 </select>
 
 <h3>Agence ZARAKOUSTRA</h3>
-<a class="lnk btn" href="https://wa.me/2250170075417">
-Contacter sur WhatsApp
-</a>
-<a class="lnk btn2" href="mailto:businessci1213@gmail.com">
-Envoyer un e-mail
-</a>
+<a class="lnk btn" href="https://wa.me/2250170075417">Contacter sur WhatsApp</a>
+<a class="lnk btn2" href="mailto:businessci1213@gmail.com">Envoyer un e-mail</a>
 `;
 
 
