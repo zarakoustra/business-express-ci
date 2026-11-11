@@ -3077,6 +3077,94 @@ x.type='button';x.className='xclose';x.textContent='Fermer';x.onclick=closeMenu;
 mbox.append(x);
 menu.hidden=false;
 };
+</script><style>
+#xdots{min-width:44px;min-height:40px;padding:0;font-size:24px;line-height:1;
+background:#fff;color:#0B2545;border:2px solid #000;border-radius:12px;margin-right:6px}
+body:not([data-tab="home"]) #xdots{display:none!important}
+
+#xmenu{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.5);
+display:flex;align-items:flex-end;justify-content:center}
+#xmenu[hidden]{display:none!important}
+#xmenu .xmb{background:#fff;color:#0B2545;width:100%;max-width:560px;max-height:85vh;
+overflow-y:auto;border-radius:16px 16px 0 0;padding:16px;display:flex;flex-direction:column;
+gap:8px;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+#xmenu .xmb h3{font-size:15px;margin:10px 0 2px;color:#0B2545}
+#xmenu .xmb .xs{font-size:14px;font-weight:700;color:#0B2545}
+#xmenu .xmb .xmi{min-height:48px;background:#fff;color:#0B6FA8;border:1px solid #0B6FA8;
+border-radius:12px;font-weight:700;font-size:16px;text-align:left;padding:0 14px;width:100%}
+#xmenu .xmb .xclose{min-height:48px;background:#0B2545;color:#fff;border:0;border-radius:12px;font-weight:700;font-size:16px}
+#xmenu .xmb select{width:100%;min-height:44px;font-size:16px;border:1px solid #0B6FA8;
+border-radius:10px;padding:6px 10px;background:#fff;color:#0B2545}
+#xmenu .xmb a.lnk{display:flex;align-items:center;justify-content:center;min-height:48px;
+border-radius:12px;font-weight:700;text-decoration:none}
+</style>
+
+<script type="module">
+const $=id=>document.getElementById(id);
+const B=document.body;
+
+/* Supprime les anciens éléments, pour repartir proprement */
+$('xdots')?.remove();
+$('xmenu')?.remove();
+
+const topBtn=$('top');
+const dots=document.createElement('button');
+dots.id='xdots';dots.type='button';dots.textContent='⋮';
+dots.setAttribute('aria-label','Mes fonctionnalités');
+topBtn.before(dots);
+
+const menu=document.createElement('div');menu.id='xmenu';menu.hidden=true;
+const mbox=document.createElement('div');mbox.className='xmb';
+menu.append(mbox);
+document.body.append(menu);
+menu.addEventListener('click',e=>{if(e.target===menu)menu.hidden=true;});
+
+const panel=$('settingsPanel');
+
+function openFeature(k){
+menu.hidden=true;
+if(topBtn.textContent!=='Vendre'){
+alert('Connecte-toi pour voir cette fonctionnalité.');
+topBtn.click();
+return;
+}
+document.querySelector('#xnav button[data-k="acc"]').click();
+setTimeout(()=>{
+const b=panel.querySelector(`[data-open="${k}"]`);
+if(b)b.click();
+},50);
+}
+
+function title(t){const e=document.createElement('h3');e.textContent=t;return e;}
+
+dots.onclick=()=>{
+mbox.replaceChildren();
+mbox.append(title('Mes fonctionnalités'));
+
+panel.querySelectorAll('[data-open]').forEach(b=>{
+if(b.hidden)return;
+const it=document.createElement('button');
+it.type='button';it.className='xmi';
+it.textContent=b.textContent.trim();
+it.onclick=()=>openFeature(b.dataset.open);
+mbox.append(it);
+});
+
+mbox.append(title('Préférences'));
+const l1=document.createElement('span');l1.className='xs';l1.textContent='Langue';
+const l2=document.createElement('span');l2.className='xs';l2.textContent='Apparence';
+mbox.append(l1,$('appLanguage'),l2,$('appTheme'));
+
+mbox.append(title('Agence ZARAKOUSTRA'));
+panel.querySelectorAll('a.lnk').forEach(a=>mbox.append(a));
+
+const x=document.createElement('button');
+x.type='button';x.className='xclose';x.textContent='Fermer';
+x.onclick=()=>{menu.hidden=true;};
+mbox.append(x);
+
+menu.hidden=false;
+};
 </script>
 </body>
 </html>
