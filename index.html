@@ -2807,6 +2807,12 @@ paint();
 body{
   padding-bottom:calc(100px + env(safe-area-inset-bottom,0px));
 }
+</style><style>
+body[data-tab="acc"] #xacc > .row,
+body[data-tab="acc"] #xacc > p,
+body[data-tab="acc"] #tl+button{display:none!important}
+body[data-tab="acc"] #settingsPanel{display:flex!important}
+body[data-tab="acc"] #settingsPanel .settings-back{display:none!important}
 </style>
 </body>
 </html>
