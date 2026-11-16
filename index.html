@@ -3462,8 +3462,13 @@ try {
 
   onAuthStateChanged(auth, u => {
     user = u;
-    if(u) load(u); else box.style.display = 'none';
-  });
+    box.style.display = 'flex';
+if(u){
+  load(u);
+} else {
+  $('zkInfo').textContent = 'Connecte-toi pour gérer ta boutique.';
+  ['zkName','zkCity','zkDesc','zkLink','zkPhone','zkSave'].forEach(i => $(i).style.display = 'none');
+}
 } catch(e) {
   alert('Erreur boutique : ' + e.message);
 }
