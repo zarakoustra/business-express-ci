@@ -3312,10 +3312,11 @@ header .pfa{width:40px;height:40px}
 header #top{background:#0B6FA8!important;color:#fff!important;border:0!important;
   border-radius:999px;min-height:40px;padding:0 16px;font-size:14px;font-weight:700;
   box-shadow:none}
-</style><style>
-#xshop{display:none}
+  </style><style>
+#xshop{display:none;flex-direction:column;gap:8px;margin-top:8px}
 body[data-tab="acc"] #xshop:not([hidden]){display:flex}
-#xshop{flex-direction:column;gap:8px}
+#xshop input,#xshop textarea{width:100%;min-height:44px;padding:8px 12px;font-size:16px;border:1px solid var(--bd);border-radius:10px;background:var(--cd);color:var(--tx)}
+#xshop .mu{color:var(--mu);font-size:14px;margin:0}
 </style>
 <script type="module">
 import {getApp} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
@@ -3328,24 +3329,25 @@ const $=id=>document.getElementById(id);
 const box=document.createElement('section');
 box.id='xshop';box.hidden=true;
 box.innerHTML=`
-<h2>Ma boutique</h2>
+<h3>🏪 Ma boutique</h3>
 <p class="mu" id="xshinfo"></p>
 <input id="xshname" maxlength="40" placeholder="Nom de la boutique">
 <input id="xshcity" maxlength="40" placeholder="Ville">
 <textarea id="xshdesc" rows="3" maxlength="500" placeholder="Décris ce que tu vends"></textarea>
 <button type="button" class="btn" id="xshsave">Créer ma boutique</button>
 <p class="mu" id="xshmsg"></p>`;
-$('xname').after(box);
+document.querySelector('#settingsPanel [data-open="xprofile"]').after(box);
 
 let user=null;
 
 async function load(u){
   const v=await getDoc(doc(db,'verified',u.uid)).catch(()=>null);
   if(!v||!v.exists()){
-    $('xshinfo').textContent='Boutique réservée aux vendeurs vérifiés. Demande le badge depuis l’agence.';
-    box.querySelectorAll('input,textarea,button').forEach(e=>e.hidden=true);
+    $('xshinfo').textContent='Boutique réservée aux vendeurs vérifiés. Ton compte n’a pas encore le badge.';
+    ['xshname','xshcity','xshdesc','xshsave'].forEach(i=>$(i).hidden=true);
     return;
   }
+  ['xshname','xshcity','xshdesc','xshsave'].forEach(i=>$(i).hidden=false);
   const s=await getDoc(doc(db,'shops',u.uid)).catch(()=>null);
   const d=s&&s.exists()?s.data():{};
   $('xshname').value=d.name||'';
@@ -3366,7 +3368,7 @@ $('xshsave').onclick=async()=>{
     $('xshinfo').textContent='Ta boutique est en ligne.';
     $('xshsave').textContent='Enregistrer ma boutique';
   }catch(e){
-    m.textContent='Enregistrement impossible. Vérifie que ton badge est actif.';
+    m.textContent='Enregistrement impossible. Vérifie que ton badge est actif et que les règles sont publiées.';
   }
 };
 
