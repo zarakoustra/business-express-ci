@@ -3312,6 +3312,69 @@ header .pfa{width:40px;height:40px}
 header #top{background:#0B6FA8!important;color:#fff!important;border:0!important;
   border-radius:999px;min-height:40px;padding:0 16px;font-size:14px;font-weight:700;
   box-shadow:none}
+</style><style>
+#xshop{display:none}
+body[data-tab="acc"] #xshop:not([hidden]){display:flex}
+#xshop{flex-direction:column;gap:8px}
 </style>
+<script type="module">
+import {getApp} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+import {getAuth,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+import {getFirestore,doc,getDoc,setDoc} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
+
+const auth=getAuth(getApp()), db=getFirestore(getApp());
+const $=id=>document.getElementById(id);
+
+const box=document.createElement('section');
+box.id='xshop';box.hidden=true;
+box.innerHTML=`
+<h2>Ma boutique</h2>
+<p class="mu" id="xshinfo"></p>
+<input id="xshname" maxlength="40" placeholder="Nom de la boutique">
+<input id="xshcity" maxlength="40" placeholder="Ville">
+<textarea id="xshdesc" rows="3" maxlength="500" placeholder="Décris ce que tu vends"></textarea>
+<button type="button" class="btn" id="xshsave">Créer ma boutique</button>
+<p class="mu" id="xshmsg"></p>`;
+$('xname').after(box);
+
+let user=null;
+
+async function load(u){
+  const v=await getDoc(doc(db,'verified',u.uid)).catch(()=>null);
+  if(!v||!v.exists()){
+    $('xshinfo').textContent='Boutique réservée aux vendeurs vérifiés. Demande le badge depuis l’agence.';
+    box.querySelectorAll('input,textarea,button').forEach(e=>e.hidden=true);
+    return;
+  }
+  const s=await getDoc(doc(db,'shops',u.uid)).catch(()=>null);
+  const d=s&&s.exists()?s.data():{};
+  $('xshname').value=d.name||'';
+  $('xshcity').value=d.city||'';
+  $('xshdesc').value=d.description||'';
+  $('xshsave').textContent=s&&s.exists()?'Enregistrer ma boutique':'Créer ma boutique';
+  $('xshinfo').textContent=s&&s.exists()?'Ta boutique est en ligne.':'Tu n’as pas encore de boutique.';
+}
+
+$('xshsave').onclick=async()=>{
+  const n=$('xshname').value.trim(), c=$('xshcity').value.trim(), d=$('xshdesc').value.trim();
+  const m=$('xshmsg');
+  if(n.length<2){m.textContent='Donne un nom d’au moins 2 caractères.';return;}
+  if(!c){m.textContent='Indique ta ville.';return;}
+  try{
+    await setDoc(doc(db,'shops',user.uid),{name:n,city:c,description:d,updatedAt:Date.now()});
+    m.textContent='Boutique enregistrée ✓';
+    $('xshinfo').textContent='Ta boutique est en ligne.';
+    $('xshsave').textContent='Enregistrer ma boutique';
+  }catch(e){
+    m.textContent='Enregistrement impossible. Vérifie que ton badge est actif.';
+  }
+};
+
+onAuthStateChanged(auth,u=>{
+  user=u;
+  box.hidden=!u;
+  if(u) load(u);
+});
+</script>
 </body>
 </html>
