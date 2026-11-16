@@ -3378,8 +3378,77 @@ onAuthStateChanged(auth,u=>{
   if(u) load(u);
 });
 </script><style>
-#settingsPanel button{display:flex;justify-content:flex-start;text-align:left;gap:10px}
+#settingsPanel button{display:flex;align-items:center;justify-content:flex-start;text-align:left;gap:10px;min-height:52px}
 #settingsPanel select{text-align:left}
-</style>
+</style><script type="module">
+import {getApp} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+import {getAuth,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+import {getFirestore,doc,getDoc,setDoc} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
+
+try {
+  const auth = getAuth(getApp());
+  const db = getFirestore(getApp());
+  const panel = document.getElementById('settingsPanel');
+
+  // Trouve le bouton « Partager mon profil » et insère la boutique juste après
+  const anchor = [...panel.querySelectorAll('button')].find(b => b.textContent.includes('Partager mon profil'));
+
+  const box = document.createElement('div');
+  box.id = 'zkShopBox';
+  box.style.cssText = 'display:none;flex-direction:column;gap:8px;margin-top:8px;padding:12px;border:1px solid #CFE8F7;border-radius:12px;background:#fff';
+  box.innerHTML = `
+    <b style="font-size:18px">🏪 Ma boutique</b>
+    <p id="zkInfo" style="margin:0;color:#3E5C76;font-size:14px"></p>
+    <input id="zkName" maxlength="40" placeholder="Nom de la boutique" style="min-height:44px;padding:8px 12px;font-size:16px;border:1px solid #CFE8F7;border-radius:10px">
+    <input id="zkCity" maxlength="40" placeholder="Ville" style="min-height:44px;padding:8px 12px;font-size:16px;border:1px solid #CFE8F7;border-radius:10px">
+    <textarea id="zkDesc" rows="3" maxlength="500" placeholder="Décris ce que tu vends" style="padding:8px 12px;font-size:16px;border:1px solid #CFE8F7;border-radius:10px"></textarea>
+    <button type="button" id="zkSave" style="min-height:48px;border-radius:12px;border:0;background:#5BB8EA;font-weight:700;font-size:16px">Créer ma boutique</button>
+    <p id="zkMsg" style="margin:0;color:#3E5C76;font-size:14px"></p>`;
+
+  (anchor ? anchor.after(box) : panel.append(box));
+
+  let user = null;
+  const $ = id => document.getElementById(id);
+
+  async function load(u){
+    box.style.display = 'flex';
+    let verified = false;
+    try { verified = (await getDoc(doc(db,'verified',u.uid))).exists(); } catch(e){}
+    if(!verified){
+      $('zkInfo').textContent = 'Boutique réservée aux vendeurs vérifiés. Ton compte n’a pas encore le badge.';
+      ['zkName','zkCity','zkDesc','zkSave'].forEach(i => $(i).style.display = 'none');
+      return;
+    }
+    let d = {};
+    try { const s = await getDoc(doc(db,'shops',u.uid)); if(s.exists()) d = s.data(); } catch(e){}
+    $('zkName').value = d.name || '';
+    $('zkCity').value = d.city || '';
+    $('zkDesc').value = d.description || '';
+    $('zkSave').textContent = d.name ? 'Enregistrer ma boutique' : 'Créer ma boutique';
+    $('zkInfo').textContent = d.name ? 'Ta boutique est en ligne.' : 'Tu n’as pas encore de boutique.';
+  }
+
+  $('zkSave').onclick = async () => {
+    const n = $('zkName').value.trim(), c = $('zkCity').value.trim(), d = $('zkDesc').value.trim();
+    if(n.length < 2){ $('zkMsg').textContent = 'Donne un nom d’au moins 2 caractères.'; return; }
+    if(!c){ $('zkMsg').textContent = 'Indique ta ville.'; return; }
+    try{
+      await setDoc(doc(db,'shops',user.uid), {name:n, city:c, description:d, updatedAt:Date.now()});
+      $('zkMsg').textContent = 'Boutique enregistrée ✓';
+      $('zkSave').textContent = 'Enregistrer ma boutique';
+      $('zkInfo').textContent = 'Ta boutique est en ligne.';
+    }catch(e){
+      $('zkMsg').textContent = 'Enregistrement impossible. Vérifie que les règles Firestore sont publiées.';
+    }
+  };
+
+  onAuthStateChanged(auth, u => {
+    user = u;
+    if(u) load(u); else box.style.display = 'none';
+  });
+} catch(e) {
+  alert('Erreur boutique : ' + e.message);
+}
+</script>
 </body>
 </html>
