@@ -3430,6 +3430,186 @@ try {
 } catch(e) {
   $('zkInfo').textContent = 'Erreur : ' + e.message;
 }
+</script><style>
+#xtools{display:flex;gap:8px}
+#xtools button{flex:0 0 auto;min-height:44px}
+#xadv{display:none;flex-direction:column;gap:8px}
+#xadv.open{display:flex}
+#xadv .r{display:flex;gap:8px}
+#xadv .r>*{flex:1;min-width:0}
+#xadv label{font-size:13px;font-weight:700;display:flex;flex-direction:column;gap:4px}
+#xcount{font-size:13px;margin:0}
+body:not([data-tab="home"]) :is(#xtools,#xadv,#xcount){display:none!important}
+body:is(.sellmode,.catmode,.xprofmode) :is(#xtools,#xadv,#xcount){display:none!important}
+#xtoasts{position:fixed;top:calc(10px + env(safe-area-inset-top,0px));left:12px;right:12px;z-index:400;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.xt{pointer-events:auto;background:#fff;color:#0B2545;border:2px solid #000;border-radius:14px;box-shadow:4px 4px 0 #000;padding:10px 12px;font-size:14px;font-weight:600;cursor:pointer;animation:xtin .25s ease}
+@keyframes xtin{from{transform:translateY(-12px);opacity:0}to{transform:none;opacity:1}}
+:root[data-theme="dark"] .xt{background:var(--cd);color:var(--tx)}
+</style>
+
+<script type="module">
+import {getApp} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+import {getAuth,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+import {getFirestore,collection,collectionGroup,query,where,orderBy,onSnapshot,doc,setDoc} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
+
+const app=getApp(),auth=getAuth(app),db=getFirestore(app);
+const $=id=>document.getElementById(id);
+const B=document.body;
+const mk=(tag,props)=>Object.assign(document.createElement(tag),props);
+const money=i=>Number(i.price).toLocaleString('fr-FR')+' FCFA'+(i.unit?' '+i.unit:'');
+const ETATS=[['neuf','Neuf'],['comme-neuf','Comme neuf'],['bon','Bon état'],['usage','Usagé'],['pieces','Pour pièces']];
+
+let user=null, items=[], mine=[], meta={}, subs=[];
+const chatSubs=new Map();
+
+/* ============ 2. ÉTAT DU PRODUIT : champ dans le formulaire de vente ============ */
+const etatLbl=mk('label');
+etatLbl.textContent='État du produit';
+const etatSel=mk('select');
+ETATS.forEach(([v,t])=>etatSel.add(new Option(t,v)));
+etatLbl.append(etatSel);
+$('go').before(etatLbl);
+
+let pending=null;
+$('go').addEventListener('click',()=>{
+  pending={title:$('ti').value.trim(),etat:etatSel.value};
+},true);
+new MutationObserver(()=>{
+  if(!pending||!$('msg').textContent.startsWith('Annonce envoyée'))return;
+  const p=pending; pending=null;
+  const hit=mine.filter(x=>x.title===p.title).sort((a,b)=>(b.t||0)-(a.t||0))[0];
+  if(hit&&user)setDoc(doc(db,'productMeta',hit.id),{etat:p.etat,uid:user.uid}).catch(()=>{});
+}).observe($('msg'),{childList:true,characterData:true,subtree:true});
+
+/* ============ 2. RECHERCHE AVANCÉE : filtres prix, état, date ============ */
+const tools=mk('div',{id:'xtools'});
+const tbtn=mk('button',{type:'button',className:'btn2',textContent:'⚙️ Filtres avancés'});
+tools.append(tbtn);
+const adv=mk('section',{id:'xadv'});
+const count=mk('p',{id:'xcount',className:'mu'});
+
+const pmin=mk('input',{type:'number',inputMode:'numeric',placeholder:'0'});
+const pmax=mk('input',{type:'number',inputMode:'numeric',placeholder:'Illimité'});
+const eSel=mk('select');
+eSel.add(new Option('Tous états',''));
+ETATS.forEach(([v,t])=>eSel.add(new Option(t,v)));
+const dSel=mk('select');
+[['','Toutes dates'],['1','Dernières 24 h'],['7','7 derniers jours'],['30','30 derniers jours']]
+  .forEach(([v,t])=>dSel.add(new Option(t,v)));
+const reset=mk('button',{type:'button',className:'btn2',textContent:'Réinitialiser'});
+
+const field=(text,el)=>{const l=mk('label');l.append(text,el);return l;};
+const row=mk('div',{className:'r'});
+row.append(field('Prix min (FCFA)',pmin),field('Prix max (FCFA)',pmax));
+adv.append(row,field('État du produit',eSel),field('Date de publication',dSel),reset);
+$('list').before(tools,adv,count);
+
+tbtn.onclick=()=>adv.classList.toggle('open');
+[pmin,pmax,eSel,dSel].forEach(e=>{e.addEventListener('input',apply);e.addEventListener('change',apply);});
+reset.onclick=()=>{pmin.value='';pmax.value='';eSel.value='';dSel.value='';apply();};
+
+function apply(){
+  const list=$('list'); if(!list)return;
+  const min=parseInt(pmin.value,10)||0;
+  const max=parseInt(pmax.value,10)||Infinity;
+  const et=eSel.value;
+  const days=parseInt(dSel.value,10)||0;
+  const now=Date.now();
+  const active=min>0||max!==Infinity||!!et||days>0;
+  let shown=0;
+  list.querySelectorAll(':scope>button.card').forEach(c=>{
+    const i=items.find(x=>c.textContent.includes(x.title)&&c.textContent.includes(money(x)));
+    if(!i){c.style.display='';shown++;return;}
+    const m=meta[i.id]||{};
+    const p=Number(i.price);
+    const ok=p>=min&&p<=max
+      &&(!et||m.etat===et)
+      &&(!days||now-(i.t||0)<=days*864e5);
+    c.style.display=ok?'':'none';
+    if(ok)shown++;
+  });
+  count.textContent=active?shown+' annonce(s) correspondant aux filtres':'';
+}
+// les cartes sont recréées à chaque rendu : on réapplique les filtres
+new MutationObserver(apply).observe($('list'),{childList:true});
+
+onSnapshot(query(collection(db,'products'),where('ok','==',true)),s=>{
+  items=s.docs.map(d=>({id:d.id,...d.data()}));
+  apply();
+},()=>{});
+onSnapshot(collection(db,'productMeta'),s=>{
+  meta={}; s.docs.forEach(d=>{meta[d.id]=d.data();});
+  apply();
+},()=>{});
+
+/* ============ 3. NOTIFICATIONS ============ */
+const tw=mk('div',{id:'xtoasts'});
+B.append(tw);
+function toast(text,onclick){
+  const t=mk('div',{className:'xt',textContent:text});
+  t.onclick=()=>{t.remove();if(onclick)onclick();};
+  tw.append(t);
+  try{navigator.vibrate&&navigator.vibrate(150);}catch(e){}
+  setTimeout(()=>t.remove(),7000);
+}
+const goTab=k=>document.querySelector('#xnav button[data-k="'+k+'"]')?.click();
+
+onAuthStateChanged(auth,u=>{
+  user=u;
+  subs.forEach(f=>f()); subs=[];
+  chatSubs.forEach(f=>f()); chatSubs.clear();
+  mine=[];
+  if(!u){apply();return;}
+
+  // a) Mes annonces : passage de « en attente » à « en ligne »
+  let firstMine=true; const seenOk={};
+  subs.push(onSnapshot(query(collection(db,'products'),where('uid','==',u.uid)),s=>{
+    mine=s.docs.map(d=>({id:d.id,...d.data()}));
+    s.docs.forEach(d=>{
+      const x=d.data();
+      if(!firstMine&&x.ok===true&&seenOk[d.id]===false)
+        toast('✅ Ton annonce « '+x.title+' » est en ligne');
+      seenOk[d.id]=x.ok===true;
+    });
+    firstMine=false;
+    apply();
+  },()=>{}));
+
+  // b) Messages : nouveaux messages sur mes conversations
+  let bc=[], sc=[];
+  const syncChats=()=>{
+    new Map([...bc,...sc].map(c=>[c.id,c])).forEach((c,id)=>{
+      if(chatSubs.has(id))return;
+      let first=true;
+      const un=onSnapshot(query(collection(db,'chats',id,'msgs'),orderBy('t')),s=>{
+        if(first){first=false;return;}
+        s.docChanges().forEach(ch=>{
+          if(ch.type!=='added')return;
+          const m=ch.doc.data();
+          if(m.from===u.uid)return;
+          toast('💬 Nouveau message sur « '+(c.title||'annonce')+' »',()=>goTab('msg'));
+        });
+      },()=>{});
+      chatSubs.set(id,un);
+    });
+  };
+  subs.push(onSnapshot(query(collection(db,'chats'),where('buyerUid','==',u.uid)),s=>{
+    bc=s.docs.map(d=>({id:d.id,...d.data()})); syncChats();
+  },()=>{}));
+  subs.push(onSnapshot(query(collection(db,'chats'),where('sellerUid','==',u.uid)),s=>{
+    sc=s.docs.map(d=>({id:d.id,...d.data()})); syncChats();
+  },()=>{}));
+
+  // c) Nouveaux avis reçus sur mes annonces
+  let firstRev=true;
+  subs.push(onSnapshot(query(collectionGroup(db,'reviews'),where('sellerUid','==',u.uid)),s=>{
+    if(firstRev){firstRev=false;return;}
+    s.docChanges().forEach(ch=>{
+      if(ch.type==='added'&&ch.doc.data().uid!==u.uid)
+        toast('⭐ Nouvel avis reçu sur une de tes annonces',()=>goTab('acc'));
+    });
+  },()=>{}));
+});
 </script>
 </body>
 </html>
