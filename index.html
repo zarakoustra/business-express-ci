@@ -3546,6 +3546,106 @@ import {getFirestore,doc,getDoc,collection,query,where,getDocs} from "https://ww
     page.append(h('span', 'Impossible de charger cette boutique.', 'color:#3E5C76'));
   }
 })();
+</script><script type="module">
+import {getApp} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+import {getAuth,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+import {getFirestore,doc,getDoc,setDoc} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
+
+const $ = id => document.getElementById(id);
+const inp = 'min-height:44px;padding:8px 12px;font-size:16px;border:1px solid #CFE8F7;border-radius:10px;width:100%';
+
+const box = document.createElement('div');
+box.id = 'zkShopBox';
+box.style.cssText = 'display:flex;flex-direction:column;gap:8px;margin:12px 0;padding:12px;border:1px solid #CFE8F7;border-radius:12px;background:#fff';
+box.innerHTML = `
+  <b style="font-size:18px">🏪 Ma boutique</b>
+  <p id="zkInfo" style="margin:0;color:#3E5C76;font-size:14px">Chargement…</p>
+  <input id="zkName" maxlength="40" placeholder="Nom de la boutique" style="${inp}">
+  <input id="zkCity" maxlength="40" placeholder="Ville" style="${inp}">
+  <textarea id="zkDesc" rows="3" maxlength="500" placeholder="Décris ce que tu vends" style="${inp}"></textarea>
+  <input id="zkLink" type="url" placeholder="Lien public (facultatif)" style="${inp}">
+  <input id="zkPhone" type="tel" placeholder="Numéro WhatsApp (privé, facultatif)" style="${inp}">
+  <button type="button" id="zkSave" style="min-height:48px;border-radius:12px;border:0;background:#5BB8EA;font-weight:700;font-size:16px">Créer ma boutique</button>
+  <p id="zkMsg" style="margin:0;color:#3E5C76;font-size:14px"></p>`;
+
+// Place la boîte après « Partager mon profil », sinon en bas de Paramètres
+const panel = document.getElementById('settingsPanel');
+const anchor = panel ? [...panel.querySelectorAll('button')].find(b => b.textContent.includes('Partager mon profil')) : null;
+if (anchor) anchor.after(box);
+else if (panel) panel.append(box);
+else document.body.append(box);
+
+const form = ['zkName','zkCity','zkDesc','zkLink','zkPhone','zkSave'];
+let user = null;
+let db = null;
+
+function cleanPhone(p){
+  let d = p.replace(/\D/g,'');
+  if(d.startsWith('00')) d = d.slice(2);
+  if(d.length === 10) d = '225' + d;
+  return /^\d{11,13}$/.test(d) ? d : null;
+}
+
+async function load(u){
+  $('zkInfo').textContent = 'Chargement…';
+  let verified = false;
+  try { verified = (await getDoc(doc(db,'verified',u.uid))).exists(); } catch(e){}
+  if(!verified){
+    $('zkInfo').textContent = 'Boutique réservée aux vendeurs vérifiés.';
+    form.forEach(i => $(i).style.display = 'none');
+    return;
+  }
+  form.forEach(i => $(i).style.display = '');
+  let d = {}, c = {};
+  try { const s = await getDoc(doc(db,'shops',u.uid)); if(s.exists()) d = s.data(); } catch(e){}
+  try { const p = await getDoc(doc(db,'shopContacts',u.uid)); if(p.exists()) c = p.data(); } catch(e){}
+  $('zkName').value = d.name || '';
+  $('zkCity').value = d.city || '';
+  $('zkDesc').value = d.description || '';
+  $('zkLink').value = d.link || '';
+  $('zkPhone').value = c.phone || '';
+  $('zkSave').textContent = d.name ? 'Enregistrer ma boutique' : 'Créer ma boutique';
+  $('zkInfo').textContent = d.name ? 'Ta boutique est en ligne.' : 'Tu n’as pas encore de boutique.';
+}
+
+$('zkSave').onclick = async () => {
+  const n = $('zkName').value.trim(), c = $('zkCity').value.trim();
+  const d = $('zkDesc').value.trim(), l = $('zkLink').value.trim(), raw = $('zkPhone').value.trim();
+  const m = $('zkMsg');
+  if(!user){ m.textContent = 'Connecte-toi d’abord.'; return; }
+  if(n.length < 2){ m.textContent = 'Donne un nom d’au moins 2 caractères.'; return; }
+  if(!c){ m.textContent = 'Indique ta ville.'; return; }
+  if(l && !/^https:\/\//.test(l)){ m.textContent = 'Le lien doit commencer par https://'; return; }
+  let phone = '';
+  if(raw){
+    phone = cleanPhone(raw);
+    if(!phone){ m.textContent = 'Numéro invalide (ex : 0707070707).'; return; }
+  }
+  try{
+    await setDoc(doc(db,'shops',user.uid), {name:n, city:c, description:d, link:l, updatedAt:Date.now()});
+    if(phone) await setDoc(doc(db,'shopContacts',user.uid), {phone});
+    m.textContent = 'Boutique enregistrée ✓';
+    $('zkSave').textContent = 'Enregistrer ma boutique';
+    $('zkInfo').textContent = 'Ta boutique est en ligne.';
+  }catch(e){
+    m.textContent = 'Enregistrement impossible. Vérifie les règles Firestore.';
+  }
+};
+
+try {
+  const auth = getAuth(getApp());
+  db = getFirestore(getApp());
+  onAuthStateChanged(auth, u => {
+    user = u;
+    if(u) load(u);
+    else {
+      $('zkInfo').textContent = 'Connecte-toi pour gérer ta boutique.';
+      form.forEach(i => $(i).style.display = 'none');
+    }
+  });
+} catch(e) {
+  $('zkInfo').textContent = 'Erreur : ' + e.message;
+}
 </script>
 </body>
 </html>
