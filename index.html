@@ -3420,7 +3420,7 @@ try {
     try { const s = await getDoc(doc(db,'shops',u.uid)); if(s.exists()) d = s.data(); } catch(e){}
     try { const p = await getDoc(doc(db,'shopContacts',u.uid)); if(p.exists()) c = p.data(); } catch(e){}
     $('zkName').value = d.name || '';
-    $('zkCity').value = d.city || '';
+    $('zkCity').value = SHOP_CITIES.includes(d.city) ? d.city : '';
     $('zkDesc').value = d.description || '';
     $('zkLink').value = d.link || '';
     $('zkPhone').value = c.phone || '';
