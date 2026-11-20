@@ -59,7 +59,7 @@ border-radius:10px;padding:8px;font-size:14px}
 #terms p{margin:0;font-size:14px}
 [hidden]{display:none!important}
   header{padding:10px 14px}
-  
+
 .pf{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
 .pft{font-size:11px;font-weight:700}
 .pfa{position:relative;width:44px;height:44px}
@@ -67,8 +67,7 @@ border-radius:10px;padding:8px;font-size:14px}
 .pfc{position:absolute;right:-6px;bottom:-4px;font-size:12px;font-style:normal;
 background:#fff;border-radius:50%;padding:2px}
 header #top{background:transparent;color:#000;border:2px solid #000}
-</style>
-<style>
+</style><style>
 /* Photo de profil : bord noir, "Profil" sous la photo */
 .pfa img{border:3px solid #000}
 .pft{order:2;margin-top:2px}
@@ -3443,36 +3442,7 @@ try {
     if(!c){ m.textContent = 'Indique ta ville.'; return; }
     if(l && !/^https:\/\//.test(l)){ m.textContent = 'Le lien doit commencer par https://'; return; }
     let phone = '';
-    if(raw){
-      phone = cleanPhone(raw);
-      if(!phone){ m.textContent = 'Numéro invalide (10 chiffres, ex : 0707070707).'; return; }
-    }
-    try{
-      await setDoc(doc(db,'shops',user.uid), {name:n, city:c, description:d, link:l, updatedAt:Date.now()});
-      if(phone){
-        await setDoc(doc(db,'shopContacts',user.uid), {phone});
-      }
-      m.textContent = 'Boutique enregistrée ✓';
-      $('zkSave').textContent = 'Enregistrer ma boutique';
-      $('zkInfo').textContent = 'Ta boutique est en ligne.';
-    }catch(e){
-      m.textContent = 'Enregistrement impossible. Vérifie que les règles Firestore sont publiées.';
-    }
-  };
-
-  onAuthStateChanged(auth, u => {
-    user = u;
-    box.style.display = 'flex';
-if(u){
-  load(u);
-} else {
-  $('zkInfo').textContent = 'Connecte-toi pour gérer ta boutique.';
-  ['zkName','zkCity','zkDesc','zkLink','zkPhone','zkSave'].forEach(i => $(i).style.display = 'none');
-}
-} catch(e) {
-  alert('Erreur boutique : ' + e.message);
-}
-</script><script type="module">
+<script type="module">
 import {getApp} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
 import {getFirestore,doc,getDoc,collection,query,where,getDocs} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
 
