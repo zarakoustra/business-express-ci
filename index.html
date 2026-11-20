@@ -3637,7 +3637,7 @@ $('zkSave').onclick = async () => {
     if(!phone){ m.textContent = 'Numéro invalide (ex : 0707070707).'; return; }
   }
   try{
-    await setDoc(doc(db,'shops',user.uid), {name:n, city:c, description:d, link:l, updatedAt:Date.now()});
+    await setDoc(doc(db,'shops',user.uid), {name:n, city:c, description:d, link:l, status:'open', t:Date.now()});
     if(phone) await setDoc(doc(db,'shopContacts',user.uid), {phone});
     m.textContent = 'Boutique enregistrée ✓';
     $('zkSave').textContent = 'Enregistrer ma boutique';
