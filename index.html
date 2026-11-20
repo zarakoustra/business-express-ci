@@ -3561,7 +3561,7 @@ box.innerHTML = `
   <b style="font-size:18px">🏪 Ma boutique</b>
   <p id="zkInfo" style="margin:0;color:#3E5C76;font-size:14px">Chargement…</p>
   <input id="zkName" maxlength="40" placeholder="Nom de la boutique" style="${inp}">
-  <input id="zkCity" maxlength="40" placeholder="Ville" style="${inp}">
+  <select id="zkCity" style="${inp}"></select>
   <textarea id="zkDesc" rows="3" maxlength="500" placeholder="Décris ce que tu vends" style="${inp}"></textarea>
   <input id="zkLink" type="url" placeholder="Lien public (facultatif)" style="${inp}">
   <input id="zkPhone" type="tel" placeholder="Numéro WhatsApp (privé, facultatif)" style="${inp}">
@@ -3569,6 +3569,21 @@ box.innerHTML = `
   <p id="zkMsg" style="margin:0;color:#3E5C76;font-size:14px"></p>`;
 
 // Place la boîte après « Partager mon profil », sinon en bas de Paramètres
+const SHOP_CITIES = [
+'Abengourou','Abidjan','Abobo','Adjamé','Adiaké','Adzopé','Agboville','Aboisso',
+'Anyama','Assinie','Attécoubé','Bangolo','Béoumi','Bingerville','Bondoukou',
+'Bonoua','Bouaflé','Bouaké','Bouna','Boundiali','Cocody','Dabakala','Dabou',
+'Daloa','Danané','Dimbokro','Divo','Duékoué','Ferkessédougou','Gagnoa',
+'Grand-Bassam','Grand-Lahou','Guiglo','Guitry','Issia','Jacqueville','Katiola',
+'Korhogo','Koumassi','Lakota','Man','Marcory','Odienné','Oumé','Plateau',
+'Port-Bouët','San-Pédro','Sassandra','Séguéla','Sinfra','Songon','Soubré',
+'Tabou','Tiassalé','Touba','Treichville','Vavoua','Yamoussoukro','Yopougon',
+'Zuénoula'
+].sort((a,b)=>a.localeCompare(b,'fr')).concat('Autre');
+
+const citySel = $('zkCity');
+citySel.append(new Option('Choisir une ville', ''));
+SHOP_CITIES.forEach(v => citySel.append(new Option(v, v)));
 const panel = document.getElementById('settingsPanel');
 const anchor = panel ? [...panel.querySelectorAll('button')].find(b => b.textContent.includes('Partager mon profil')) : null;
 if (anchor) anchor.after(box);
@@ -3600,7 +3615,7 @@ async function load(u){
   try { const s = await getDoc(doc(db,'shops',u.uid)); if(s.exists()) d = s.data(); } catch(e){}
   try { const p = await getDoc(doc(db,'shopContacts',u.uid)); if(p.exists()) c = p.data(); } catch(e){}
   $('zkName').value = d.name || '';
-  $('zkCity').value = d.city || '';
+  $('zkCity').value = SHOP_CITIES.includes(d.city) ? d.city : '';
   $('zkDesc').value = d.description || '';
   $('zkLink').value = d.link || '';
   $('zkPhone').value = c.phone || '';
