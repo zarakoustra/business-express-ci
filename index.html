@@ -3882,6 +3882,133 @@ new MutationObserver(()=>{
     t.after(b);
   }
 }).observe(det,{childList:true});
+</script><style>
+#xver{display:none;flex-direction:column;gap:8px}
+body[data-tab="acc"][data-sub="xver"] #xver{display:flex!important}
+.xlvl{display:inline-block;font-size:12px;font-weight:700;border:1.5px solid #000;border-radius:999px;padding:2px 8px;margin:2px 4px 2px 0;background:#fff;color:#0B2545}
+.xlvls{display:flex;flex-wrap:wrap;gap:4px}
+</style>
+
+<section id="xver"></section>
+
+<script type="module">
+import {getApp} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+import {getAuth,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+import {getFirestore,collection,query,where,onSnapshot} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
+
+const auth=getAuth(getApp()),db=getFirestore(getApp());
+const $=id=>document.getElementById(id);
+const mk=(t,p={})=>Object.assign(document.createElement(t),p);
+const money=i=>Number(i.price).toLocaleString('fr-FR')+' FCFA'+(i.unit?' '+i.unit:'');
+const AGENCE='2250170075417';
+const MAX_SANS_IDENTITE=5;
+
+let user=null, items=[], mine=[], phoneOk={}, verLevel={};
+
+/* ===== Écran « Vérifier mon compte » ===== */
+const sec=$('xver');
+$('xacc').after(sec);
+const lvlBox=mk('div',{className:'xlvls'});
+const statusP=mk('p',{className:'mu'});
+const uidP=mk('p',{className:'mu',style:'word-break:break-all;user-select:all'});
+const waBtn=mk('a',{className:'btn lnk',target:'_blank',rel:'noopener noreferrer',textContent:'💬 Envoyer ma demande à l’agence'});
+const copyBtn=mk('button',{type:'button',className:'btn2',textContent:'📋 Copier mon identifiant'});
+copyBtn.onclick=async()=>{
+  try{await navigator.clipboard.writeText(user.uid);copyBtn.textContent='✓ Copié';}
+  catch(e){prompt('Copie cet identifiant :',user.uid);}
+};
+sec.append(
+  mk('h2',{textContent:'🔐 Vérifier mon compte'}),
+  lvlBox, statusP,
+  mk('p',{className:'mu',textContent:'Pour vérifier ton numéro, envoie-nous ton identifiant et ton numéro WhatsApp. Nous validons manuellement, c’est gratuit.'}),
+  uidP, copyBtn, waBtn
+);
+
+const sp=$('settingsPanel');
+const openBtn=mk('button',{type:'button',className:'btn2',textContent:'🔐 Vérifier mon compte'});
+openBtn.onclick=()=>{
+  if(!user){alert('Connecte-toi pour vérifier ton compte.');return;}
+  document.body.classList.remove('settings-open');
+  document.body.dataset.sub='xver';
+  window.scrollTo(0,0);
+};
+const ref=sp.querySelector('[data-open="xmine"]');
+ref?ref.before(openBtn):sp.append(openBtn);
+
+/* ===== Niveaux de badge ===== */
+function levelsOf(uid){
+  const l=[];
+  if(phoneOk[uid])l.push('Compte confirmé');
+  const v=verLevel[uid];
+  if(v)l.push('Identité vérifiée');
+  if(v==='professionnel')l.push('Professionnel vérifié');
+  return l;
+}
+function refreshStatus(){
+  if(!user){statusP.textContent='Connecte-toi pour vérifier ton compte.';lvlBox.replaceChildren();return;}
+  const l=levelsOf(user.uid);
+  lvlBox.replaceChildren(...(l.length?l:['Aucun badge pour le moment']).map(t=>
+    mk('span',{className:'xlvl',textContent:(l.length?'✓ ':'')+t})));
+  statusP.textContent=phoneOk[user.uid]
+    ?'Ton numéro est vérifié. Tu peux publier.'
+    :'Ton numéro n’est pas encore vérifié. Tu ne peux pas publier pour le moment.';
+  uidP.textContent='Ton identifiant : '+user.uid;
+  const txt='Bonjour, je demande la vérification de mon compte ZARAKOUSTRA.\nIdentifiant : '+user.uid+'\nNuméro : ';
+  waBtn.href='https://wa.me/'+AGENCE+'?text='+encodeURIComponent(txt);
+}
+
+onSnapshot(collection(db,'phoneVerified'),s=>{
+  phoneOk={}; s.docs.forEach(d=>{phoneOk[d.id]=true;});
+  refreshStatus();
+},()=>{});
+onSnapshot(collection(db,'verified'),s=>{
+  verLevel={}; s.docs.forEach(d=>{verLevel[d.id]=d.data().niveau||'identite';});
+  refreshStatus();
+},()=>{});
+
+/* ===== Badges dans le détail d'une annonce ===== */
+onSnapshot(query(collection(db,'products'),where('ok','==',true)),s=>{
+  items=s.docs.map(d=>({id:d.id,...d.data()}));
+},()=>{});
+const det=$('detail');
+new MutationObserver(()=>{
+  if(det.hidden||det.querySelector('.xlvls-d'))return;
+  const t=[...det.children].find(e=>e.tagName==='B');
+  const m=det.querySelector(':scope>h2');
+  if(!t||!m)return;
+  const i=items.find(x=>x.title===t.textContent&&money(x)===m.textContent);
+  if(!i)return;
+  const box=mk('div',{className:'xlvls xlvls-d'});
+  levelsOf(i.uid).forEach(txt=>box.append(mk('span',{className:'xlvl',textContent:'✓ '+txt})));
+  if(box.children.length)t.after(box);
+}).observe(det,{childList:true});
+
+/* ===== Limitation des comptes ===== */
+$('go').addEventListener('click',e=>{
+  if(!user)return;
+  if(!phoneOk[user.uid]){
+    e.stopImmediatePropagation();
+    $('msg').textContent='Ton numéro n’est pas encore vérifié. Va dans Paramètres > Vérifier mon compte.';
+    return;
+  }
+  if(!verLevel[user.uid]&&mine.length>=MAX_SANS_IDENTITE){
+    e.stopImmediatePropagation();
+    $('msg').textContent='Limite atteinte ('+MAX_SANS_IDENTITE+' annonces). Demande la vérification de ton identité pour en publier davantage.';
+  }
+},true);
+
+let unsubMine=null;
+onAuthStateChanged(auth,u=>{
+  user=u;
+  if(unsubMine){unsubMine();unsubMine=null;}
+  mine=[];
+  if(u){
+    unsubMine=onSnapshot(query(collection(db,'products'),where('uid','==',u.uid)),s=>{
+      mine=s.docs.map(d=>({id:d.id,...d.data()}));
+    },()=>{});
+  }
+  refreshStatus();
+});
 </script>
 </body>
 </html>
