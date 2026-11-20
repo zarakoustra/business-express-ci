@@ -3610,6 +3610,278 @@ onAuthStateChanged(auth,u=>{
     });
   },()=>{}));
 });
+</script><style>
+#xshop{display:none;flex-direction:column;gap:8px}
+body[data-tab="acc"][data-sub="xshop"] #xshop{display:flex!important}
+#xshop label{font-size:13px;font-weight:700;display:flex;flex-direction:column;gap:4px}
+#xshopview{display:none;flex-direction:column;gap:8px}
+body.xprofmode #xshopview{display:flex}
+#xpt{position:fixed;top:calc(10px + env(safe-area-inset-top,0px));left:12px;right:12px;z-index:400;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.xpt{pointer-events:auto;background:#fff;color:#0B2545;border:2px solid #000;border-radius:14px;box-shadow:4px 4px 0 #000;padding:10px 12px;font-size:14px;font-weight:600;cursor:pointer}
+:root[data-theme="dark"] .xpt{background:var(--cd);color:var(--tx)}
+</style>
+
+<script type="module">
+import {getApp} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+import {getAuth,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+import {getFirestore,collection,query,where,onSnapshot,doc,getDoc,setDoc} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
+
+const auth=getAuth(getApp()),db=getFirestore(getApp());
+const $=id=>document.getElementById(id);
+const mk=(t,p={})=>Object.assign(document.createElement(t),p);
+let user=null;
+const sid=new URLSearchParams(location.search).get('v');
+
+/* ===================== 1. BOUTIQUE : éditeur (Mon compte > Paramètres) ===================== */
+const sec=mk('section',{id:'xshop'});
+sec.append(mk('h2',{textContent:'🏪 Ma boutique'}),
+  mk('p',{className:'mu',textContent:'Ta vitrine publique. Les coordonnées ne sont visibles que pour les personnes connectées.'}));
+$('xacc').after(sec);
+
+const F={};
+const field=(label,el)=>{const l=mk('label');l.append(label,el);sec.append(l);return el;};
+F.nom=field('Nom de la boutique',mk('input',{maxLength:40,placeholder:'Ex : Kouassi Informatique'}));
+F.pres=field('Présentation',mk('textarea',{rows:4,maxLength:500,placeholder:'Présente-toi et ce que tu vends'}));
+F.ville=field('Ville',mk('select'));
+F.horaires=field('Horaires',mk('input',{maxLength:80,placeholder:'Ex : Lun–Sam, 8h–18h'}));
+F.site=field('Site web (facultatif)',mk('input',{type:'url',placeholder:'https://'}));
+F.adresse=field('Adresse (connectés seulement)',mk('input',{maxLength:120}));
+F.wa=field('WhatsApp pro (connectés seulement)',mk('input',{type:'tel',placeholder:'0707070707'}));
+F.mail=field('E-mail pro (connectés seulement)',mk('input',{type:'email'}));
+const msg=mk('p',{className:'mu'});
+const save=mk('button',{type:'button',className:'btn',textContent:'Enregistrer ma boutique'});
+const preview=mk('button',{type:'button',className:'btn2',textContent:'👁 Voir ma boutique'});
+sec.append(save,preview,msg);
+
+async function loadForm(){
+  if(!user)return;
+  F.ville.replaceChildren();
+  [...$('vi').options].forEach(o=>F.ville.add(new Option(o.text,o.value)));
+  msg.textContent='';
+  try{
+    const [s,c]=await Promise.all([
+      getDoc(doc(db,'shops',user.uid)),
+      getDoc(doc(db,'shopContacts',user.uid)).catch(()=>null)
+    ]);
+    const d=s.exists()?s.data():{};
+    const k=c&&c.exists()?c.data():{};
+    F.nom.value=d.nom||''; F.pres.value=d.presentation||''; F.ville.value=d.ville||'';
+    F.horaires.value=d.horaires||''; F.site.value=d.site||'';
+    F.adresse.value=k.adresse||''; F.wa.value=k.whatsapp?String(k.whatsapp).replace(/^225/,''):''; F.mail.value=k.email||'';
+  }catch(e){msg.textContent='Impossible de charger ta boutique.';}
+}
+
+save.onclick=async()=>{
+  if(!user)return;
+  const nom=F.nom.value.trim();
+  if(nom.length<2){msg.textContent='Donne un nom à ta boutique.';return;}
+  let w=F.wa.value.replace(/\D/g,'');
+  if(F.wa.value.trim()&&![10,13].includes(w.length)&&!/^\d{11,13}$/.test(w)){msg.textContent='Numéro WhatsApp invalide.';return;}
+  if(w.length===10)w='225'+w;
+  save.disabled=true;
+  try{
+    await setDoc(doc(db,'shops',user.uid),{
+      nom,presentation:F.pres.value.trim(),ville:F.ville.value,
+      horaires:F.horaires.value.trim(),site:F.site.value.trim(),t:Date.now()
+    });
+    await setDoc(doc(db,'shopContacts',user.uid),{
+      adresse:F.adresse.value.trim(),whatsapp:w,email:F.mail.value.trim()
+    });
+    msg.textContent='Boutique enregistrée ✓';
+  }catch(e){msg.textContent='Enregistrement impossible. Vérifie les règles Firestore.';}
+  save.disabled=false;
+};
+preview.onclick=()=>{location.href=location.origin+location.pathname+'?v='+user.uid;};
+
+/* bouton « Ma boutique » dans Paramètres */
+const sp=$('settingsPanel');
+const openBtn=mk('button',{type:'button',className:'btn2',textContent:'🏪 Ma boutique'});
+openBtn.onclick=()=>{
+  if(!user){alert('Connecte-toi pour gérer ta boutique.');return;}
+  document.body.classList.remove('settings-open');
+  document.body.dataset.sub='xshop';
+  loadForm();
+  window.scrollTo(0,0);
+};
+const ref=sp.querySelector('[data-open="xmine"]');
+ref?ref.before(openBtn):sp.append(openBtn);
+
+/* ===================== 1. BOUTIQUE : vitrine publique (?v=uid) ===================== */
+let view=null;
+if(sid){
+  view=mk('section',{id:'xshopview'});
+  ($('xprof')||$('detail')).before(view);
+}
+const mkA=(txt,href,cls)=>{
+  const a=mk('a',{href,textContent:txt,className:cls+' lnk'});
+  if(href.startsWith('http')){a.target='_blank';a.rel='noopener noreferrer';}
+  return a;
+};
+async function renderView(){
+  if(!view)return;
+  view.replaceChildren();
+  let s=null;
+  try{s=await getDoc(doc(db,'shops',sid));}catch(e){}
+  const d=s&&s.exists()?s.data():null;
+  if(!d){view.style.display='none';return;}
+  view.style.display='';
+  view.append(mk('h2',{textContent:'🏪 '+d.nom}));
+  if(d.presentation)view.append(mk('p',{className:'mu',textContent:d.presentation}));
+  const info=[d.ville,d.horaires].filter(Boolean).join(' · ');
+  if(info)view.append(mk('p',{className:'mu',textContent:'📍 '+info}));
+  if(d.site)view.append(mkA('🌐 Site web',d.site,'btn2'));
+  if(!user){
+    view.append(mk('p',{className:'mu',textContent:'Connecte-toi pour voir les coordonnées du vendeur.'}));
+    return;
+  }
+  let c=null;
+  try{c=await getDoc(doc(db,'shopContacts',sid));}catch(e){}
+  const k=c&&c.exists()?c.data():{};
+  const row=mk('div',{className:'row'});
+  if(k.whatsapp){
+    row.append(mkA('💬 WhatsApp','https://wa.me/'+k.whatsapp+'?text='+encodeURIComponent('Bonjour, je viens de voir ta boutique sur Zarakoustra.'),'btn'));
+    row.append(mkA('📞 Appeler','tel:+'+k.whatsapp,'btn2'));
+  }
+  if(k.email)row.append(mkA('✉️ E-mail','mailto:'+k.email,'btn2'));
+  if(k.adresse)view.append(mk('p',{className:'mu',textContent:'🏠 '+k.adresse}));
+  if(row.children.length)view.append(row);
+  else view.append(mk('p',{className:'mu',textContent:'Aucune coordonnée renseignée.'}));
+}
+
+onAuthStateChanged(auth,u=>{
+  user=u;
+  renderView();
+});
+
+/* ===================== 2. ALERTE DE PRIX ===================== */
+const st=mk('style');
+st.textContent='.xpalert{margin-top:4px}';
+document.head.append(st);
+const tw=mk('div',{id:'xpt'});
+document.body.append(tw);
+const fmt=n=>Number(n).toLocaleString('fr-FR')+' FCFA';
+function toast(txt){
+  const t=mk('div',{className:'xpt',textContent:txt});
+  t.onclick=()=>t.remove();
+  tw.append(t);
+  try{navigator.vibrate&&navigator.vibrate(150);}catch(e){}
+  setTimeout(()=>t.remove(),8000);
+}
+
+const money=i=>Number(i.price).toLocaleString('fr-FR')+' FCFA'+(i.unit?' '+i.unit:'');
+let items=[], alerts=new Map(), watchers=new Map(), subs=[];
+const det=$('detail');
+
+onSnapshot(query(collection(db,'products'),where('ok','==',true)),s=>{
+  items=s.docs.map(d=>({id:d.id,...d.data()}));
+},()=>{});
+
+function findItem(){
+  const t=[...det.children].find(e=>e.tagName==='B');
+  const m=det.querySelector(':scope>h2');
+  if(!t||!m)return null;
+  return items.find(x=>x.title===t.textContent&&money(x)===m.textContent)||null;
+}
+
+function refreshBtns(){
+  det.querySelectorAll('.xpalert').forEach(b=>{
+    const on=user&&alerts.has(b.dataset.pid+'_'+user.uid);
+    b.textContent=on?'🔕 Ne plus suivre le prix':'🔔 Suivre le prix';
+  });
+}
+
+/* surveille un produit suivi : signale tout changement de prix */
+function watch(a){
+  const un=onSnapshot(doc(db,'products',a.productId),s=>{
+    if(!s.exists())return;
+    const rec=alerts.get(a.id)||a;
+    const cur=Number(s.data().price);
+    const last=Number(rec.lastPrice);
+    if(cur===last)return;
+    toast('🔔 Prix modifié : « '+(rec.title||'annonce')+' » '+fmt(last)+' → '+fmt(cur));
+    rec.lastPrice=cur;
+    alerts.set(a.id,rec);
+    updateAlert(a.id,cur);
+  },()=>{});
+  watchers.set(a.id,un);
+}
+async function updateAlert(id,price){
+  try{
+    const {updateDoc}=await import("https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js");
+    await updateDoc(doc(db,'priceAlerts',id),{lastPrice:price});
+  }catch(e){}
+}
+function stop(id){
+  const f=watchers.get(id); if(f)f(); watchers.delete(id);
+}
+
+onAuthStateChanged(auth,u=>{
+  subs.forEach(f=>f()); subs=[];
+  watchers.forEach(f=>f()); watchers.clear();
+  alerts=new Map();
+  refreshBtns();
+  if(!u)return;
+  subs.push(onSnapshot(query(collection(db,'priceAlerts'),where('uid','==',u.uid)),s=>{
+    const seen=new Set();
+    s.docs.forEach(d=>{
+      const a={id:d.id,...d.data()};
+      alerts.set(d.id,a); seen.add(d.id);
+      if(!watchers.has(d.id))watch(a);
+    });
+    [...alerts.keys()].forEach(id=>{
+      if(!seen.has(id)){alerts.delete(id);stop(id);}
+    });
+    refreshBtns();
+  },()=>{}));
+});
+
+async function toggleAlert(i){
+  if(!user){alert('Connecte-toi pour suivre un prix.');return;}
+  const id=i.id+'_'+user.uid;
+  try{
+    if(alerts.has(id)){
+      const {deleteDoc}=await import("https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js");
+      await deleteDoc(doc(db,'priceAlerts',id));
+    }else{
+      const {setDoc}=await import("https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js");
+      await setDoc(doc(db,'priceAlerts',id),{productId:i.id,uid:user.uid,title:i.title,lastPrice:Number(i.price),t:Date.now()});
+    }
+  }catch(e){alert('Action impossible. Réessaie.');}
+}
+
+async function changePrice(i){
+  const raw=prompt('Nouveau prix (FCFA) pour « '+i.title+' » :',i.price);
+  if(raw===null)return;
+  const n=parseInt(raw.replace(/\D/g,''),10);
+  if(!(n>0)){alert('Prix invalide.');return;}
+  if(n===Number(i.price)){alert('Le prix est identique.');return;}
+  try{
+    const {updateDoc}=await import("https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js");
+    await updateDoc(doc(db,'products',i.id),{price:n});
+    alert('Prix modifié ✓ Les acheteurs qui suivent cette annonce seront prévenus.');
+  }catch(e){alert('Modification impossible.');}
+}
+
+new MutationObserver(()=>{
+  if(det.hidden)return;
+  const i=findItem();
+  if(!i)return;
+  const t=[...det.children].find(e=>e.tagName==='B');
+  const owner=user&&user.uid===i.uid;
+
+  if(!owner&&!det.querySelector('.xpalert')){
+    const b=mk('button',{type:'button',className:'btn2 xpalert'});
+    b.dataset.pid=i.id;
+    b.onclick=()=>toggleAlert(i);
+    t.after(b);
+    refreshBtns();
+  }
+  if(owner&&!det.querySelector('.xpedit')){
+    const b=mk('button',{type:'button',className:'btn2 xpedit',textContent:'✏️ Modifier le prix'});
+    b.onclick=()=>changePrice(i);
+    t.after(b);
+  }
+}).observe(det,{childList:true});
 </script>
 </body>
 </html>
