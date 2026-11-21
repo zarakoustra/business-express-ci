@@ -6,8 +6,9 @@
 <meta name="theme-color" content="#A8DDF7">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap">
 <title>ZARATHOUSTRA</title>
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-MZ78EHSL6R"></script>
-<script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3/dist/tabler-icons.min.css">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-MZ78EHSL6R">
+</script><script>
 window.dataLayer=window.dataLayer||[];
 function gtag(){dataLayer.push(arguments);}
 gtag('js',new Date());
@@ -4362,6 +4363,53 @@ header .pft{
 :root[data-theme="dark"] #xcats button:hover i{
   border-color:#65BDEB;
 }
+</style><style>
+/* ===== BARRE DU BAS : bleu clair ===== */
+#xnav{
+  background:#A8DDF7 !important;
+  border:1px solid #CFE8F7 !important;
+  box-shadow:0 6px 18px rgba(11,111,168,.18) !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+}
+#xnav button{
+  color:#0B2545 !important;
+  font-weight:500;
+}
+#xnav button.on{
+  color:#FFFFFF !important;
+  background:#0B6FA8;
+  border-radius:16px;
+  margin:4px;
+}
+#xnav #xsell{
+  background:#FFFFFF !important;
+  color:#0B6FA8 !important;
+  border:2px solid #0B6FA8 !important;
+  border-radius:12px !important;
+  margin:6px 4px !important;
+}
 </style>
+
+<script type="module">
+/* Icônes Tabler, traits fins, couleur du texte */
+const MAP={home:'ti-home',fav:'ti-heart',msg:'ti-message',acc:'ti-settings'};
+
+function applyIcons(){
+  document.querySelectorAll('#xnav button').forEach(b=>{
+    const s=b.querySelector(':scope > span:first-child');
+    if(!s||s.dataset.ico)return;
+    const cls=b.id==='xsell'?'ti-plus':MAP[b.dataset.k];
+    if(!cls)return;
+    s.innerHTML='<i class="ti '+cls+'" aria-hidden="true" style="font-size:20px;line-height:1"></i>';
+    s.dataset.ico='1';
+    s.style.display='flex';
+    s.style.justifyContent='center';
+    s.style.fontSize='0';
+  });
+}
+applyIcons();
+new MutationObserver(applyIcons).observe(document.body,{childList:true,subtree:true});
+  </script>
 </body>
 </html>
