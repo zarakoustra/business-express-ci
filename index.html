@@ -4417,6 +4417,92 @@ function applyIcons(){
 }
 applyIcons();
 new MutationObserver(applyIcons).observe(document.body,{childList:true,subtree:true});
-</script>
+</script><style>
+/* ===== PARAMÈTRES : style professionnel ===== */
+#settingsPanel{
+  gap:4px;
+  padding:4px 0 24px;
+}
+#settingsPanel > h2{
+  font-size:22px;
+  font-weight:600;
+  color:#0B2545;
+  margin:4px 0 8px;
+}
+#settingsPanel h3{
+  font-size:13px;
+  font-weight:600;
+  color:#3E5C76;
+  margin:18px 0 6px 4px;
+}
+#settingsPanel button[data-open],
+#settingsPanel .settings-back{
+  display:flex !important;
+  justify-content:space-between;
+  align-items:center;
+  width:100%;
+  min-height:52px;
+  padding:12px 14px !important;
+  margin:0;
+  text-align:left;
+  background:#FFFFFF !important;
+  color:#0B2545 !important;
+  border:1px solid #CFE8F7 !important;
+  border-radius:12px !important;
+  font-size:15px;
+  font-weight:500;
+  box-shadow:none;
+}
+#settingsPanel button[data-open]::after{
+  content:"›";
+  font-size:22px;
+  line-height:1;
+  color:#0B6FA8;
+  margin-left:auto;
+  padding-left:8px;
+}
+#settingsPanel button[data-open]:hover{
+  background:#F4FAFF !important;
+  border-color:#0B6FA8 !important;
+}
+#settingsPanel button[data-open]:active{
+  transform:scale(.99);
+}
+#settingsPanel label{
+  display:block;
+  font-size:13px;
+  font-weight:500;
+  color:#3E5C76;
+  margin:12px 0 4px 4px;
+}
+#settingsPanel select{
+  width:100%;
+  min-height:48px;
+  border:1px solid #CFE8F7;
+  border-radius:12px;
+  padding:10px 12px;
+  background:#FFFFFF;
+  color:#0B2545;
+  font-size:15px;
+}
+#settingsPanel a.lnk{
+  min-height:48px;
+  border-radius:12px;
+  font-weight:500;
+}
+:root[data-theme="dark"] #settingsPanel button[data-open],
+:root[data-theme="dark"] #settingsPanel .settings-back{
+  background:#1B2935 !important;
+  color:#F1F5F9 !important;
+  border-color:#34495A !important;
+}
+:root[data-theme="dark"] #settingsPanel button[data-open]:hover{
+  background:#243C50 !important;
+  border-color:#65BDEB !important;
+}
+:root[data-theme="dark"] #settingsPanel h3{
+  color:#AAB8C5;
+}
+</style>
 </body>
 </html>
