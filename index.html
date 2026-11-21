@@ -4503,6 +4503,24 @@ new MutationObserver(applyIcons).observe(document.body,{childList:true,subtree:t
 :root[data-theme="dark"] #settingsPanel h3{
   color:#AAB8C5;
 }
-</style>
+</style><script type="module">
+/* Retire les emojis en début de libellé dans les Paramètres */
+const EMOJI_START=/^[\p{Extended_Pictographic}\p{Emoji_Presentation}\uFE0F\u200D\s]+/u;
+
+function cleanSettings(){
+  const panel=document.getElementById('settingsPanel');
+  if(!panel)return;
+  panel.querySelectorAll('button, h3').forEach(el=>{
+    el.childNodes.forEach(n=>{
+      if(n.nodeType===3){
+        const t=n.data.replace(EMOJI_START,'');
+        if(t!==n.data)n.data=t;
+      }
+    });
+  });
+}
+cleanSettings();
+new MutationObserver(cleanSettings).observe(document.body,{childList:true,subtree:true,characterData:true});
+</script>
 </body>
 </html>
