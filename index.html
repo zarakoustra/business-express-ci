@@ -4853,6 +4853,28 @@ new MutationObserver(cleanSettings).observe(document.body,{childList:true,subtre
     if(e.key==='ArrowRight')step(1);
   });
 })();
+</script><script type="module">
+/* Corrige le titre « undefined » de la vitrine : lit « nom » ou « name » */
+import {getApp} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+import {getFirestore,doc,getDoc} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
+
+const db=getFirestore(getApp());
+const sid=new URLSearchParams(location.search).get('v');
+
+function fixTitle(){
+  const h=[...document.querySelectorAll('#xshopview h2')][0];
+  if(!h||!h.textContent.includes('undefined'))return;
+  if(!sid)return;
+  getDoc(doc(db,'shops',sid)).then(s=>{
+    if(!s.exists())return;
+    const d=s.data();
+    const nom=d.nom||d.name;
+    if(nom)h.textContent='🏪 '+nom;
+    else h.textContent='🏪 Boutique';
+  }).catch(()=>{});
+}
+fixTitle();
+new MutationObserver(fixTitle).observe(document.body,{childList:true,subtree:true,characterData:true});
 </script>
 </body>
 </html>
