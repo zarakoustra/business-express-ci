@@ -4009,6 +4009,129 @@ onAuthStateChanged(auth,u=>{
   }
   refreshStatus();
 });
+</script><style>
+.xflags{display:flex;flex-wrap:wrap;gap:4px}
+.xflag{display:inline-block;font-size:12px;font-weight:700;border:1.5px solid #B00020;color:#B00020;border-radius:999px;padding:2px 8px;background:#fff}
+</style>
+
+<script type="module">
+import {getApp} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+import {getAuth,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+import {getFirestore,collection,onSnapshot,doc,updateDoc} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
+
+const auth=getAuth(getApp()),db=getFirestore(getApp());
+const $=id=>document.getElementById(id);
+const mk=(t,p={})=>Object.assign(document.createElement(t),p);
+const ADMIN='rBxaE8OltfeNwvpUivDdqZqhxjl1';
+const DAY=864e5, MAX_PAR_JOUR=5;
+
+/* Expressions typiques d'arnaque (texte normalisé, sans accents) */
+const RISK=[
+  /paiement d avance|payer d avance|payer avant (de )?(voir|recevoir)/,
+  /western union|moneygram/,
+  /frais de (livraison|transport|douane)/,
+  /\bdouane\b/,
+  /hors (de )?(l )?appli|hors plateforme|en dehors de l appli/,
+  /envoy(er|ez) (de )?l argent/
+];
+const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim();
+const isRisk=t=>RISK.some(r=>r.test(norm(t)));
+
+let isAdm=false, all=[];
+
+/* ===== 1. CALCUL DES SIGNAUX ===== */
+function analyse(list){
+  const now=Date.now();
+  const byUid={};
+  list.forEach(p=>{(byUid[p.uid]=byUid[p.uid]||[]).push(p);});
+
+  const textKey=p=>norm(p.title)+'|'+norm(p.desc);
+  const photoKey=p=>{
+    const s=(Array.isArray(p.photos)&&p.photos[0])||p.photo||'';
+    return s?s.length+':'+s.slice(-120):'';
+  };
+  const textOwners={}, photoOwners={};
+  list.forEach(p=>{
+    if(norm(p.title).length>=8){
+      const k=textKey(p);
+      (textOwners[k]=textOwners[k]||new Set()).add(p.uid);
+    }
+    const pk=photoKey(p);
+    if(pk)(photoOwners[pk]=photoOwners[pk]||new Set()).add(p.uid);
+  });
+
+  const cat={};
+  list.filter(p=>p.ok===true&&!p.unit).forEach(p=>{
+    (cat[p.cat]=cat[p.cat]||[]).push(Number(p.price));
+  });
+  const med=a=>{const s=a.slice().sort((x,y)=>x-y);return s[Math.floor(s.length/2)];};
+
+  return list.map(p=>{
+    const f=[];
+    const tk=textKey(p), pk=photoKey(p);
+    if((norm(p.title).length>=8&&textOwners[tk].size>1)||(pk&&photoOwners[pk].size>1))
+      f.push('annonce copiée');
+    if((byUid[p.uid]||[]).filter(x=>now-(x.t||0)<DAY).length>MAX_PAR_JOUR)
+      f.push('publication massive');
+    const c=cat[p.cat]||[];
+    if(c.length>=5&&!p.unit){
+      const m=med(c), pr=Number(p.price);
+      if(pr<m*0.2)f.push('prix très bas');
+      else if(pr>m*5)f.push('prix très élevé');
+    }
+    if(isRisk((p.title||'')+' '+(p.desc||'')))f.push('termes à risque');
+    return {id:p.id,flags:f};
+  });
+}
+
+/* ===== 2. ÉCRITURE DES SIGNAUX (admin seulement, seulement si changés) ===== */
+async function runDetection(){
+  if(!isAdm||!all.length)return;
+  for(const r of analyse(all)){
+    const p=all.find(x=>x.id===r.id);
+    const old=p.flags||[];
+    if(JSON.stringify(old)!==JSON.stringify(r.flags)){
+      try{await updateDoc(doc(db,'products',r.id),{flags:r.flags});}catch(e){}
+    }
+  }
+}
+onSnapshot(collection(db,'products'),s=>{
+  all=s.docs.map(d=>({id:d.id,...d.data()}));
+  runDetection();
+},()=>{});
+onAuthStateChanged(auth,u=>{
+  isAdm=!!(u&&u.uid===ADMIN);
+  runDetection();
+});
+
+/* ===== 3. AFFICHAGE DANS LA LISTE « À VALIDER » EXISTANTE ===== */
+function annotate(){
+  const adm=$('adm');
+  if(!adm||adm.hidden)return;
+  adm.querySelectorAll(':scope>.mod').forEach(c=>{
+    if(c.querySelector('.xflags'))return;
+    if(![...c.querySelectorAll('button')].some(b=>b.textContent==='Approuver'))return;
+    const txt=c.textContent;
+    const p=all.find(x=>x.ok!==true&&txt.includes(x.title)
+      &&txt.includes(Number(x.price).toLocaleString('fr-FR')));
+    if(!p||!p.flags||!p.flags.length)return;
+    const box=mk('div',{className:'xflags'});
+    p.flags.forEach(f=>box.append(mk('span',{className:'xflag',textContent:'⚠ '+f})));
+    c.insertBefore(box,c.querySelector('button'));
+  });
+}
+new MutationObserver(annotate).observe($('adm'),{childList:true,subtree:true});
+
+/* ===== 4. AVERTISSEMENT DANS LES MESSAGES (tous les utilisateurs) ===== */
+document.addEventListener('click',e=>{
+  const b=e.target.closest('#xmsg button');
+  if(!b||b.textContent.trim()!=='Envoyer')return;
+  const inp=document.querySelector('#xmsg input');
+  if(inp&&isRisk(inp.value)&&!confirm('Attention : ce message contient des termes souvent utilisés dans les arnaques (paiement d’avance, hors de l’appli…). Ne paie jamais avant d’avoir vu le produit. Envoyer quand même ?')){
+    e.preventDefault();
+    e.stopImmediatePropagation();
+  }
+},true);
 </script>
 </body>
 </html>
