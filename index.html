@@ -4564,6 +4564,66 @@ new MutationObserver(cleanSettings).observe(document.body,{childList:true,subtre
   color:#F1F5F9 !important;
   border-color:#34495A !important;
 }
+</style><style>
+/* ===== ACCUEIL : filtres, annonces et boutons d'information ===== */
+
+/* Bouton Filtres avancés */
+#xtools button{
+  min-height:44px;
+  padding:0 14px;
+  background:#FFFFFF !important;
+  color:#0B6FA8 !important;
+  border:1px solid #CFE8F7 !important;
+  border-radius:12px !important;
+  font-size:14px;
+  font-weight:500;
+}
+
+/* Cartes d'annonces */
+#list button.card{
+  background:#FFFFFF !important;
+  border:1px solid #CFE8F7 !important;
+  border-radius:14px !important;
+  padding:10px !important;
+  box-shadow:0 1px 2px rgba(11,37,69,.06) !important;
+}
+#list button.card b{
+  font-size:15px;
+  font-weight:600;
+  color:#0B2545;
+}
+#list button.card:hover{
+  border-color:#0B6FA8 !important;
+}
+
+/* Boutons Conditions d'utilisation et Contacter l'agence */
+#tl,
+#tl + button{
+  display:flex !important;
+  justify-content:center;
+  align-items:center;
+  width:100%;
+  min-height:48px;
+  margin:0 0 8px;
+  padding:10px 14px;
+  background:#FFFFFF !important;
+  color:#0B2545 !important;
+  border:1px solid #CFE8F7 !important;
+  border-radius:12px !important;
+  font-size:14px;
+  font-weight:500;
+  text-align:center;
+}
+
+/* Mode sombre */
+:root[data-theme="dark"] #xtools button,
+:root[data-theme="dark"] #list button.card,
+:root[data-theme="dark"] #tl,
+:root[data-theme="dark"] #tl + button{
+  background:#1B2935 !important;
+  color:#F1F5F9 !important;
+  border-color:#34495A !important;
+}
 </style>
 </body>
 </html>
