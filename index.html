@@ -4326,6 +4326,42 @@ header .pft{
   color:#65BDEB !important;
   border-color:#65BDEB !important;
 }
+</style><style>
+/* Grille des catégories : tuiles blanches, fine bordure, libellés lisibles */
+#xcats{
+  gap:18px 10px;
+}
+#xcats button{
+  color:#0B2545;
+  font-size:13px;
+  font-weight:500;
+  line-height:1.3;
+}
+#xcats button i{
+  background:#FFFFFF;
+  border:1px solid #CFE8F7;
+  border-radius:12px;
+  font-size:28px;
+  transition:transform .15s ease, border-color .15s ease;
+}
+#xcats button:hover i{
+  border-color:#0B6FA8;
+}
+#xcats button:active i{
+  transform:scale(.97);
+}
+
+/* Mode sombre : même logique, couleurs du thème */
+:root[data-theme="dark"] #xcats button{
+  color:#F1F5F9;
+}
+:root[data-theme="dark"] #xcats button i{
+  background:#1B2935;
+  border-color:#34495A;
+}
+:root[data-theme="dark"] #xcats button:hover i{
+  border-color:#65BDEB;
+}
 </style>
 </body>
 </html>
