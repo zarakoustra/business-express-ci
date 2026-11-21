@@ -4364,30 +4364,37 @@ header .pft{
   border-color:#65BDEB;
 }
 </style><style>
-/* ===== BARRE DU BAS : bleu clair ===== */
+/* ===== BARRE DU BAS COMPACTE ===== */
+body{
+  padding-bottom:calc(72px + env(safe-area-inset-bottom,0px)) !important;
+}
 #xnav{
-  background:#A8DDF7 !important;
-  border:1px solid #CFE8F7 !important;
-  box-shadow:0 6px 18px rgba(11,111,168,.18) !important;
-  backdrop-filter:none !important;
-  -webkit-backdrop-filter:none !important;
+  left:10px !important;
+  right:10px !important;
+  bottom:calc(8px + env(safe-area-inset-bottom,0px)) !important;
+  padding:4px 6px !important;
+  height:auto !important;
+  border-radius:22px !important;
 }
 #xnav button{
-  color:#0B2545 !important;
-  font-weight:500;
+  min-height:0 !important;
+  height:auto !important;
+  padding:6px 0 !important;
+  gap:2px !important;
+  font-size:11px !important;
+  line-height:1.1 !important;
 }
 #xnav button.on{
-  color:#FFFFFF !important;
-  background:#0B6FA8;
-  border-radius:16px;
-  margin:4px;
+  margin:2px !important;
 }
 #xnav #xsell{
-  background:#FFFFFF !important;
-  color:#0B6FA8 !important;
-  border:2px solid #0B6FA8 !important;
-  border-radius:12px !important;
-  margin:6px 4px !important;
+  min-height:0 !important;
+  padding:6px 0 !important;
+  margin:3px 2px !important;
+}
+#xnav i.ti{
+  font-size:18px !important;
+  line-height:1 !important;
 }
 </style>
 
@@ -4410,6 +4417,6 @@ function applyIcons(){
 }
 applyIcons();
 new MutationObserver(applyIcons).observe(document.body,{childList:true,subtree:true});
-  </script>
+</script>
 </body>
 </html>
