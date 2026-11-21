@@ -4624,6 +4624,235 @@ new MutationObserver(cleanSettings).observe(document.body,{childList:true,subtre
   color:#F1F5F9 !important;
   border-color:#34495A !important;
 }
+</style><style>
+/* ===== DÉTAIL D'UNE ANNONCE : style professionnel ===== */
+
+/* Prix et titre */
+#detail > h2{
+  font-size:26px;
+  font-weight:600;
+  color:#0B2545;
+  margin:6px 0 2px;
+}
+#detail > b{
+  font-size:17px;
+  font-weight:500;
+  color:#0B2545;
+}
+
+/* Badges de confiance : pastilles fines, sans contour noir */
+#detail .xlvl{
+  font-size:12px;
+  font-weight:500;
+  color:#0B2545;
+  background:#F4FAFF;
+  border:1px solid #CFE8F7;
+  border-radius:999px;
+  padding:3px 10px;
+}
+#detail .xlvls-d{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  margin:6px 0 4px;
+}
+
+/* Boutons : même ligne sobre que les paramètres */
+#detail button,
+#detail a.lnk{
+  display:flex !important;
+  justify-content:center;
+  align-items:center;
+  width:100%;
+  min-height:48px;
+  margin:0 0 8px;
+  padding:10px 14px;
+  background:#FFFFFF !important;
+  color:#0B6FA8 !important;
+  border:1px solid #CFE8F7 !important;
+  border-radius:12px !important;
+  font-size:15px;
+  font-weight:500;
+  box-shadow:none !important;
+}
+#detail button:hover,
+#detail a.lnk:hover{
+  background:#F4FAFF !important;
+  border-color:#0B6FA8 !important;
+}
+
+/* Action principale : voir le numéro */
+#detail .btn{
+  background:#0B6FA8 !important;
+  color:#FFFFFF !important;
+  border-color:#0B6FA8 !important;
+}
+
+/* Actions secondaires : signaler, supprimer */
+#detail button.btn2:not(.btn){
+  font-weight:500;
+}
+
+/* Description et méta-données */
+#detail > p.mu{
+  font-size:14px;
+  line-height:1.6;
+  color:#3E5C76;
+}
+#detail .ok{
+  font-size:14px;
+  font-weight:500;
+  color:#0B6FA8;
+}
+
+/* Avertissement de sécurité */
+#detail .safe{
+  font-size:13px;
+  line-height:1.5;
+  color:#0B2545;
+  background:#F4FAFF;
+  border:1px solid #0B6FA8;
+  border-radius:12px;
+  padding:12px 14px;
+}
+
+/* Mode sombre */
+:root[data-theme="dark"] #detail button,
+:root[data-theme="dark"] #detail a.lnk{
+  background:#1B2935 !important;
+  color:#F1F5F9 !important;
+  border-color:#34495A !important;
+}
+:root[data-theme="dark"] #detail .btn{
+  background:#65BDEB !important;
+  color:#0B2545 !important;
+  border-color:#65BDEB !important;
+}
+:root[data-theme="dark"] #detail .xlvl{
+  background:#1B2935;
+  color:#F1F5F9;
+  border-color:#34495A;
+}
+:root[data-theme="dark"] #detail .safe{
+  background:#1B2935;
+  color:#F1F5F9;
+}
+</style><style>
+/* ===== ZOOM SUR LES PHOTOS D'UNE ANNONCE ===== */
+#detail img{
+  cursor:zoom-in;
+}
+#xzoom{
+  position:fixed;
+  inset:0;
+  z-index:1000;
+  display:none;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  background:rgba(0,0,0,.92);
+}
+#xzoom.open{
+  display:flex;
+}
+#xzoom .xz-img{
+  max-width:100%;
+  max-height:82vh;
+  object-fit:contain;
+  touch-action:pinch-zoom;
+  user-select:none;
+  -webkit-user-drag:none;
+}
+#xzoom .xz-top{
+  position:absolute;
+  top:calc(12px + env(safe-area-inset-top,0px));
+  left:12px;
+  right:12px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  color:#FFFFFF;
+  font-size:14px;
+  font-weight:500;
+}
+#xzoom button{
+  min-height:44px;
+  min-width:44px;
+  padding:0 12px;
+  background:rgba(255,255,255,.12);
+  color:#FFFFFF;
+  border:1px solid rgba(255,255,255,.3);
+  border-radius:12px;
+  font-size:15px;
+  font-weight:500;
+}
+#xzoom .xz-nav{
+  position:absolute;
+  bottom:calc(20px + env(safe-area-inset-bottom,0px));
+  left:12px;
+  right:12px;
+  display:flex;
+  justify-content:space-between;
+}
 </style>
+
+<script>
+(function(){
+  const ov=document.createElement('div');
+  ov.id='xzoom';
+  ov.innerHTML=
+    '<div class="xz-top"><span id="xz-count"></span><button type="button" id="xz-close" aria-label="Fermer">✕</button></div>'+
+    '<img class="xz-img" id="xz-img" alt="Photo de l’annonce">'+
+    '<div class="xz-nav"><button type="button" id="xz-prev" aria-label="Photo précédente">‹</button><button type="button" id="xz-next" aria-label="Photo suivante">›</button></div>';
+  document.body.appendChild(ov);
+
+  const img=document.getElementById('xz-img');
+  const count=document.getElementById('xz-count');
+  const prev=document.getElementById('xz-prev');
+  const next=document.getElementById('xz-next');
+  let list=[], idx=0;
+
+  function show(){
+    img.src=list[idx].src;
+    count.textContent=(idx+1)+' / '+list.length;
+    prev.hidden=next.hidden=list.length<2;
+  }
+  function open(imgs,i){
+    list=imgs; idx=i; show();
+    ov.classList.add('open');
+    document.body.style.overflow='hidden';
+  }
+  function close(){
+    ov.classList.remove('open');
+    document.body.style.overflow='';
+  }
+  function step(d){
+    idx=(idx+d+list.length)%list.length;
+    show();
+  }
+
+  document.addEventListener('click',e=>{
+    if(e.target.closest('#xzoom')){
+      if(e.target.id==='xz-close'||e.target===ov)close();
+      else if(e.target.id==='xz-prev')step(-1);
+      else if(e.target.id==='xz-next')step(1);
+      return;
+    }
+    const clicked=e.target.closest('#detail img');
+    if(!clicked||clicked.closest('a'))return;
+    const imgs=[...document.querySelectorAll('#detail img')]
+      .filter(i=>!i.closest('a')&&i.getAttribute('src'));
+    if(!imgs.length)return;
+    open(imgs,Math.max(0,imgs.indexOf(clicked)));
+  });
+
+  document.addEventListener('keydown',e=>{
+    if(!ov.classList.contains('open'))return;
+    if(e.key==='Escape')close();
+    if(e.key==='ArrowLeft')step(-1);
+    if(e.key==='ArrowRight')step(1);
+  });
+})();
+</script>
 </body>
 </html>
