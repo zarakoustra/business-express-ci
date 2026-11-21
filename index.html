@@ -4132,6 +4132,156 @@ document.addEventListener('click',e=>{
     e.stopImmediatePropagation();
   }
 },true);
+</script><style>
+.xvbox{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.xvcode{font-size:32px;font-weight:900;letter-spacing:.2em;text-align:center;border:2px dashed #0B6FA8;border-radius:12px;padding:10px;color:#0B2545;background:#fff}
+.xvcard{border:1px solid var(--bd);border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:6px;background:var(--cd)}
+</style>
+
+<script type="module">
+import {getApp} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+import {getAuth,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-auth.js";
+import {getFirestore,collection,onSnapshot,doc,getDoc,setDoc,deleteDoc} from "https://www.gstatic.com/firebasejs/13.2.0/firebase-firestore.js";
+
+const auth=getAuth(getApp()),db=getFirestore(getApp());
+const $=id=>document.getElementById(id);
+const mk=(t,p={})=>Object.assign(document.createElement(t),p);
+const ADMIN='rBxaE8OltfeNwvpUivDdqZqhxjl1';
+const AGENCE='2250170075417';
+
+let user=null, isAdm=false, reqs=[];
+let unsubOwn=null, unsubAdm=null;
+
+function toNum(v){
+  let d=String(v||'').replace(/\D/g,'');
+  if(d.startsWith('00'))d=d.slice(2);
+  if(d.length===10)d='225'+d;
+  return /^\d{11,13}$/.test(d)?d:null;
+}
+function newCode(){
+  return String(100000+Math.floor(Math.random()*900000));
+}
+
+/* ===================== VENDEUR ===================== */
+const sec=$('xver');
+const box=mk('div',{className:'xvbox'});
+const title=mk('h3',{textContent:'Code de vérification'});
+const phoneIn=mk('input',{type:'tel',placeholder:'Ton numéro WhatsApp (ex : 0707070707)',maxLength:20});
+const genBtn=mk('button',{type:'button',className:'btn',textContent:'Générer mon code'});
+const codeBox=mk('div',{className:'xvcode',textContent:'——'});
+const sendLink=mk('a',{className:'btn lnk',target:'_blank',rel:'noopener noreferrer',textContent:'💬 Envoyer le code à l’agence'});
+sendLink.style.display='none';
+const msg=mk('p',{className:'mu'});
+box.append(title,phoneIn,genBtn,codeBox,sendLink,msg);
+if(sec)sec.append(box);
+
+function showCode(r){
+  codeBox.textContent=r.code;
+  sendLink.href='https://wa.me/'+AGENCE+'?text='+encodeURIComponent(
+    'Bonjour, je demande la vérification de mon compte ZARAKOUSTRA.\n'+
+    'Identifiant : '+r.uid+'\n'+
+    'Numéro : +'+r.phone+'\n'+
+    'Code : '+r.code);
+  sendLink.style.display='';
+  msg.textContent='Envoie ce code à l’agence sur WhatsApp. Ton numéro sera validé après contrôle.';
+}
+
+genBtn.onclick=async()=>{
+  if(!user){alert('Connecte-toi d’abord.');return;}
+  const n=toNum(phoneIn.value);
+  if(!n){msg.textContent='Numéro invalide (ex : 0707070707).';return;}
+  genBtn.disabled=true;
+  try{
+    const done=await getDoc(doc(db,'phoneVerified',user.uid));
+    if(done.exists()){
+      msg.textContent='Ton numéro est déjà vérifié ✓';
+    }else{
+      const code=newCode();
+      await setDoc(doc(db,'verifRequests',user.uid),{
+        uid:user.uid,phone:n,code,t:Date.now(),status:'pending'
+      });
+      showCode({uid:user.uid,phone:n,code});
+    }
+  }catch(e){
+    msg.textContent='Impossible de générer le code. Réessaie.';
+  }
+  genBtn.disabled=false;
+};
+
+/* ===================== ADMIN ===================== */
+const adm=$('adm');
+const panel=mk('section',{id:'xvreq'});
+panel.hidden=true;
+if(adm)adm.prepend(panel);
+
+function drawAdmin(){
+  panel.replaceChildren(mk('b',{textContent:'Demandes de vérification ('+reqs.length+')'}));
+  if(!reqs.length){
+    panel.append(mk('p',{className:'mu',textContent:'Aucune demande en attente.'}));
+    return;
+  }
+  reqs.forEach(r=>{
+    const c=mk('div',{className:'xvcard'});
+    const input=mk('input',{inputMode:'numeric',placeholder:'Code reçu sur WhatsApp',maxLength:6});
+    c.append(
+      mk('span',{textContent:'Numéro : +'+r.phone}),
+      mk('span',{className:'mu',textContent:'Identifiant : '+r.uid}),
+      input
+    );
+    const ok=mk('button',{type:'button',className:'btn',textContent:'✓ Valider'});
+    ok.onclick=async()=>{
+      if(input.value.trim()!==r.code){
+        alert('Le code ne correspond pas. Ne valide pas.');
+        return;
+      }
+      try{
+        await setDoc(doc(db,'phoneVerified',r.uid),{phone:true,t:Date.now()});
+        await deleteDoc(doc(db,'verifRequests',r.uid));
+      }catch(e){
+        alert('Validation impossible. Vérifie les règles Firestore.');
+      }
+    };
+    const no=mk('button',{type:'button',className:'btn2',textContent:'✕ Refuser'});
+    no.onclick=async()=>{
+      if(!confirm('Refuser cette demande ?'))return;
+      try{await deleteDoc(doc(db,'verifRequests',r.uid));}
+      catch(e){alert('Action impossible.');}
+    };
+    c.append(ok,no);
+    panel.append(c);
+  });
+}
+
+/* Modération est redessinée par l'appli : on remet notre bloc en haut */
+if(adm){
+  new MutationObserver(()=>{
+    if(!panel.isConnected)adm.prepend(panel);
+  }).observe(adm,{childList:true});
+}
+
+/* ===================== CONNEXION ===================== */
+onAuthStateChanged(auth,u=>{
+  user=u;
+  isAdm=!!(u&&u.uid===ADMIN);
+
+  if(unsubOwn){unsubOwn();unsubOwn=null;}
+  if(unsubAdm){unsubAdm();unsubAdm=null;}
+
+  if(u){
+    unsubOwn=onSnapshot(doc(db,'verifRequests',u.uid),s=>{
+      if(s.exists())showCode(s.data());
+    },()=>{});
+  }
+  if(isAdm){
+    unsubAdm=onSnapshot(collection(db,'verifRequests'),s=>{
+      reqs=s.docs.map(d=>({id:d.id,...d.data()}));
+      drawAdmin();
+    },()=>{});
+  }else{
+    reqs=[];
+  }
+  panel.hidden=!isAdm;
+});
 </script>
 </body>
 </html>
